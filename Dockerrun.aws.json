@@ -1,0 +1,10 @@
+{
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+        "Name":"danylokol/dormwatch-web-app:__TAG__",
+        "Update":"true"
+    },
+    "Ports": [
+        {"ContainerPort": "80"}
+    ]
+}
