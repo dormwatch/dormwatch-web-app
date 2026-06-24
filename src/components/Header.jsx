@@ -43,8 +43,14 @@ const Header = () => {
         : `${SERVER_URL}${cleanPath.startsWith('/api') ? '' : '/api'}${cleanPath}?t=${imgHash}`;
   }
 
+  const isAdminUser =
+    user?.role &&
+    ["admin", "адміністратор"].includes(
+      (user.role.role_name || "").toLowerCase()
+    );
+
   const placeObj = user?.place; 
-  const buildingName = placeObj?.building?.name || placeObj?.building?.number;
+  const buildingName = placeObj?.building?.name || placeObj?.building?.number || placeObj?.building?.building_id;
   const roomText = placeObj 
     ? `Гуртожиток №${buildingName || '?'}, ${placeObj.place_name}`
     : "Кімната не вказана";
@@ -76,7 +82,7 @@ const Header = () => {
                 Дашборд
               </Link>
               
-              {user?.is_admin && (
+              {isAdminUser && (
                   <Link to="/admin" className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${currentPath === "/admin" ? "bg-indigo-50 text-indigo-600" : "text-indigo-600 hover:bg-indigo-50"}`}>
                     Комендант-центр
                   </Link>
@@ -141,7 +147,7 @@ const Header = () => {
             <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium rounded-lg hover:bg-slate-100">
               Дашборд
             </Link>
-            {user?.is_admin && (
+            {isAdminUser && (
                 <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium rounded-lg text-indigo-600 bg-indigo-50">
                 Комендант-центр
                 </Link>
