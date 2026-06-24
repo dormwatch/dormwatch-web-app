@@ -163,16 +163,25 @@ useEffect(() => {
                 <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">
                   Пріоритет
                 </label>
-                <select
-                  name="priority"
-                  value={formData.priority}
-                  onChange={handleInputChange}
-                  className="w-full p-3 sm:p-4 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="low">Низький</option>
-                  <option value="medium">Середній</option>
-                  <option value="high">Високий</option>
-                </select>
+                <div className="flex gap-2">
+                  {[
+                    { id: "low", label: "Низький", color: "bg-green-100 text-green-700 hover:bg-green-200 border-green-200", activeColor: "bg-green-500 text-white border-green-500 shadow-md shadow-green-200" },
+                    { id: "medium", label: "Середній", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200", activeColor: "bg-yellow-500 text-white border-yellow-500 shadow-md shadow-yellow-200" },
+                    { id: "high", label: "Високий", color: "bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-200", activeColor: "bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-200" },
+                    { id: "critical", label: "Критичний", color: "bg-red-100 text-red-700 hover:bg-red-200 border-red-200", activeColor: "bg-red-500 text-white border-red-500 shadow-md shadow-red-200" },
+                  ].map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, priority: p.id }))}
+                      className={`flex-1 py-2 sm:py-3 rounded-xl border text-[10px] sm:text-xs font-bold transition-all ${
+                        formData.priority === p.id ? p.activeColor : p.color
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">
