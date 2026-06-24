@@ -9,6 +9,7 @@ const CreateReportPage = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    priority: "low",
   });
 
   const [photoFile, setPhotoFile] = useState(null);
@@ -80,6 +81,7 @@ useEffect(() => {
         category: selectedCategory,
         title: formData.title.trim(),
         description: formData.description.trim(),
+        priority: formData.priority,
         photoFile: photoFile, 
       });
 
@@ -157,6 +159,21 @@ useEffect(() => {
           {/* Title & Description */}
           <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
             <div className="space-y-5">
+              <div>
+                <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">
+                  Пріоритет
+                </label>
+                <select
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleInputChange}
+                  className="w-full p-3 sm:p-4 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="low">Низький</option>
+                  <option value="medium">Середній</option>
+                  <option value="high">Високий</option>
+                </select>
+              </div>
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">
                   Заголовок
