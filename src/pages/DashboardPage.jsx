@@ -266,16 +266,18 @@ const DashboardPage = () => {
                           Додано {new Date(problem.createdAt).toLocaleDateString()}
                         </span>
                         
-                        <button onClick={(e) => toggleComments(problem.id, e)} className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
-                          💬 Коментарі {openCommentsId === problem.id ? '▲' : '▼'}
-                        </button>
+                        {currentUser && (isAdmin || currentUser.user === problem.user_id) && (
+                          <button onClick={(e) => toggleComments(problem.id, e)} className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+                            💬 Коментарі {openCommentsId === problem.id ? '▲' : '▼'}
+                          </button>
+                        )}
                       </div>
 
                     </div>
                   </div>
                 </div>
 
-                {openCommentsId === problem.id && (
+                {openCommentsId === problem.id && currentUser && (isAdmin || currentUser.user === problem.user_id) && (
                   <div className="bg-slate-50 p-4 sm:p-6 border-t border-slate-100 animate-in slide-in-from-top-2">
                       <div className="space-y-3 mb-4 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                           {(commentsData[problem.id] || []).length === 0 ? (
