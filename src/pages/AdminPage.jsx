@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   fetchPendingComplaints, 
   fetchApprovedComplaints, 
@@ -20,9 +20,10 @@ import Preloader from "../components/Preloader";
 const SERVER_URL = "http://127.0.0.1:8000";
 
 const AdminPage = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("requests"); // "requests" | "tickets"
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("pending");
+  const [selectedStatus, setSelectedStatus] = useState(location.state?.selectedStatus || "pending");
 
   const [ticketCategory, setTicketCategory] = useState("all");
   const [ticketStatus, setTicketStatus] = useState("all");

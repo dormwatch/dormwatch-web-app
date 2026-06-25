@@ -49,7 +49,7 @@ const UserPage = () => {
 
   useEffect(() => {
     let alive = true;
-    (async () => {
+    const loadData = async () => {
       setLoading(true);
       try {
         const [data, user] = await Promise.all([
@@ -64,8 +64,16 @@ const UserPage = () => {
       } finally {
         if (alive) setLoading(false);
       }
-    })();
-    return () => { alive = false; };
+    };
+
+    loadData();
+
+    window.addEventListener('profileUpdated', loadData);
+    
+    return () => { 
+      alive = false; 
+      window.removeEventListener('profileUpdated', loadData);
+    };
   }, []);
 
   const onDelete = async (id) => {

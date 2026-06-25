@@ -8,13 +8,116 @@ import {
   changeUserRoom,
   fetchBuildings,
   fetchPlaces,
+  fetchAllComplaints
 } from "../services/problemsApi";
+import { Link } from "react-router-dom";
 import UserPage from "./UserPage";
 import Preloader from "../components/Preloader";
 
 const SERVER_URL = "http://127.0.0.1:8000";
 
 const EMAIL_DOMAIN_HINT = "@lpnu.ua";
+
+const AdminProfileView = () => {
+  const [stats, setStats] = useState({ pending: 0, critical: 0, resolvedThisMonth: 0 });
+  const [urgentIssues, setUrgentIssues] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const complaints = await fetchAllComplaints();
+        const pending = complaints.filter(c => c.status === "pending").length;
+        const resolved = complaints.filter(c => c.status === "resolved").length;
+        const activeIssues = complaints.filter(c => c.status !== "resolved");
+        const criticalIssues = activeIssues.filter(c => c.priority === "critical" || c.priority === "high");
+        
+        setStats({
+          pending,
+          critical: criticalIssues.length,
+          resolvedThisMonth: resolved
+        });
+
+        // Get top 5 urgent issues
+        const activeUrgent = criticalIssues
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5);
+            
+        setUrgentIssues(activeUrgent);
+      } catch (err) {
+        console.warn(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStats();
+  }, []);
+
+  if (loading) return <div className="p-8 text-center"><span className="animate-pulse">Завантаження статистики...</span></div>;
+
+  return (
+    <div className="space-y-6">
+      {/* Quick Stats */}
+      <div className="bg-white rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-black text-slate-900">Швидка статистика</h3>
+          <Link to="/admin" className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors">
+            Перейти до керування →
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-4 bg-amber-50 rounded-xl border border-amber-100">
+            <p className="text-3xl font-black text-amber-600">{stats.pending}</p>
+            <p className="text-[10px] font-bold text-amber-800 uppercase tracking-wider mt-1">Очікують розгляду</p>
+          </div>
+          <div className="p-4 bg-red-50 rounded-xl border border-red-100">
+            <p className="text-3xl font-black text-red-600">{stats.critical}</p>
+            <p className="text-[10px] font-bold text-red-800 uppercase tracking-wider mt-1">Критичні проблеми</p>
+          </div>
+          <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+            <p className="text-3xl font-black text-emerald-600">{stats.resolvedThisMonth}</p>
+            <p className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider mt-1">Вирішено (загалом)</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Urgent Issues */}
+      <div className="bg-white rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
+        <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+          <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+          Термінові проблеми
+        </h3>
+        
+        {urgentIssues.length === 0 ? (
+          <div className="p-6 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-100">
+            Наразі немає критичних проблем. Все спокійно!
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {urgentIssues.map(issue => (
+              <div key={issue.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-red-100 text-red-700">
+                      {issue.priority === 'critical' ? 'Критично' : 'Високий'}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      Корпус {issue.building} • {issue.placeName}
+                    </span>
+                  </div>
+                  <p className="text-sm font-bold text-slate-900">{issue.title}</p>
+                </div>
+                <Link to="/admin" state={{ selectedStatus: issue.status }} className="shrink-0 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 px-4 py-2 rounded-lg transition-colors text-center">
+                  Розглянути
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const AccountPage = () => {
   const [user, setUser] = useState(null);
@@ -684,7 +787,7 @@ const AccountPage = () => {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
-          <UserPage />
+          {isAdmin ? <AdminProfileView /> : <UserPage />}
         </div>
       </div>
     </main>
