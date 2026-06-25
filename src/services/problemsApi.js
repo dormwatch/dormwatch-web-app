@@ -190,9 +190,9 @@ export async function fetchUserProfile() {
 
 export async function createProblem(problem) {
   const formData = new FormData();
-  formData.append("building_number", problem.building);
-  formData.append("floor_number", problem.floor);
-  formData.append("room_number", problem.room);
+  if (problem.place_name) {
+    formData.append("place_name", problem.place_name);
+  }
   formData.append("category", problem.category);
   formData.append("title", problem.title);
   formData.append("description", problem.description);
