@@ -220,6 +220,16 @@ export async function fetchMyProblems() {
   return [];
 }
 
+export async function fetchAllComplaints() {
+  try {
+    const data = await fetchJson("/complaints/");
+    if (Array.isArray(data)) return data.map(normalizeComplaint).sort(sortByNew);
+  } catch (e) {
+    console.warn("Fetch error:", e);
+  }
+  return [];
+}
+
 export async function fetchApprovedComplaints(sort = "new") {
   try {
     const data = await fetchJson("/complaints/");
