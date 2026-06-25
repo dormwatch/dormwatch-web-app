@@ -25,6 +25,8 @@ const PhotoModal = ({ src, onClose }) => {
 
 const DashboardPage = () => {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCorps, setActiveCorps] = useState("all");
+  const [activePriority, setActivePriority] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ const DashboardPage = () => {
       setLoading(true);
       try {
         const [complaintsData, userData] = await Promise.all([
-            fetchApprovedComplaints("new").catch(() => []),
+            fetchApprovedComplaints("new", { corps: activeCorps, priority: activePriority }).catch(() => []),
             fetchUserProfile().catch(() => null)
         ]);
         if (Array.isArray(complaintsData)) setProblems(complaintsData);
@@ -63,7 +65,7 @@ const DashboardPage = () => {
       }
     };
     loadData();
-  }, []);
+  }, [activeCorps, activePriority]);
 
   const handleDelete = async (id, e) => {
     e.preventDefault(); 
@@ -176,13 +178,39 @@ const DashboardPage = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          <input 
-            type="text" 
-            placeholder="Пошук заявок..." 
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64"
-          />
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="Пошук заявок..." 
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64"
+            />
+            <select 
+              value={activeCorps}
+              onChange={e => setActiveCorps(e.target.value)}
+              className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="all">Всі гуртожитки</option>
+              <option value="Гуртожиток 1">Гуртожиток 1</option>
+              <option value="Гуртожиток 2">Гуртожиток 2</option>
+              <option value="Гуртожиток 3">Гуртожиток 3</option>
+              <option value="Гуртожиток 4">Гуртожиток 4</option>
+              <option value="Гуртожиток 5">Гуртожиток 5</option>
+              <option value="Гуртожиток 6">Гуртожиток 6</option>
+            </select>
+            <select 
+              value={activePriority}
+              onChange={e => setActivePriority(e.target.value)}
+              className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="all">Всі пріоритети</option>
+              <option value="low">Низький</option>
+              <option value="medium">Середній</option>
+              <option value="high">Високий</option>
+              <option value="critical">Критичний</option>
+            </select>
+          </div>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <button
