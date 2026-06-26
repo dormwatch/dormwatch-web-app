@@ -43,7 +43,13 @@ const AdminPage = () => {
   const [ticketEmployee, setTicketEmployee] = useState("");
   const [ticketToEdit, setTicketToEdit] = useState(null); // stores ticket_id if editing
   const [complaintSearchQuery, setComplaintSearchQuery] = useState("");
+  const [complaintCorps, setComplaintCorps] = useState("all");
+  const [complaintPriority, setComplaintPriority] = useState("all");
   const [ticketSearchQuery, setTicketSearchQuery] = useState("");
+  const [ticketWorker, setTicketWorker] = useState("all");
+  const [ticketPriority, setTicketPriority] = useState("all");
+  const [ticketDateFrom, setTicketDateFrom] = useState("");
+  const [ticketDateTo, setTicketDateTo] = useState("");
   const navigate = useNavigate();
 
   // Перевірка авторизації
@@ -91,11 +97,12 @@ const AdminPage = () => {
     setItems([]);
     
     try {
+      const filters = { corps: complaintCorps, priority: complaintPriority };
       let data = [];
-      if (selectedStatus === "pending") data = await fetchPendingComplaints();
-      else if (selectedStatus === "approved") data = await fetchApprovedComplaints("new");
-      else if (selectedStatus === "rejected") data = await fetchRejectedComplaints();
-      else if (selectedStatus === "resolved") data = await fetchComplaintsByStatus("resolved");
+      if (selectedStatus === "pending") data = await fetchPendingComplaints(filters);
+      else if (selectedStatus === "approved") data = await fetchApprovedComplaints("new", filters);
+      else if (selectedStatus === "rejected") data = await fetchRejectedComplaints(filters);
+      else if (selectedStatus === "resolved") data = await fetchComplaintsByStatus("resolved", filters);
       
       setItems(data);
       
@@ -108,11 +115,25 @@ const AdminPage = () => {
     }
   };
 
-  useEffect(() => { loadItems(); }, [selectedStatus]);
+  useEffect(() => { loadItems(); }, [selectedStatus, complaintCorps, complaintPriority]);
+
+  const loadTickets = async () => {
+    const filters = {};
+    if (ticketWorker !== "all") filters.worker = ticketWorker;
+    if (ticketPriority !== "all") filters.priority = ticketPriority;
+    if (ticketDateFrom) filters.date_from = ticketDateFrom;
+    if (ticketDateTo) filters.date_to = ticketDateTo;
+    fetchTickets(filters).then(setTickets);
+  };
 
   useEffect(() => {
     if (activeTab === "tickets") {
-      fetchTickets().then(setTickets);
+      loadTickets();
+    }
+  }, [activeTab, ticketWorker, ticketPriority, ticketDateFrom, ticketDateTo]);
+
+  useEffect(() => {
+    if (activeTab === "tickets") {
       fetchApprovedComplaints("new").then(setApprovedForTickets);
       fetchEmployees().then(setEmployees);
     }
@@ -238,16 +259,30 @@ const AdminPage = () => {
   const filteredTicketsList = useMemo(() => {
     return approvedForTickets.filter((p) => {
       const categoryOk = ticketCategory === "all" ? true : String(p.category) === String(ticketCategory);
+      const priorityOk = ticketPriority === "all" ? true : p.priority === ticketPriority;
+      
       const hasTicket = tickets.some(t => t.complaint === p.id);
-      const statusOk = ticketStatus === "all" ? true : 
-                       ticketStatus === "created" ? hasTicket : 
-                       !hasTicket;
+      
+      const hasActiveTicketFilter = ticketWorker !== "all" || ticketDateFrom !== "" || ticketDateTo !== "";
+      
+      let statusOk = true;
+      if (hasActiveTicketFilter) {
+          statusOk = hasTicket;
+          if (ticketStatus === "not_created") {
+              statusOk = false;
+          }
+      } else {
+          statusOk = ticketStatus === "all" ? true : 
+                     ticketStatus === "created" ? hasTicket : 
+                     !hasTicket;
+      }
+
       const searchOk = ticketSearchQuery === "" || 
         (p.title || "").toLowerCase().includes(ticketSearchQuery.toLowerCase()) || 
         (p.description || "").toLowerCase().includes(ticketSearchQuery.toLowerCase());
-      return categoryOk && statusOk && searchOk;
+      return categoryOk && priorityOk && statusOk && searchOk;
     });
-  }, [approvedForTickets, tickets, ticketCategory, ticketStatus, ticketSearchQuery]);
+  }, [approvedForTickets, tickets, ticketCategory, ticketStatus, ticketSearchQuery, ticketPriority, ticketWorker, ticketDateFrom, ticketDateTo]);
 
   const humanLocation = (p) => {
     const b = p.building ? `Корпус №${p.building}` : "Корпус ?";
@@ -323,6 +358,38 @@ const AdminPage = () => {
                 </label>
               ))}
             </div>
+          </div>
+
+          <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
+            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Гуртожитки</h4>
+            <select 
+              value={complaintCorps}
+              onChange={e => setComplaintCorps(e.target.value)}
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="all">Всі гуртожитки</option>
+              <option value="Гуртожиток 1">Гуртожиток 1</option>
+              <option value="Гуртожиток 2">Гуртожиток 2</option>
+              <option value="Гуртожиток 3">Гуртожиток 3</option>
+              <option value="Гуртожиток 4">Гуртожиток 4</option>
+              <option value="Гуртожиток 5">Гуртожиток 5</option>
+              <option value="Гуртожиток 6">Гуртожиток 6</option>
+            </select>
+          </div>
+
+          <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
+            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Пріоритет</h4>
+            <select 
+              value={complaintPriority}
+              onChange={e => setComplaintPriority(e.target.value)}
+              className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="all">Всі пріоритети</option>
+              <option value="low">Низький</option>
+              <option value="medium">Середній</option>
+              <option value="high">Високий</option>
+              <option value="critical">Критичний</option>
+            </select>
           </div>
         </div>
 
@@ -483,6 +550,49 @@ const AdminPage = () => {
                     </span>
                   </label>
                 ))}
+              </div>
+            </div>
+
+            <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Працівник</h4>
+              <select 
+                value={ticketWorker}
+                onChange={e => setTicketWorker(e.target.value)}
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="all">Всі працівники</option>
+                {employees.map(emp => (
+                  <option key={emp.user} value={emp.user}>{emp.first_name} {emp.last_name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Пріоритет</h4>
+              <select 
+                value={ticketPriority}
+                onChange={e => setTicketPriority(e.target.value)}
+                className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="all">Всі пріоритети</option>
+                <option value="low">Низький</option>
+                <option value="medium">Середній</option>
+                <option value="high">Високий</option>
+                <option value="critical">Критичний</option>
+              </select>
+            </div>
+
+            <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Дати дедлайну</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">З:</label>
+                  <input type="date" value={ticketDateFrom} onChange={e => setTicketDateFrom(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">По:</label>
+                  <input type="date" value={ticketDateTo} onChange={e => setTicketDateTo(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
               </div>
             </div>
           </div>

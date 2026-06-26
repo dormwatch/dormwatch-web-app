@@ -301,9 +301,13 @@ export async function fetchMyProblems() {
   return [];
 }
 
-export async function fetchAllComplaints() {
+export async function fetchAllComplaints(filters = {}) {
   try {
-    const data = await fetchJson("/complaints/");
+    const params = new URLSearchParams();
+    if (filters.corps && filters.corps !== 'all') params.append('corps', filters.corps);
+    if (filters.priority && filters.priority !== 'all') params.append('priority', filters.priority);
+    const q = params.toString() ? `?${params.toString()}` : "";
+    const data = await fetchJson(`/complaints/${q}`);
     if (Array.isArray(data)) return data.map(normalizeComplaint).sort(sortByNew);
   } catch (e) {
     console.warn("Fetch error:", e);
@@ -311,9 +315,13 @@ export async function fetchAllComplaints() {
   return [];
 }
 
-export async function fetchApprovedComplaints(sort = "new") {
+export async function fetchApprovedComplaints(sort = "new", filters = {}) {
   try {
-    const data = await fetchJson("/complaints/");
+    const params = new URLSearchParams();
+    if (filters.corps && filters.corps !== 'all') params.append('corps', filters.corps);
+    if (filters.priority && filters.priority !== 'all') params.append('priority', filters.priority);
+    const q = params.toString() ? `?${params.toString()}` : "";
+    const data = await fetchJson(`/complaints/${q}`);
     if (Array.isArray(data)) {
       const approved = data
         .map(normalizeComplaint)
@@ -329,9 +337,13 @@ export async function fetchApprovedComplaints(sort = "new") {
   return [];
 }
 
-export async function fetchPendingComplaints() {
+export async function fetchPendingComplaints(filters = {}) {
   try {
-    const data = await fetchJson("/complaints/");
+    const params = new URLSearchParams();
+    if (filters.corps && filters.corps !== 'all') params.append('corps', filters.corps);
+    if (filters.priority && filters.priority !== 'all') params.append('priority', filters.priority);
+    const q = params.toString() ? `?${params.toString()}` : "";
+    const data = await fetchJson(`/complaints/${q}`);
     if (Array.isArray(data))
       return data
         .map(normalizeComplaint)
@@ -343,9 +355,13 @@ export async function fetchPendingComplaints() {
   return [];
 }
 
-export async function fetchRejectedComplaints() {
+export async function fetchRejectedComplaints(filters = {}) {
   try {
-    const data = await fetchJson("/complaints/");
+    const params = new URLSearchParams();
+    if (filters.corps && filters.corps !== 'all') params.append('corps', filters.corps);
+    if (filters.priority && filters.priority !== 'all') params.append('priority', filters.priority);
+    const q = params.toString() ? `?${params.toString()}` : "";
+    const data = await fetchJson(`/complaints/${q}`);
     if (Array.isArray(data))
       return data
         .map(normalizeComplaint)
@@ -357,9 +373,13 @@ export async function fetchRejectedComplaints() {
   return [];
 }
 
-export async function fetchComplaintsByStatus(targetStatus) {
+export async function fetchComplaintsByStatus(targetStatus, filters = {}) {
   try {
-    const data = await fetchJson("/complaints/");
+    const params = new URLSearchParams();
+    if (filters.corps && filters.corps !== 'all') params.append('corps', filters.corps);
+    if (filters.priority && filters.priority !== 'all') params.append('priority', filters.priority);
+    const q = params.toString() ? `?${params.toString()}` : "";
+    const data = await fetchJson(`/complaints/${q}`);
     if (Array.isArray(data))
       return data
         .map(normalizeComplaint)
@@ -430,9 +450,16 @@ export async function fetchEmployees() {
   return [];
 }
 
-export async function fetchTickets() {
+export async function fetchTickets(filters = {}) {
   try {
-      const data = await fetchJson("/tickets/");
+      const params = new URLSearchParams();
+      if (filters.worker && filters.worker !== 'all') params.append('worker', filters.worker);
+      if (filters.priority && filters.priority !== 'all') params.append('priority', filters.priority);
+      if (filters.date_from) params.append('date_from', filters.date_from);
+      if (filters.date_to) params.append('date_to', filters.date_to);
+      const q = params.toString() ? `?${params.toString()}` : "";
+      
+      const data = await fetchJson(`/tickets/${q}`);
       if (Array.isArray(data)) return data;
   } catch (e) {
       console.warn("Failed to fetch tickets", e);
