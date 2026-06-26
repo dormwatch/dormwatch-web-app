@@ -34,7 +34,7 @@ Complaint cards and data tables should feel like physical work orders.
 
 ### Asymmetrical Hover States
 Interactions should feel mechanical and precise.
-*   Instead of lifting elements with a drop-shadow on hover, reveal a solid \`4px\` left border in the primary accent color (\`indigo-500\` or \`indigo-600\`), accompanied by a slight horizontal translation (\`translate-x-1\`) of the text content.
+*   Instead of lifting elements with a drop-shadow on hover, reveal a solid \`4px\` left border in the primary accent color (\`blue-500\` or \`blue-600\`), accompanied by a slight horizontal translation (\`translate-x-1\`) of the text content.
 
 ---
 
@@ -53,12 +53,12 @@ A legible, highly utilitarian sans-serif font ensures readability across all dev
 
 ## 4. Color Palette
 
-Our palette is grounded in warm neutrals (Stone) and a deep, authoritative primary accent (Indigo/Navy). 
+Our palette is grounded in warm neutrals (Stone) and a deep, authoritative primary accent (Blue/Navy). 
 
 ### Primary Accent (Brand/Action)
-*   **Default:** \`indigo-800\` (\`#3730a3\` - Closest to #2E3192)
-*   **Hover:** \`indigo-900\` (\`#312e81\` - Closest to #252775)
-*   **Dark Mode Vibrant Accent:** \`indigo-500\` (\`#6366f1\`) - Used sparingly for borders or active indicators against dark backgrounds.
+*   **Default:** \`blue-800\` (\`#3730a3\` - Closest to #2E3192)
+*   **Hover:** \`blue-900\` (\`#312e81\` - Closest to #252775)
+*   **Dark Mode Vibrant Accent:** \`blue-500\` (\`#6366f1\`) - Used sparingly for borders or active indicators against dark backgrounds.
 
 ### Light Mode Theme
 The Light Mode should feel like a clean, well-lit office desk holding fresh paperwork.
@@ -92,9 +92,9 @@ The Dark Mode should feel like a late-night control room—high contrast, low gl
 *   **Strict Rule:** No rounded corners. The interface relies entirely on sharp, structural 90-degree angles to maintain its brutalist, utilitarian authority.
 
 ### Buttons & Inputs
-*   **Primary Action Buttons:** Solid \`indigo-800\` background, white text, bold font weight, square corners. Hover is \`indigo-900\`.
+*   **Primary Action Buttons:** Solid \`blue-800\` background, white text, bold font weight, square corners. Hover is \`blue-900\`.
 *   **Inputs:** Must have a visible, solid border.
-*   **Focus States:** A sharp, 2px solid ring (\`focus:ring-2 focus:ring-indigo-600 focus:outline-none focus:ring-offset-1\`).
+*   **Focus States:** A sharp, 2px solid ring (\`focus:ring-2 focus:ring-blue-600 focus:outline-none focus:ring-offset-1\`).
 
 ### Intentional Empty States
 Do not leave dead space when there is no data.
@@ -120,13 +120,13 @@ To enforce this exact design system in the React frontend without manual CSS dri
 Run the following command to initialize the project components:
 
 \`\`\`bash
-npx shadcn@latest init --preset b3lCbBb32
+npx shadcn@latest init --preset b1ZhP5EQy
 \`\`\`
 
 **Why this preset?**
-This specific preset configuration (\`b3lCbBb32\`) natively enforces our core design principles out-of-the-box:
+This specific preset configuration (\`b1ZhP5EQy\`) natively enforces our core design principles out-of-the-box:
 *   **Style:** Lyra
 *   **Base Color:** Stone (Matching our warm gray requirement)
-*   **Theme / Chart Color:** Indigo (Replace the default orange with our brand blue)
+*   **Theme / Chart Color:** Blue (Replace the default orange with our brand blue)
 *   **Font / Heading Font:** Inter
 *   **Radius:** None (0px) - This is critical for eliminating the default web "slop" styling in favor of our crisp, architectural ticket motifs.
