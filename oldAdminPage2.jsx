@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   fetchPendingComplaints, 
@@ -17,8 +17,9 @@ import {
   fetchEmployees,
   updateTicket
 } from "../services/problemsApi";
-import { resolveImageUrl } from "../services/imageUtils";
 import Preloader from "../components/Preloader";
+
+const SERVER_URL = "http://127.0.0.1:8000";
 
 const AdminPage = () => {
   const location = useLocation();
@@ -51,7 +52,7 @@ const AdminPage = () => {
   const [ticketDateTo, setTicketDateTo] = useState("");
   const navigate = useNavigate();
 
-  // Перевірка авторизації
+  // ╨Я╨╡╤А╨╡╨▓╤Ц╤А╨║╨░ ╨░╨▓╤В╨╛╤А╨╕╨╖╨░╤Ж╤Ц╤Ч
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -60,7 +61,7 @@ const AdminPage = () => {
           navigate("/");
           return;
         }
-        const isAdmin = user.role && ["admin", "адміністратор"].includes((user.role.role_name || "").toLowerCase());
+        const isAdmin = user.role && ["admin", "╨░╨┤╨╝╤Ц╨╜╤Ц╤Б╤В╤А╨░╤В╨╛╤А"].includes((user.role.role_name || "").toLowerCase());
         if (!isAdmin) {
           navigate("/");
         }
@@ -76,18 +77,18 @@ const AdminPage = () => {
   const [commentInput, setCommentInput] = useState("");
 
   const categoryOptions = useMemo(() => [
-      { id: "all", name: "Всі" },
-      { id: "plumbing", name: "Сантехніка" },
-      { id: "electricity", name: "Електрика" },
-      { id: "furniture", name: "Меблі" },
-      { id: "internet", name: "Інтернет" },
+      { id: "all", name: "╨Т╤Б╤Ц" },
+      { id: "plumbing", name: "╨б╨░╨╜╤В╨╡╤Е╨╜╤Ц╨║╨░" },
+      { id: "electricity", name: "╨Х╨╗╨╡╨║╤В╤А╨╕╨║╨░" },
+      { id: "furniture", name: "╨Ь╨╡╨▒╨╗╤Ц" },
+      { id: "internet", name: "╨Ж╨╜╤В╨╡╤А╨╜╨╡╤В" },
   ], []);
 
   const statusOptions = useMemo(() => [
-      { id: "pending", name: "Очікують розгляду" },
-      { id: "approved", name: "Підтверджені" },
-      { id: "rejected", name: "Відхилені" },
-      { id: "resolved", name: "Вирішені" }
+      { id: "pending", name: "╨Ю╤З╤Ц╨║╤Г╤О╤В╤М ╤А╨╛╨╖╨│╨╗╤П╨┤╤Г" },
+      { id: "approved", name: "╨Я╤Ц╨┤╤В╨▓╨╡╤А╨┤╨╢╨╡╨╜╤Ц" },
+      { id: "rejected", name: "╨Т╤Ц╨┤╤Е╨╕╨╗╨╡╨╜╤Ц" },
+      { id: "resolved", name: "╨Т╨╕╤А╤Ц╤И╨╡╨╜╤Ц" }
   ], []);
 
   const loadItems = async () => {
@@ -108,7 +109,7 @@ const AdminPage = () => {
       const user = await fetchUserProfile().catch(() => null);
       setCurrentUser(user);
     } catch (e) {
-      setErr("Не вдалося завантажити заявки.");
+      setErr("╨Э╨╡ ╨▓╨┤╨░╨╗╨╛╤Б╤П ╨╖╨░╨▓╨░╨╜╤В╨░╨╢╨╕╤В╨╕ ╨╖╨░╤П╨▓╨║╨╕.");
     } finally {
       setLoading(false);
     }
@@ -159,22 +160,22 @@ const AdminPage = () => {
     try {
       if (ticketToEdit) {
         await updateTicket(ticketToEdit, ticketEmployee || "", ticketDeadline || "");
-        alert("Тікет оновлено!");
+        alert("╨в╤Ц╨║╨╡╤В ╨╛╨╜╨╛╨▓╨╗╨╡╨╜╨╛!");
       } else {
         await createTicket(selectedComplaintForTicket.id, ticketEmployee || null, ticketDeadline || null);
-        alert("Тікет створено!");
+        alert("╨в╤Ц╨║╨╡╤В ╤Б╤В╨▓╨╛╤А╨╡╨╜╨╛!");
       }
       const newTickets = await fetchTickets();
       setTickets(newTickets);
       setIsTicketModalOpen(false);
       setSelectedComplaintForTicket(null);
     } catch (e) {
-      alert("Помилка збереження тікета");
+      alert("╨Я╨╛╨╝╨╕╨╗╨║╨░ ╨╖╨▒╨╡╤А╨╡╨╢╨╡╨╜╨╜╤П ╤В╤Ц╨║╨╡╤В╨░");
     }
   };
 
   const handleChangeStatus = async (id, newStatus) => {
-    const ok = confirm("Оновити статус заявки?");
+    const ok = confirm("╨Ю╨╜╨╛╨▓╨╕╤В╨╕ ╤Б╤В╨░╤В╤Г╤Б ╨╖╨░╤П╨▓╨║╨╕?");
     if (!ok) return;
 
     try {
@@ -182,18 +183,18 @@ const AdminPage = () => {
       loadItems();
     } catch (error) {
       console.error(error);
-      alert(`Помилка при оновленні статусу`);
+      alert(`╨Я╨╛╨╝╨╕╨╗╨║╨░ ╨┐╤А╨╕ ╨╛╨╜╨╛╨▓╨╗╨╡╨╜╨╜╤Ц ╤Б╤В╨░╤В╤Г╤Б╤Г`);
     }
   };
 
   const handleRemove = async (id) => {
-    const ok = confirm("Видалити цю заявку назавжди?");
+    const ok = confirm("╨Т╨╕╨┤╨░╨╗╨╕╤В╨╕ ╤Ж╤О ╨╖╨░╤П╨▓╨║╤Г ╨╜╨░╨╖╨░╨▓╨╢╨┤╨╕?");
     if (!ok) return;
     try {
       await deleteProblem(id);
       setItems((prev) => prev.filter((p) => String(p.id) !== String(id)));
     } catch (error) {
-      alert("Помилка при видаленні");
+      alert("╨Я╨╛╨╝╨╕╨╗╨║╨░ ╨┐╤А╨╕ ╨▓╨╕╨┤╨░╨╗╨╡╨╜╨╜╤Ц");
     }
   };
 
@@ -216,7 +217,7 @@ const AdminPage = () => {
     const newComment = { 
         id: tempId, 
         text: commentInput, 
-        author: currentUser ? `${currentUser.first_name} ${currentUser.last_name}`.trim() : "Адмін", 
+        author: currentUser ? `${currentUser.first_name} ${currentUser.last_name}`.trim() : "╨Р╨┤╨╝╤Ц╨╜", 
         date: new Date().toISOString() 
     };
     
@@ -228,12 +229,12 @@ const AdminPage = () => {
         const realComments = await fetchComments(id);
         setCommentsData(prev => ({ ...prev, [id]: realComments }));
     } catch(err) {
-        alert("Не вдалось відправити коментар");
+        alert("╨Э╨╡ ╨▓╨┤╨░╨╗╨╛╤Б╤М ╨▓╤Ц╨┤╨┐╤А╨░╨▓╨╕╤В╨╕ ╨║╨╛╨╝╨╡╨╜╤В╨░╤А");
     }
   };
 
   const handleDeleteComment = async (complaintId, commentId) => {
-      if (!confirm("Видалити цей коментар?")) return;
+      if (!confirm("╨Т╨╕╨┤╨░╨╗╨╕╤В╨╕ ╤Ж╨╡╨╣ ╨║╨╛╨╝╨╡╨╜╤В╨░╤А?")) return;
       try {
           await deleteComment(commentId);
           setCommentsData(prev => ({
@@ -241,7 +242,7 @@ const AdminPage = () => {
               [complaintId]: prev[complaintId].filter(c => c.id !== commentId)
           }));
       } catch (e) {
-          alert("Помилка видалення коментаря");
+          alert("╨Я╨╛╨╝╨╕╨╗╨║╨░ ╨▓╨╕╨┤╨░╨╗╨╡╨╜╨╜╤П ╨║╨╛╨╝╨╡╨╜╤В╨░╤А╤П");
       }
   };
 
@@ -284,17 +285,17 @@ const AdminPage = () => {
   }, [approvedForTickets, tickets, ticketCategory, ticketStatus, ticketSearchQuery, ticketPriority, ticketWorker, ticketDateFrom, ticketDateTo]);
 
   const humanLocation = (p) => {
-    const b = p.building ? `Корпус №${p.building}` : "Корпус ?";
-    const place = p.placeName ? `${p.placeName}` : "Місце ?";
-    return `${b} • ${place}`;
+    const b = p.building ? `╨Ъ╨╛╤А╨┐╤Г╤Б тДЦ${p.building}` : "╨Ъ╨╛╤А╨┐╤Г╤Б ?";
+    const place = p.placeName ? `${p.placeName}` : "╨Ь╤Ц╤Б╤Ж╨╡ ?";
+    return `${b} тАв ${place}`;
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 sm:mb-6 lg:mb-8 gap-4 sm:gap-6">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Адміністрування</h2>
-          <p className="text-sm sm:text-base text-slate-500 mt-1">Комендант-центр</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">╨Р╨┤╨╝╤Ц╨╜╤Ц╤Б╤В╤А╤Г╨▓╨░╨╜╨╜╤П</h2>
+          <p className="text-sm sm:text-base text-slate-500 mt-1">╨Ъ╨╛╨╝╨╡╨╜╨┤╨░╨╜╤В-╤Ж╨╡╨╜╤В╤А</p>
         </div>
       </div>
 
@@ -307,7 +308,7 @@ const AdminPage = () => {
               : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
           }`}
         >
-          Керування заявками
+          ╨Ъ╨╡╤А╤Г╨▓╨░╨╜╨╜╤П ╨╖╨░╤П╨▓╨║╨░╨╝╨╕
         </button>
         <button
           onClick={() => setActiveTab("tickets")}
@@ -317,7 +318,7 @@ const AdminPage = () => {
               : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
           }`}
         >
-          Керування тікетами
+          ╨Ъ╨╡╤А╤Г╨▓╨░╨╜╨╜╤П ╤В╤Ц╨║╨╡╤В╨░╨╝╨╕
         </button>
       </div>
 
@@ -327,12 +328,12 @@ const AdminPage = () => {
             <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
               <input 
                 type="text" 
-                placeholder="Пошук заявок..." 
+                placeholder="╨Я╨╛╤И╤Г╨║ ╨╖╨░╤П╨▓╨╛╨║..." 
                 value={complaintSearchQuery}
                 onChange={e => setComplaintSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 mb-4 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Статус</h4>
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨б╤В╨░╤В╤Г╤Б</h4>
             <div className="space-y-2">
               {statusOptions.map((s) => (
                 <label key={s.id} className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl cursor-pointer ${selectedStatus === s.id ? "bg-indigo-50" : "hover:bg-slate-50"}`}>
@@ -346,7 +347,7 @@ const AdminPage = () => {
           </div>
 
           <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
-            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Категорії</h4>
+            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨Ъ╨░╤В╨╡╨│╨╛╤А╤Ц╤Ч</h4>
             <div className="space-y-2">
               {categoryOptions.map((cat) => (
                 <label key={cat.id} className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl cursor-pointer ${selectedCategory === cat.id ? "bg-indigo-50" : "hover:bg-slate-50"}`}>
@@ -360,34 +361,34 @@ const AdminPage = () => {
           </div>
 
           <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
-            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Гуртожитки</h4>
+            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨║╨╕</h4>
             <select 
               value={complaintCorps}
               onChange={e => setComplaintCorps(e.target.value)}
               className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="all">Всі гуртожитки</option>
-              <option value="Гуртожиток 1">Гуртожиток 1</option>
-              <option value="Гуртожиток 2">Гуртожиток 2</option>
-              <option value="Гуртожиток 3">Гуртожиток 3</option>
-              <option value="Гуртожиток 4">Гуртожиток 4</option>
-              <option value="Гуртожиток 5">Гуртожиток 5</option>
-              <option value="Гуртожиток 6">Гуртожиток 6</option>
+              <option value="all">╨Т╤Б╤Ц ╨│╤Г╤А╤В╨╛╨╢╨╕╤В╨║╨╕</option>
+              <option value="╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 1">╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 1</option>
+              <option value="╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 2">╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 2</option>
+              <option value="╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 3">╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 3</option>
+              <option value="╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 4">╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 4</option>
+              <option value="╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 5">╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 5</option>
+              <option value="╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 6">╨У╤Г╤А╤В╨╛╨╢╨╕╤В╨╛╨║ 6</option>
             </select>
           </div>
 
           <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
-            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Пріоритет</h4>
+            <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨Я╤А╤Ц╨╛╤А╨╕╤В╨╡╤В</h4>
             <select 
               value={complaintPriority}
               onChange={e => setComplaintPriority(e.target.value)}
               className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="all">Всі пріоритети</option>
-              <option value="low">Низький</option>
-              <option value="medium">Середній</option>
-              <option value="high">Високий</option>
-              <option value="critical">Критичний</option>
+              <option value="all">╨Т╤Б╤Ц ╨┐╤А╤Ц╨╛╤А╨╕╤В╨╡╤В╨╕</option>
+              <option value="low">╨Э╨╕╨╖╤М╨║╨╕╨╣</option>
+              <option value="medium">╨б╨╡╤А╨╡╨┤╨╜╤Ц╨╣</option>
+              <option value="high">╨Т╨╕╤Б╨╛╨║╨╕╨╣</option>
+              <option value="critical">╨Ъ╤А╨╕╤В╨╕╤З╨╜╨╕╨╣</option>
             </select>
           </div>
         </div>
@@ -396,13 +397,13 @@ const AdminPage = () => {
           {loading && <Preloader />}
           {!loading && err && <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-2xl font-bold">{err}</div>}
           
-          {/* Слово Архів прибрано */}
+          {/* ╨б╨╗╨╛╨▓╨╛ ╨Р╤А╤Е╤Ц╨▓ ╨┐╤А╨╕╨▒╤А╨░╨╜╨╛ */}
           {!loading && !err && filtered.length === 0 && (
             <div className="bg-white p-10 rounded-2xl border border-slate-100 text-center">
               <p className="text-slate-900 font-black text-lg mb-2">
-                 {selectedStatus === 'pending' ? "Черга пуста! 😎" : "Пусто"}
+                 {selectedStatus === 'pending' ? "╨з╨╡╤А╨│╨░ ╨┐╤Г╤Б╤В╨░! ЁЯШО" : "╨Я╤Г╤Б╤В╨╛"}
               </p>
-              <p className="text-slate-500 text-sm">Немає заявок з вибраними параметрами.</p>
+              <p className="text-slate-500 text-sm">╨Э╨╡╨╝╨░╤Ф ╨╖╨░╤П╨▓╨╛╨║ ╨╖ ╨▓╨╕╨▒╤А╨░╨╜╨╕╨╝╨╕ ╨┐╨░╤А╨░╨╝╨╡╤В╤А╨░╨╝╨╕.</p>
             </div>
           )}
 
@@ -415,35 +416,35 @@ const AdminPage = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
                       <div className="min-w-0">
-                        <h4 className="text-lg sm:text-xl font-black text-slate-900 truncate">{p.title || "Без заголовку"}</h4>
+                        <h4 className="text-lg sm:text-xl font-black text-slate-900 truncate">{p.title || "╨С╨╡╨╖ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╤Г"}</h4>
                         <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mt-1">{humanLocation(p)}</p>
                       </div>
                       
-                      {/* Динамічний бейдж статусу */}
+                      {/* ╨Ф╨╕╨╜╨░╨╝╤Ц╤З╨╜╨╕╨╣ ╨▒╨╡╨╣╨┤╨╢ ╤Б╤В╨░╤В╤Г╤Б╤Г */}
                       <span className={`px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-black rounded-lg uppercase tracking-widest w-fit ${
                           p.status === "pending" ? "bg-amber-100 text-amber-700" :
                           p.status === "rejected" ? "bg-red-100 text-red-700" : 
                           p.status === "resolved" ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700"
                       }`}>
-                        {p.status === "pending" ? "Очікує" : p.status === "rejected" ? "Відхилено" : p.status === "resolved" ? "Вирішено" : "Підтверджено"}
+                        {p.status === "pending" ? "╨Ю╤З╤Ц╨║╤Г╤Ф" : p.status === "rejected" ? "╨Т╤Ц╨┤╤Е╨╕╨╗╨╡╨╜╨╛" : p.status === "resolved" ? "╨Т╨╕╤А╤Ц╤И╨╡╨╜╨╛" : "╨Я╤Ц╨┤╤В╨▓╨╡╤А╨┤╨╢╨╡╨╜╨╛"}
                       </span>
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-3">
                       <span className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-md uppercase">
-                        {CATEGORY_LABELS[p.category] || p.category || "Категорія"}
+                        {CATEGORY_LABELS[p.category] || p.category || "╨Ъ╨░╤В╨╡╨│╨╛╤А╤Ц╤П"}
                       </span>
                       <span className={`px-2 py-1 text-[10px] font-black rounded-md uppercase ${p.priority === 'high' ? 'bg-red-100 text-red-700' : p.priority === 'low' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                        Пріоритет: {p.priority === 'high' ? 'Високий' : p.priority === 'low' ? 'Низький' : 'Середній'}
+                        ╨Я╤А╤Ц╨╛╤А╨╕╤В╨╡╤В: {p.priority === 'high' ? '╨Т╨╕╤Б╨╛╨║╨╕╨╣' : p.priority === 'low' ? '╨Э╨╕╨╖╤М╨║╨╕╨╣' : '╨б╨╡╤А╨╡╨┤╨╜╤Ц╨╣'}
                       </span>
                       {p.createdAt && <span className="px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-black rounded-md uppercase">{new Date(p.createdAt).toLocaleString()}</span>}
                     </div>
 
-                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-4">{p.description || "—"}</p>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-4">{p.description || "тАФ"}</p>
 
                     {p.photoUrl && (
                       <div className="w-full h-44 sm:h-56 rounded-2xl overflow-hidden bg-slate-100 mb-4">
-                        <img src={resolveImageUrl(p.thumbnail || p.photoUrl)} alt="problem" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <img src={ p.photoUrl.startsWith("http") || p.photoUrl.startsWith("blob:") ? p.photoUrl : `${SERVER_URL}/api${p.photoUrl}` } alt="problem" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
                       </div>
                     )}
 
@@ -451,34 +452,34 @@ const AdminPage = () => {
                       <div className="flex items-center gap-4">
                           <span className="text-[10px] sm:text-xs text-slate-400 font-medium">ID: {p.id}</span>
                           <button onClick={() => toggleComments(p.id)} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
-                            💬 Коментарі {openCommentsId === p.id ? '▲' : '▼'}
+                            ЁЯТм ╨Ъ╨╛╨╝╨╡╨╜╤В╨░╤А╤Ц {openCommentsId === p.id ? 'тЦ▓' : 'тЦ╝'}
                           </button>
                       </div>
 
-                      {/* Кнопки дій Адміна */}
+                      {/* ╨Ъ╨╜╨╛╨┐╨║╨╕ ╨┤╤Ц╨╣ ╨Р╨┤╨╝╤Ц╨╜╨░ */}
                       <div className="flex flex-wrap gap-2">
                         {isPending && (
                           <>
-                            <button onClick={() => handleChangeStatus(p.id, 'approved')} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-600 text-white rounded-lg sm:rounded-xl hover:bg-indigo-700">Підтвердити</button>
-                            <button onClick={() => handleChangeStatus(p.id, 'rejected')} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold bg-amber-50 text-amber-600 rounded-lg sm:rounded-xl hover:bg-amber-100">Відхилити</button>
+                            <button onClick={() => handleChangeStatus(p.id, 'approved')} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-600 text-white rounded-lg sm:rounded-xl hover:bg-indigo-700">╨Я╤Ц╨┤╤В╨▓╨╡╤А╨┤╨╕╤В╨╕</button>
+                            <button onClick={() => handleChangeStatus(p.id, 'rejected')} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold bg-amber-50 text-amber-600 rounded-lg sm:rounded-xl hover:bg-amber-100">╨Т╤Ц╨┤╤Е╨╕╨╗╨╕╤В╨╕</button>
                           </>
                         )}
                         {isApproved && (
-                            <button onClick={() => handleChangeStatus(p.id, 'resolved')} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-700 rounded-lg sm:rounded-xl hover:bg-emerald-200">Вирішено</button>
+                            <button onClick={() => handleChangeStatus(p.id, 'resolved')} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-700 rounded-lg sm:rounded-xl hover:bg-emerald-200">╨Т╨╕╤А╤Ц╤И╨╡╨╜╨╛</button>
                         )}
                         
                         <button onClick={() => handleRemove(p.id)} className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold bg-red-50 text-red-600 rounded-lg sm:rounded-xl hover:bg-red-100 transition-colors">
-                          Видалити
+                          ╨Т╨╕╨┤╨░╨╗╨╕╤В╨╕
                         </button>
                       </div>
                     </div>
 
-                    {/* Секція коментарів для Адміна */}
+                    {/* ╨б╨╡╨║╤Ж╤Ц╤П ╨║╨╛╨╝╨╡╨╜╤В╨░╤А╤Ц╨▓ ╨┤╨╗╤П ╨Р╨┤╨╝╤Ц╨╜╨░ */}
                     {openCommentsId === p.id && (
                       <div className="bg-slate-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-100 mt-4 w-full">
                           <div className="space-y-3 mb-4 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                               {(commentsData[p.id] || []).length === 0 ? (
-                                  <p className="text-center text-xs text-slate-400 font-medium">Поки немає коментарів.</p>
+                                  <p className="text-center text-xs text-slate-400 font-medium">╨Я╨╛╨║╨╕ ╨╜╨╡╨╝╨░╤Ф ╨║╨╛╨╝╨╡╨╜╤В╨░╤А╤Ц╨▓.</p>
                               ) : (
                                   (commentsData[p.id] || []).map(c => (
                                       <div key={c.id} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 relative group">
@@ -487,7 +488,7 @@ const AdminPage = () => {
                                               <span className="text-[9px] text-slate-400 font-bold">{new Date(c.date).toLocaleDateString()}</span>
                                           </div>
                                           <p className="text-xs text-slate-600">{c.text}</p>
-                                          <button onClick={() => handleDeleteComment(p.id, c.id)} className="absolute top-2 right-2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" title="Видалити коментар">
+                                          <button onClick={() => handleDeleteComment(p.id, c.id)} className="absolute top-2 right-2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" title="╨Т╨╕╨┤╨░╨╗╨╕╤В╨╕ ╨║╨╛╨╝╨╡╨╜╤В╨░╤А">
                                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                           </button>
                                       </div>
@@ -495,9 +496,9 @@ const AdminPage = () => {
                               )}
                           </div>
                           <div className="flex gap-2">
-                              <input value={commentInput} onChange={e => setCommentInput(e.target.value)} placeholder="Відповісти..." className="flex-1 px-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500" onKeyDown={(e) => e.key === 'Enter' && handleSendComment(p.id)} />
+                              <input value={commentInput} onChange={e => setCommentInput(e.target.value)} placeholder="╨Т╤Ц╨┤╨┐╨╛╨▓╤Ц╤Б╤В╨╕..." className="flex-1 px-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500" onKeyDown={(e) => e.key === 'Enter' && handleSendComment(p.id)} />
                               <button onClick={() => handleSendComment(p.id)} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">
-                                  Відправити
+                                  ╨Т╤Ц╨┤╨┐╤А╨░╨▓╨╕╤В╨╕
                               </button>
                           </div>
                       </div>
@@ -516,17 +517,17 @@ const AdminPage = () => {
             <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
               <input 
                 type="text" 
-                placeholder="Пошук тікетів..." 
+                placeholder="╨Я╨╛╤И╤Г╨║ ╤В╤Ц╨║╨╡╤В╤Ц╨▓..." 
                 value={ticketSearchQuery}
                 onChange={e => setTicketSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 mb-4 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Наявність тікета</h4>
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨Э╨░╤П╨▓╨╜╤Ц╤Б╤В╤М ╤В╤Ц╨║╨╡╤В╨░</h4>
               <div className="space-y-2">
                 {[
-                  { id: "all", name: "Всі" },
-                  { id: "not_created", name: "Без тікета" },
-                  { id: "created", name: "З тікетом" }
+                  { id: "all", name: "╨Т╤Б╤Ц" },
+                  { id: "not_created", name: "╨С╨╡╨╖ ╤В╤Ц╨║╨╡╤В╨░" },
+                  { id: "created", name: "╨Ч ╤В╤Ц╨║╨╡╤В╨╛╨╝" }
                 ].map((s) => (
                   <label key={s.id} className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl cursor-pointer ${ticketStatus === s.id ? "bg-indigo-50" : "hover:bg-slate-50"}`}>
                     <input type="radio" checked={ticketStatus === s.id} onChange={() => setTicketStatus(s.id)} className="w-4 h-4 text-indigo-600" />
@@ -539,7 +540,7 @@ const AdminPage = () => {
             </div>
 
             <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
-              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Категорії</h4>
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨Ъ╨░╤В╨╡╨│╨╛╤А╤Ц╤Ч</h4>
               <div className="space-y-2">
                 {categoryOptions.map((cat) => (
                   <label key={cat.id} className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl cursor-pointer ${ticketCategory === cat.id ? "bg-indigo-50" : "hover:bg-slate-50"}`}>
@@ -553,13 +554,13 @@ const AdminPage = () => {
             </div>
 
             <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
-              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Працівник</h4>
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨Я╤А╨░╤Ж╤Ц╨▓╨╜╨╕╨║</h4>
               <select 
                 value={ticketWorker}
                 onChange={e => setTicketWorker(e.target.value)}
                 className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="all">Всі працівники</option>
+                <option value="all">╨Т╤Б╤Ц ╨┐╤А╨░╤Ж╤Ц╨▓╨╜╨╕╨║╨╕</option>
                 {employees.map(emp => (
                   <option key={emp.user} value={emp.user}>{emp.first_name} {emp.last_name}</option>
                 ))}
@@ -567,29 +568,29 @@ const AdminPage = () => {
             </div>
 
             <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
-              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Пріоритет</h4>
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨Я╤А╤Ц╨╛╤А╨╕╤В╨╡╤В</h4>
               <select 
                 value={ticketPriority}
                 onChange={e => setTicketPriority(e.target.value)}
                 className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="all">Всі пріоритети</option>
-                <option value="low">Низький</option>
-                <option value="medium">Середній</option>
-                <option value="high">Високий</option>
-                <option value="critical">Критичний</option>
+                <option value="all">╨Т╤Б╤Ц ╨┐╤А╤Ц╨╛╤А╨╕╤В╨╡╤В╨╕</option>
+                <option value="low">╨Э╨╕╨╖╤М╨║╨╕╨╣</option>
+                <option value="medium">╨б╨╡╤А╨╡╨┤╨╜╤Ц╨╣</option>
+                <option value="high">╨Т╨╕╤Б╨╛╨║╨╕╨╣</option>
+                <option value="critical">╨Ъ╤А╨╕╤В╨╕╤З╨╜╨╕╨╣</option>
               </select>
             </div>
 
             <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-sm">
-              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">Дати дедлайну</h4>
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4">╨Ф╨░╤В╨╕ ╨┤╨╡╨┤╨╗╨░╨╣╨╜╤Г</h4>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">З:</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">╨Ч:</label>
                   <input type="date" value={ticketDateFrom} onChange={e => setTicketDateFrom(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">По:</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">╨Я╨╛:</label>
                   <input type="date" value={ticketDateTo} onChange={e => setTicketDateTo(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
               </div>
@@ -597,10 +598,10 @@ const AdminPage = () => {
           </div>
 
           <div className="lg:col-span-3 space-y-6">
-            <h3 className="text-xl font-bold text-slate-900">Тікети для підтверджених заявок</h3>
+            <h3 className="text-xl font-bold text-slate-900">╨в╤Ц╨║╨╡╤В╨╕ ╨┤╨╗╤П ╨┐╤Ц╨┤╤В╨▓╨╡╤А╨┤╨╢╨╡╨╜╨╕╤Е ╨╖╨░╤П╨▓╨╛╨║</h3>
             {filteredTicketsList.length === 0 ? (
               <div className="bg-white p-10 rounded-2xl border border-slate-100 text-center">
-                <p className="text-slate-500 text-sm">Немає заявок з вибраними параметрами.</p>
+                <p className="text-slate-500 text-sm">╨Э╨╡╨╝╨░╤Ф ╨╖╨░╤П╨▓╨╛╨║ ╨╖ ╨▓╨╕╨▒╤А╨░╨╜╨╕╨╝╨╕ ╨┐╨░╤А╨░╨╝╨╡╤В╤А╨░╨╝╨╕.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-6">
@@ -610,14 +611,14 @@ const AdminPage = () => {
                     <div key={p.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start mb-2">
-                          <h4 className="text-lg font-black text-slate-900">{p.title || "Без заголовку"}</h4>
+                          <h4 className="text-lg font-black text-slate-900">{p.title || "╨С╨╡╨╖ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╤Г"}</h4>
                           <span className={`px-2 py-1 text-[10px] font-black rounded-md uppercase whitespace-nowrap ${p.priority === 'high' ? 'bg-red-100 text-red-700' : p.priority === 'low' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                            {p.priority === 'high' ? 'Високий' : p.priority === 'low' ? 'Низький' : 'Середній'}
+                            {p.priority === 'high' ? '╨Т╨╕╤Б╨╛╨║╨╕╨╣' : p.priority === 'low' ? '╨Э╨╕╨╖╤М╨║╨╕╨╣' : '╨б╨╡╤А╨╡╨┤╨╜╤Ц╨╣'}
                           </span>
                         </div>
                         <div className="flex gap-2 mb-3 items-center">
                           <span className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-md uppercase">
-                            {CATEGORY_LABELS[p.category] || p.category || "Категорія"}
+                            {CATEGORY_LABELS[p.category] || p.category || "╨Ъ╨░╤В╨╡╨│╨╛╤А╤Ц╤П"}
                           </span>
                           <span className="text-xs text-slate-500 font-medium">{humanLocation(p)}</span>
                         </div>
@@ -626,13 +627,13 @@ const AdminPage = () => {
                       <div>
                         {ticket ? (
                           <div className="bg-indigo-50 p-3 rounded-xl border border-indigo-100 relative group">
-                            <p className="text-xs font-bold text-indigo-900">Тікет створено (ID: {ticket.ticket_id})</p>
-                            {ticket.user && <p className="text-xs text-indigo-800 mt-1">Виконавець: {ticket.user.first_name} {ticket.user.last_name}</p>}
-                            {ticket.deadline && <p className="text-xs text-indigo-700 mt-1">Дедлайн: {new Date(ticket.deadline).toLocaleDateString()}</p>}
+                            <p className="text-xs font-bold text-indigo-900">╨в╤Ц╨║╨╡╤В ╤Б╤В╨▓╨╛╤А╨╡╨╜╨╛ (ID: {ticket.ticket_id})</p>
+                            {ticket.user && <p className="text-xs text-indigo-800 mt-1">╨Т╨╕╨║╨╛╨╜╨░╨▓╨╡╤Ж╤М: {ticket.user.first_name} {ticket.user.last_name}</p>}
+                            {ticket.deadline && <p className="text-xs text-indigo-700 mt-1">╨Ф╨╡╨┤╨╗╨░╨╣╨╜: {new Date(ticket.deadline).toLocaleDateString()}</p>}
                             <button 
                               onClick={() => openEditTicketModal(p, ticket)} 
                               className="absolute top-3 right-3 text-indigo-600 hover:text-indigo-800 opacity-0 group-hover:opacity-100 transition-opacity"
-                              title="Редагувати тікет"
+                              title="╨а╨╡╨┤╨░╨│╤Г╨▓╨░╤В╨╕ ╤В╤Ц╨║╨╡╤В"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                             </button>
@@ -642,7 +643,7 @@ const AdminPage = () => {
                             onClick={() => openTicketModal(p)}
                             className="w-full px-4 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl hover:bg-indigo-700 transition-colors"
                           >
-                            Створити тікет
+                            ╨б╤В╨▓╨╛╤А╨╕╤В╨╕ ╤В╤Ц╨║╨╡╤В
                           </button>
                         )}
                       </div>
@@ -660,7 +661,7 @@ const AdminPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-[2rem] w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 sm:p-8">
             <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-black text-slate-900">Створити тікет</h2>
+              <h2 className="text-2xl font-black text-slate-900">╨б╤В╨▓╨╛╤А╨╕╤В╨╕ ╤В╤Ц╨║╨╡╤В</h2>
               <button onClick={() => setIsTicketModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
@@ -676,25 +677,25 @@ const AdminPage = () => {
                     {CATEGORY_LABELS[selectedComplaintForTicket.category] || selectedComplaintForTicket.category}
                   </span>
                   <span className={`px-2 py-1 text-[10px] font-black rounded-md uppercase ${selectedComplaintForTicket.priority === 'high' ? 'bg-red-100 text-red-700' : selectedComplaintForTicket.priority === 'low' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                    Пріоритет: {selectedComplaintForTicket.priority === 'high' ? 'Високий' : selectedComplaintForTicket.priority === 'low' ? 'Низький' : 'Середній'}
+                    ╨Я╤А╤Ц╨╛╤А╨╕╤В╨╡╤В: {selectedComplaintForTicket.priority === 'high' ? '╨Т╨╕╤Б╨╛╨║╨╕╨╣' : selectedComplaintForTicket.priority === 'low' ? '╨Э╨╕╨╖╤М╨║╨╕╨╣' : '╨б╨╡╤А╨╡╨┤╨╜╤Ц╨╣'}
                   </span>
                 </div>
                 {selectedComplaintForTicket.photoUrl && (
                   <div className="mt-4 w-full h-40 rounded-lg overflow-hidden bg-slate-200">
-                    <img src={resolveImageUrl(selectedComplaintForTicket.thumbnail || selectedComplaintForTicket.photoUrl)} alt="problem" className="w-full h-full object-cover" />
+                    <img src={selectedComplaintForTicket.photoUrl.startsWith("http") || selectedComplaintForTicket.photoUrl.startsWith("blob:") ? selectedComplaintForTicket.photoUrl : `${SERVER_URL}/api${selectedComplaintForTicket.photoUrl}`} alt="problem" className="w-full h-full object-cover" />
                   </div>
                 )}
               </div>
 
               {/* Form fields */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Виконавець</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">╨Т╨╕╨║╨╛╨╜╨░╨▓╨╡╤Ж╤М</label>
                 <select
                   value={ticketEmployee}
                   onChange={(e) => setTicketEmployee(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4"
                 >
-                  <option value="">-- Не призначено --</option>
+                  <option value="">-- ╨Э╨╡ ╨┐╤А╨╕╨╖╨╜╨░╤З╨╡╨╜╨╛ --</option>
                   {employees.map(emp => (
                     <option key={emp.user} value={emp.user}>
                       {emp.first_name} {emp.last_name} (ID: {emp.user})
@@ -702,7 +703,7 @@ const AdminPage = () => {
                   ))}
                 </select>
 
-                <label className="block text-sm font-bold text-slate-700 mb-2">Дедлайн виконання</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">╨Ф╨╡╨┤╨╗╨░╨╣╨╜ ╨▓╨╕╨║╨╛╨╜╨░╨╜╨╜╤П</label>
                 <input 
                   type="date" 
                   value={ticketDeadline}
@@ -713,10 +714,10 @@ const AdminPage = () => {
 
               <div className="flex gap-3 pt-4">
                 <button onClick={() => setIsTicketModalOpen(false)} className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200">
-                  Скасувати
+                  ╨б╨║╨░╤Б╤Г╨▓╨░╤В╨╕
                 </button>
                 <button onClick={handleConfirmCreateTicket} className="flex-1 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700">
-                  Зберегти тікет
+                  ╨Ч╨▒╨╡╤А╨╡╨│╤В╨╕ ╤В╤Ц╨║╨╡╤В
                 </button>
               </div>
             </div>

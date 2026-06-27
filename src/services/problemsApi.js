@@ -262,12 +262,22 @@ function sortByNew(a, b) {
   return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 }
 
+let fetchProfilePromise = null;
+
 export async function fetchUserProfile() {
-  try {
-    return await fetchJson(`/profile/?t=${Date.now()}`);
-  } catch (e) {
-    return null;
-  }
+  if (fetchProfilePromise) return fetchProfilePromise;
+
+  fetchProfilePromise = (async () => {
+    try {
+      return await fetchJson(`/profile/?t=${Date.now()}`);
+    } catch (e) {
+      return null;
+    } finally {
+      fetchProfilePromise = null;
+    }
+  })();
+
+  return fetchProfilePromise;
 }
 
 export async function createProblem(problem) {
@@ -529,4 +539,6 @@ export async function changeUserRoom(building, floor, room) {
     },
   });
 }
+
+
 

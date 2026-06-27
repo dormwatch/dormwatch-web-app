@@ -1,15 +1,17 @@
+import { Building2 } from "lucide-react";
+
 const Footer = () => {
   return (
-    <footer className="bg-slate-900 py-16 text-white mt-12">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
+    <footer className="bg-stone-800 border-t border-stone-700 py-12 text-stone-50 mt-12 shrink-0">
+      <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-black">DW</div>
-            <span className="text-xl font-bold tracking-tight">DormWatch</span>
+          <div className="flex items-center gap-2 mb-2">
+            <Building2 className="w-5 h-5 text-indigo-500" />
+            <span className="text-lg font-bold tracking-tight">DormWatch</span>
           </div>
-          <p className="text-slate-400 text-sm">Система прямої комунікації між студентами та адміністрацією.</p>
+          <p className="text-stone-400 text-xs tracking-wider uppercase">Система прямої комунікації між студентами та адміністрацією.</p>
         </div>
-        <p className="text-indigo-400 font-bold text-sm">support@dormwatch.edu.ua</p>
+        <p className="text-indigo-400 font-bold text-sm tracking-widest uppercase text-[10px]">support@dormwatch.edu.ua</p>
       </div>
     </footer>
   );

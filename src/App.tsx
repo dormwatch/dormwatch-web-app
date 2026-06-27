@@ -1,4 +1,3 @@
-// import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import UserPage from "./pages/UserPage";
@@ -6,71 +5,79 @@ import AdminPage from "./pages/AdminPage";
 import CreateReportPage from "./pages/CreateReportPage";
 import DashboardPage from "./pages/DashboardPage";
 import AccountPage from "./pages/AccountPage";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import StudentLayout from "./components/StudentLayout";
+import AdminLayout from "./components/AdminLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
 function App() {
   return (
-    <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between">
-      <Header />
-      <main>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/user" element={<UserPage />} />
+    <Routes>
+      {/* Public / Student routes wrapped in StudentLayout */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute blockAdmin>
+            <StudentLayout>
+              <HomePage />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user"
+        element={
+          <ProtectedRoute blockAdmin>
+            <StudentLayout>
+              <UserPage />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute blockAdmin>
+            <StudentLayout>
+              <AccountPage />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
 
-          {/* All routes are now public - Clerk authentication commented out */}
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/create-report" element={<CreateReportPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/account" element={<AccountPage />} />
+      <Route
+        path="/create-report"
+        element={
+          <ProtectedRoute>
+            <StudentLayout>
+              <CreateReportPage />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
 
-          {/* Protected routes - COMMENTED OUT
-          <Route
-            path="/admin"
-            element={
-              <>
-                <SignedIn>
-                  <AdminPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            }
-          />
-          <Route
-            path="/create-report"
-            element={
-              <>
-                <SignedIn>
-                  <CreateReportPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <>
-                <SignedIn>
-                  <DashboardPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            }
-          />
-          */}
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+      {/* Admin routes wrapped in AdminLayout */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <StudentLayout>
+              <DashboardPage />
+            </StudentLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <AdminLayout>
+            <AdminPage />
+          </AdminLayout>
+        }
+      />
+
+      <Route path="*" element={<div className="p-8 font-bold text-stone-400">404 — сторінку не знайдено</div>} />
+    </Routes>
   );
 }
 
