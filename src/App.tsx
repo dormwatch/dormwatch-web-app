@@ -1,75 +1,42 @@
-// import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import UserPage from "./pages/UserPage";
 import AdminPage from "./pages/AdminPage";
+import AdminComplaintsPage from "./pages/AdminComplaintsPage";
 import CreateReportPage from "./pages/CreateReportPage";
 import DashboardPage from "./pages/DashboardPage";
 import AccountPage from "./pages/AccountPage";
+import AuthPage from "./pages/AuthPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import "./App.css";
 
 function App() {
   return (
-    <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between">
-      <Header />
-      <main>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/user" element={<UserPage />} />
-
-          {/* All routes are now public - Clerk authentication commented out */}
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/create-report" element={<CreateReportPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/account" element={<AccountPage />} />
-
-          {/* Protected routes - COMMENTED OUT
-          <Route
-            path="/admin"
-            element={
-              <>
-                <SignedIn>
-                  <AdminPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            }
-          />
-          <Route
-            path="/create-report"
-            element={
-              <>
-                <SignedIn>
-                  <CreateReportPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <>
-                <SignedIn>
-                  <DashboardPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            }
-          />
-          */}
-        </Routes>
-      </main>
-      <Footer />
+    <div className="dark min-h-screen flex flex-col justify-between">
+      <Routes>
+        <Route path="/admin/*" element={
+          <Routes>
+            <Route path="/" element={<AdminPage />} />
+            <Route path="/complaints" element={<AdminComplaintsPage />} />
+          </Routes>
+        } />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="*" element={
+          <>
+            <Header />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/user" element={<UserPage />} />
+                <Route path="/create-report" element={<CreateReportPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/account" element={<AccountPage />} />
+              </Routes>
+            </main>
+            <Footer />
+          </>
+        } />
+      </Routes>
     </div>
   );
 }
