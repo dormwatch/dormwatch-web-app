@@ -8,9 +8,12 @@ import {
   fetchUserProfile,
   CATEGORY_LABELS,
   fetchTickets,
-  fetchEmployees,
   createTicket,
-  updateTicket
+  updateTicket,
+  fetchComments,
+  postComment,
+  deleteComment,
+  fetchEmployees
 } from "../services/problemsApi";
 import { resolveImageUrl } from "../services/imageUtils";
 
@@ -36,7 +39,7 @@ const AdminPage = () => {
 
   // Filters for complaints
   const [complaintSearch, setComplaintSearch] = useState("");
-  const [complaintStatus, setComplaintStatus] = useState("pending");
+  const [complaintStatus, setComplaintStatus] = useState("all");
   const [complaintCategory, setComplaintCategory] = useState("all");
   const [complaintPriority, setComplaintPriority] = useState("all");
   const [complaintCorps, setComplaintCorps] = useState("all");
@@ -53,13 +56,54 @@ const AdminPage = () => {
   const [ticketDeadline, setTicketDeadline] = useState("");
   const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
 
-  // Complaint Details Modal State
   const [selectedComplaintDetails, setSelectedComplaintDetails] = useState<any>(null);
   const [isImageZoomed, setIsImageZoomed] = useState(false);
 
-  const openComplaintDetails = (complaint: any) => {
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [postingComment, setPostingComment] = useState(false);
+
+  const openComplaintDetails = async (complaint: any) => {
     setSelectedComplaintDetails(complaint);
     setIsImageZoomed(false);
+    setComments([]);
+    setNewComment("");
+    setLoadingComments(true);
+    try {
+      const cid = complaint.id || complaint.complaint_id;
+      const fetched = await fetchComments(cid);
+      setComments(fetched);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handlePostComment = async () => {
+    if (!newComment.trim() || !selectedComplaintDetails) return;
+    setPostingComment(true);
+    try {
+      const cid = selectedComplaintDetails.id || selectedComplaintDetails.complaint_id;
+      const added = await postComment(cid, newComment);
+      setComments(prev => [...prev, added]);
+      setNewComment("");
+    } catch (e) {
+      alert("Failed to post comment");
+    } finally {
+      setPostingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    try {
+      await deleteComment(commentId);
+      setComments(prev => prev.filter(c => c.id !== commentId));
+    } catch (e) {
+      alert("Failed to delete comment");
+    }
   };
 
   useEffect(() => {
@@ -105,7 +149,7 @@ const AdminPage = () => {
     try {
       await updateComplaintStatus(id, status);
       loadData();
-      if (selectedComplaintDetails && selectedComplaintDetails.id === id) {
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === id) {
         setSelectedComplaintDetails({ ...selectedComplaintDetails, status });
       }
     } catch(e) {
@@ -118,7 +162,7 @@ const AdminPage = () => {
     try {
       await deleteProblem(id);
       loadData();
-      if (selectedComplaintDetails && selectedComplaintDetails.id === id) {
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === id) {
         setSelectedComplaintDetails(null);
       }
     } catch(e) {
@@ -164,7 +208,7 @@ const AdminPage = () => {
         const q = ticketSearch.toLowerCase();
         if (!p.title?.toLowerCase().includes(q) && !p.description?.toLowerCase().includes(q)) return false;
       }
-      const ticket = tickets.find(t => t.complaint === p.id);
+      const ticket = tickets.find(t => t.complaint === (p.id || p.complaint_id));
       if (ticketWorker !== "all") {
         if (!ticket) return false;
         const wId = String(ticket.user?.user || ticket.user || "");
@@ -196,7 +240,8 @@ const AdminPage = () => {
       if (editingTicketId) {
         await updateTicket(editingTicketId, ticketEmployee, ticketDeadline || null);
       } else {
-        await createTicket(selectedComplaintForTicket.id, ticketEmployee, ticketDeadline || null);
+        const cid = selectedComplaintForTicket.id || selectedComplaintForTicket.complaint_id;
+        await createTicket(cid, ticketEmployee, ticketDeadline || null);
       }
       setIsTicketModalOpen(false);
       loadData();
@@ -300,7 +345,7 @@ const AdminPage = () => {
                   {items.slice(0, 5).map(p => {
                     const date = p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "N/A";
                     return (
-                      <tr key={p.id} className="hover:bg-stone-800/20 transition-colors">
+                      <tr key={p.id || p.complaint_id} className="hover:bg-stone-800/20 transition-colors">
                         <td className="p-4">
                           <p className="font-bold text-sm text-stone-50">{p.title || "Untitled"}</p>
                           <p className="text-xs text-stone-500 mt-1 line-clamp-1 max-w-md">{p.description}</p>
@@ -402,8 +447,10 @@ const AdminPage = () => {
               <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">Loading...</div>
             ) : filteredComplaints.length === 0 ? (
               <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">No complaints found.</div>
-            ) : filteredComplaints.map(p => (
-              <div key={p.id} className="bg-stone-900 border border-stone-800 p-6 flex flex-col md:flex-row gap-6 group hover:border-stone-600 transition-colors cursor-pointer" onClick={() => openComplaintDetails(p)}>
+            ) : filteredComplaints.map(p => {
+              const cid = p.id || p.complaint_id;
+              return (
+              <div key={cid} className="bg-stone-900 border border-stone-800 p-6 flex flex-col md:flex-row gap-6 group hover:border-stone-600 transition-colors cursor-pointer" onClick={() => openComplaintDetails(p)}>
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="text-xl font-bold text-stone-50">{p.title || "Untitled"}</h4>
@@ -426,14 +473,14 @@ const AdminPage = () => {
                   <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-800">
                     {p.status === 'pending' && (
                       <>
-                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(p.id, 'approved'); }} className="px-4 py-2 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
-                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(p.id, 'rejected'); }} className="px-4 py-2 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'approved'); }} className="px-4 py-2 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'rejected'); }} className="px-4 py-2 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
                       </>
                     )}
                     {(p.status === 'approved' || p.status === 'published') && (
-                      <button onClick={(e) => { e.stopPropagation(); handleStatusChange(p.id, 'resolved'); }} className="px-4 py-2 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'resolved'); }} className="px-4 py-2 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }} className="px-4 py-2 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(cid); }} className="px-4 py-2 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
                   </div>
                 </div>
                 {p.photoUrl && (
@@ -442,7 +489,8 @@ const AdminPage = () => {
                   </div>
                 )}
               </div>
-            ))}
+            );
+            })}
           </div>
         </div>
       )}
@@ -495,10 +543,11 @@ const AdminPage = () => {
             ) : filteredTicketsList.length === 0 ? (
               <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">No complaints to ticket.</div>
             ) : filteredTicketsList.map(p => {
-              const ticket = tickets.find(t => t.complaint === p.id);
+              const cid = p.id || p.complaint_id;
+              const ticket = tickets.find(t => t.complaint === cid);
               const isPublished = p.status === 'approved' || p.status === 'published';
               return (
-                <div key={p.id} className="bg-stone-900 border border-stone-800 p-6 flex flex-col justify-between group hover:border-stone-600 transition-colors">
+                <div key={cid} className="bg-stone-900 border border-stone-800 p-6 flex flex-col justify-between group hover:border-stone-600 transition-colors">
                   <div>
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="text-xl font-bold text-stone-50">{p.title || "Untitled"}</h4>
@@ -654,19 +703,69 @@ const AdminPage = () => {
                   <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem" className="w-full object-contain" />
                 </div>
               )}
+
+              <div className="mt-8 border-t border-stone-800 pt-6">
+                <h4 className="text-sm font-bold text-stone-50 uppercase tracking-widest mb-4">Comments</h4>
+                <div className="space-y-4 mb-4 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                  {loadingComments ? (
+                    <p className="text-[10px] text-stone-500 uppercase tracking-widest">Loading...</p>
+                  ) : comments.length === 0 ? (
+                    <p className="text-[10px] text-stone-500 uppercase tracking-widest">No comments yet.</p>
+                  ) : (
+                    comments.map(c => (
+                      <div key={c.id} className="bg-stone-950 border border-stone-800 p-3 group">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{c.author}</span>
+                            {(selectedComplaintDetails.user_id && c.author_id !== selectedComplaintDetails.user_id) && <span className="bg-red-900/30 text-red-500 border border-red-800 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest">Admin</span>}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] text-stone-600 font-bold">{new Date(c.date).toLocaleString()}</span>
+                            <button 
+                              onClick={() => handleDeleteComment(c.id)}
+                              className="text-red-900 hover:text-red-500 transition-colors text-lg leading-none opacity-0 group-hover:opacity-100"
+                              title="Delete Comment"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-sm text-stone-300">{c.text}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+                
+                <div className="flex gap-2 mb-6">
+                  <input 
+                    type="text" 
+                    value={newComment} 
+                    onChange={(e) => setNewComment(e.target.value)} 
+                    placeholder="Add a comment as Admin..." 
+                    className="flex-1 bg-stone-950 border border-stone-800 text-stone-50 text-sm px-3 py-2 focus:border-blue-500 outline-none"
+                  />
+                  <button 
+                    onClick={handlePostComment}
+                    disabled={postingComment || !newComment.trim()}
+                    className="bg-blue-800 hover:bg-blue-900 disabled:bg-stone-800 text-white px-4 text-[10px] uppercase tracking-widest font-bold transition-colors"
+                  >
+                    {postingComment ? "..." : "Send"}
+                  </button>
+                </div>
+              </div>
               
               {/* Modal Action Buttons */}
               <div className="flex flex-wrap gap-2 pt-6 border-t border-stone-800">
                 {selectedComplaintDetails.status === 'pending' && (
                   <>
-                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id, 'approved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
-                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id, 'rejected')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'approved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'rejected')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
                   </>
                 )}
                 {(selectedComplaintDetails.status === 'approved' || selectedComplaintDetails.status === 'published') && (
-                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id, 'resolved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
+                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'resolved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
                 )}
-                <button onClick={() => handleDelete(selectedComplaintDetails.id)} className="flex-1 px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
+                <button onClick={() => handleDelete(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id)} className="flex-1 px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
               </div>
             </div>
           </div>

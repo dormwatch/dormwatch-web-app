@@ -1,29 +1,138 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Wrench, ArrowRight, BellOff } from "lucide-react";
 import { 
   fetchMyProblems, 
+  fetchApprovedComplaints,
   fetchUserProfile, 
-  CATEGORY_LABELS 
+  CATEGORY_LABELS,
+  deleteProblem,
+  fetchComments,
+  postComment,
+  deleteComment
 } from "../services/problemsApi";
+import { resolveImageUrl } from "../services/imageUtils";
 
 const UserPage = () => {
-  const [activeTab, setActiveTab] = useState("active");
-  const [problems, setProblems] = useState<any[]>([]);
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "history" ? "history" : "active");
+  const [myProblems, setMyProblems] = useState<any[]>([]);
+  const [activeProblems, setActiveProblems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
+
+  const [selectedComplaintDetails, setSelectedComplaintDetails] = useState<any>(null);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
+
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [postingComment, setPostingComment] = useState(false);
+
+  const openComplaintDetails = async (complaint: any) => {
+    setSelectedComplaintDetails(complaint);
+    setIsImageZoomed(false);
+    
+    const isMyComplaint = myProblems.some(p => p.id === complaint.id);
+    if (isMyComplaint) {
+      setComments([]);
+      setNewComment("");
+      setLoadingComments(true);
+      try {
+        const fetched = await fetchComments(complaint.id);
+        setComments(fetched);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingComments(false);
+      }
+    } else {
+      setComments([]);
+      setNewComment("");
+    }
+  };
+
+  const handlePostComment = async () => {
+    if (!newComment.trim() || !selectedComplaintDetails) return;
+    setPostingComment(true);
+    try {
+      const added = await postComment(selectedComplaintDetails.id, newComment);
+      setComments(prev => [...prev, added]);
+      setNewComment("");
+    } catch (e) {
+      alert("Failed to post comment");
+    } finally {
+      setPostingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    try {
+      await deleteComment(commentId);
+      setComments(prev => prev.filter(c => c.id !== commentId));
+    } catch (e) {
+      alert("Failed to delete comment");
+    }
+  };
+
+  const handleDeleteComplaint = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this complaint?")) return;
+    try {
+      await deleteProblem(id);
+      setMyProblems(prev => prev.filter(p => p.id !== id));
+      setActiveProblems(prev => prev.filter(p => p.id !== id));
+      setSelectedComplaintDetails(null);
+    } catch (e) {
+      alert("Failed to delete the complaint.");
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const isPending = status === "pending";
+    const isResolved = status === "resolved";
+    const isRejected = status === "rejected";
+    const isInProgress = status === "approved" || (!isPending && !isResolved && !isRejected);
+
+    return (
+      <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
+        isPending ? 'text-yellow-500 border-yellow-700/50 bg-yellow-900/30' :
+        isInProgress ? 'text-blue-500 border-blue-700/50 bg-blue-900/30' :
+        isResolved ? 'text-green-500 border-green-700/50 bg-green-900/30' :
+        'text-stone-500 border-stone-800 bg-stone-800/50'
+      }`}>
+        {isPending ? 'PENDING' : isInProgress ? 'IN PROGRESS' : isResolved ? 'RESOLVED' : 'REJECTED'}
+      </span>
+    );
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    if (!priority) return null;
+    return (
+      <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
+        priority === 'critical' ? 'text-red-500 border-red-700/50 bg-red-900/30' :
+        priority === 'high' ? 'text-orange-500 border-orange-700/50 bg-orange-900/30' :
+        priority === 'low' ? 'text-green-500 border-green-700/50 bg-green-900/30' :
+        'text-amber-500 border-amber-700/50 bg-amber-900/30'
+      }`}>
+        {priority}
+      </span>
+    );
+  };
 
   useEffect(() => {
     let alive = true;
     const loadData = async () => {
       setLoading(true);
       try {
-        const [data, user] = await Promise.all([
+        const [myData, activeData, user] = await Promise.all([
            fetchMyProblems(),
+           fetchApprovedComplaints(),
            fetchUserProfile().catch(() => null)
         ]);
         if (!alive) return;
-        setProblems(Array.isArray(data) ? data : []);
+        setMyProblems(Array.isArray(myData) ? myData : []);
+        setActiveProblems(Array.isArray(activeData) ? activeData : []);
         setCurrentUser(user);
       } catch (e) {
         console.error("Failed to fetch user problems", e);
@@ -40,15 +149,15 @@ const UserPage = () => {
     };
   }, []);
 
-  const visible = problems
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "history" || tab === "active") {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const visible = (activeTab === "active" ? activeProblems : myProblems)
     .slice()
-    .filter(p => {
-      if (activeTab === "active") {
-        return p.status !== "resolved" && p.status !== "rejected";
-      } else {
-        return p.status === "resolved" || p.status === "rejected";
-      }
-    })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   if (loading) return <div className="flex items-center justify-center min-h-[50vh] text-[10px] font-bold text-stone-500 uppercase tracking-widest animate-pulse">Loading...</div>;
@@ -91,20 +200,28 @@ const UserPage = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-end border-b border-stone-800 pb-2">
             <h3 className="text-xl font-bold text-stone-50">
-              Active Tickets
+              {activeTab === "active" ? "Active Complaints" : "My Complaints"}
             </h3>
-            <button 
-              onClick={() => setActiveTab(activeTab === "active" ? "history" : "active")}
-              className="text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors"
-            >
-              {activeTab === "active" ? "View History" : "View Active"}
-            </button>
+            <div className="flex items-center gap-4">
+              <Link
+                to="/dashboard"
+                className="text-sm font-bold text-stone-400 hover:text-stone-300 transition-colors"
+              >
+                View Dashboard
+              </Link>
+              <button 
+                onClick={() => setActiveTab(activeTab === "active" ? "history" : "active")}
+                className="text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors"
+              >
+                {activeTab === "active" ? "View My Complaints" : "View Active"}
+              </button>
+            </div>
           </div>
 
           <div className="space-y-6">
             {visible.length === 0 ? (
               <div className="p-12 border border-stone-800 border-dashed text-center">
-                <p className="text-xs font-bold text-stone-500 uppercase tracking-widest">No tickets found.</p>
+                <p className="text-xs font-bold text-stone-500 uppercase tracking-widest">No complaints found.</p>
               </div>
             ) : (
               visible.map((p) => {
@@ -114,7 +231,7 @@ const UserPage = () => {
                 const isInProgress = p.status === "approved" || (!isPending && !isResolved && !isRejected);
 
                 return (
-                  <div key={p.id} className="bg-stone-900 border border-stone-800 p-6 sm:p-8 hover:border-stone-700 transition-colors">
+                  <div key={p.id} onClick={() => openComplaintDetails(p)} className="bg-stone-900 border border-stone-800 p-6 sm:p-8 hover:border-stone-700 transition-colors cursor-pointer group">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-2 text-[10px] font-bold text-stone-500 uppercase tracking-widest mt-1">
                         <span>{(CATEGORY_LABELS[p.category] || p.category || "OTHER").toUpperCase()}</span>
@@ -122,24 +239,26 @@ const UserPage = () => {
                         <span>{new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                       </div>
                       
-                      <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
-                        isPending ? 'text-yellow-500 border-yellow-700/50 bg-yellow-900/30' :
-                        isInProgress ? 'text-blue-500 border-blue-700/50 bg-blue-900/30' :
-                        isResolved ? 'text-green-500 border-green-700/50 bg-green-900/30' :
-                        'text-stone-500 border-stone-800 bg-stone-800/50'
-                      }`}>
-                        {isPending ? 'PENDING' : isInProgress ? 'IN PROGRESS' : isResolved ? 'RESOLVED' : 'REJECTED'}
-                      </span>
-                      {p.priority && (
+                      <div className="flex items-center gap-2 shrink-0">
                         <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
-                          p.priority === 'critical' ? 'text-red-500 border-red-700/50 bg-red-900/30' :
-                          p.priority === 'high' ? 'text-orange-500 border-orange-700/50 bg-orange-900/30' :
-                          p.priority === 'low' ? 'text-green-500 border-green-700/50 bg-green-900/30' :
-                          'text-amber-500 border-amber-700/50 bg-amber-900/30'
+                          isPending ? 'text-yellow-500 border-yellow-700/50 bg-yellow-900/30' :
+                          isInProgress ? 'text-blue-500 border-blue-700/50 bg-blue-900/30' :
+                          isResolved ? 'text-green-500 border-green-700/50 bg-green-900/30' :
+                          'text-stone-500 border-stone-800 bg-stone-800/50'
                         }`}>
-                          {p.priority}
+                          {isPending ? 'PENDING' : isInProgress ? 'IN PROGRESS' : isResolved ? 'RESOLVED' : 'REJECTED'}
                         </span>
-                      )}
+                        {p.priority && (
+                          <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
+                            p.priority === 'critical' ? 'text-red-500 border-red-700/50 bg-red-900/30' :
+                            p.priority === 'high' ? 'text-orange-500 border-orange-700/50 bg-orange-900/30' :
+                            p.priority === 'low' ? 'text-green-500 border-green-700/50 bg-green-900/30' :
+                            'text-amber-500 border-amber-700/50 bg-amber-900/30'
+                          }`}>
+                            {p.priority}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <h3 className="text-xl font-bold text-stone-50 mb-2">
@@ -186,6 +305,122 @@ const UserPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Complaint Details Modal */}
+      {selectedComplaintDetails && (
+        <div className="fixed inset-0 z-[100] flex justify-end animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setSelectedComplaintDetails(null)}></div>
+          <div className="relative w-full max-w-xl h-full bg-stone-900 border-l border-stone-700 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-stone-800 flex justify-between items-center sticky top-0 bg-stone-900/95 backdrop-blur z-10">
+              <h2 className="text-xl font-bold text-stone-50">Complaint Details</h2>
+              <button onClick={(e) => { e.stopPropagation(); setSelectedComplaintDetails(null); }} className="text-stone-500 hover:text-stone-300 transition-colors text-2xl leading-none">&times;</button>
+            </div>
+            <div className="p-6 space-y-6 flex-1">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-2xl font-bold text-stone-50">{selectedComplaintDetails.title || "Untitled"}</h3>
+                  <div className="flex gap-2 items-center shrink-0 ml-4">
+                    {getPriorityBadge(selectedComplaintDetails.priority)}
+                    {getStatusBadge(selectedComplaintDetails.status)}
+                  </div>
+                </div>
+                <div className="flex gap-2 mb-4 items-center flex-wrap">
+                  <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
+                    {CATEGORY_LABELS[selectedComplaintDetails.category] || selectedComplaintDetails.category || "OTHER"}
+                  </span>
+                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                    Building {selectedComplaintDetails.building} • {selectedComplaintDetails.placeName}
+                  </span>
+                </div>
+                <p className="text-sm text-stone-300 mb-6 leading-relaxed whitespace-pre-wrap">{selectedComplaintDetails.description}</p>
+                <div className="mt-4">
+                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Submitted on:</span>
+                  <p className="text-sm text-stone-300">{new Date(selectedComplaintDetails.createdAt).toLocaleString()}</p>
+                </div>
+              </div>
+              
+              {selectedComplaintDetails.photoUrl && (
+                <div className="border border-stone-700 bg-stone-950 p-2 cursor-pointer group mb-6" onClick={(e) => { e.stopPropagation(); setIsImageZoomed(true); }}>
+                  <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem" className="w-full object-contain" />
+                </div>
+              )}
+
+              {myProblems.some(p => p.id === selectedComplaintDetails.id) && (
+                <div className="mt-8 border-t border-stone-800 pt-6">
+                  <h4 className="text-sm font-bold text-stone-50 uppercase tracking-widest mb-4">Comments</h4>
+                  <div className="space-y-4 mb-4 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                    {loadingComments ? (
+                      <p className="text-[10px] text-stone-500 uppercase tracking-widest">Loading...</p>
+                    ) : comments.length === 0 ? (
+                      <p className="text-[10px] text-stone-500 uppercase tracking-widest">No comments yet.</p>
+                    ) : (
+                      comments.map(c => (
+                        <div key={c.id} className="bg-stone-950 border border-stone-800 p-3 group">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{c.author}</span>
+                              {(selectedComplaintDetails.user_id && c.author_id !== selectedComplaintDetails.user_id) && <span className="bg-red-900/30 text-red-500 border border-red-800 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest">Admin</span>}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-[10px] text-stone-600 font-bold">{new Date(c.date).toLocaleString()}</span>
+                              {currentUser && c.author_id === currentUser.user && (
+                                <button 
+                                  onClick={() => handleDeleteComment(c.id)}
+                                  className="text-red-900 hover:text-red-500 transition-colors text-lg leading-none opacity-0 group-hover:opacity-100"
+                                  title="Delete Comment"
+                                >
+                                  &times;
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-sm text-stone-300">{c.text}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2 mb-6">
+                    <input 
+                      type="text" 
+                      value={newComment} 
+                      onChange={(e) => setNewComment(e.target.value)} 
+                      placeholder="Add a comment..." 
+                      className="flex-1 bg-stone-950 border border-stone-800 text-stone-50 text-sm px-3 py-2 focus:border-blue-500 outline-none"
+                    />
+                    <button 
+                      onClick={handlePostComment}
+                      disabled={postingComment || !newComment.trim()}
+                      className="bg-blue-800 hover:bg-blue-900 disabled:bg-stone-800 text-white px-4 text-[10px] uppercase tracking-widest font-bold transition-colors"
+                    >
+                      {postingComment ? "..." : "Send"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {myProblems.some(p => p.id === selectedComplaintDetails.id) && (
+                <div className="border-t border-stone-800 pt-6 mt-auto">
+                  <button 
+                    onClick={() => handleDeleteComplaint(selectedComplaintDetails.id)}
+                    className="w-full py-3 bg-red-900/20 border border-red-900/50 text-red-500 text-[10px] uppercase tracking-widest font-bold hover:bg-red-900/40 transition-colors"
+                  >
+                    Delete Complaint
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Zoom Modal */}
+      {isImageZoomed && selectedComplaintDetails?.photoUrl && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-stone-950/95 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setIsImageZoomed(false)}>
+          <button onClick={() => setIsImageZoomed(false)} className="absolute top-6 right-6 text-stone-500 hover:text-white transition-colors text-4xl leading-none">&times;</button>
+          <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem Zoomed" className="max-w-[90vw] max-h-[90vh] object-contain border border-stone-800 shadow-2xl" />
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Briefcase, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { 
   updateUserProfile, 
   changeUserRoom, 
@@ -16,6 +17,7 @@ interface ProfileModalProps {
 }
 
 const ProfileModal = ({ isOpen, onClose, user, onProfileUpdate }: ProfileModalProps) => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -154,9 +156,16 @@ const ProfileModal = ({ isOpen, onClose, user, onProfileUpdate }: ProfileModalPr
                 </div>
 
                 <div className="space-y-3 mt-8">
-                  <button onClick={handleLogout} className="w-full py-3 bg-red-900/20 border border-red-900/50 text-red-500 text-[10px] uppercase tracking-widest font-bold hover:bg-red-900/40 transition-colors">
-                    Log out
-                  </button>
+                  <div className="flex flex-col gap-3">
+                    {!isAdmin && (
+                      <button onClick={() => { onClose(); navigate("/user?tab=history"); }} className="w-full py-3 bg-stone-800 border border-stone-700 text-stone-300 text-[10px] uppercase tracking-widest font-bold hover:bg-stone-700 transition-colors">
+                        My Complaints
+                      </button>
+                    )}
+                    <button onClick={handleLogout} className="w-full py-3 bg-red-900/20 border border-red-900/50 text-red-500 text-[10px] uppercase tracking-widest font-bold hover:bg-red-900/40 transition-colors">
+                      Log out
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

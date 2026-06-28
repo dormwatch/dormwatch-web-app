@@ -167,7 +167,7 @@ const DashboardPage = () => {
     {previewImage && <PhotoModal src={previewImage} onClose={() => setPreviewImage(null)} />}
 
     <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-stone-700 gap-4 sm:gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-stone-800 gap-4 sm:gap-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-stone-50">
             Стрічка проблем
@@ -184,12 +184,12 @@ const DashboardPage = () => {
               placeholder="Пошук заявок..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="px-4 py-2 bg-stone-900 border border-stone-700 text-stone-50 text-sm focus:outline-none focus:border-blue-500 transition-colors w-full sm:w-64"
+              className="px-4 py-2 bg-stone-950 border border-stone-800 text-stone-50 text-sm focus:outline-none focus:border-stone-600 transition-colors w-full sm:w-64"
             />
             <select 
               value={activeCorps}
               onChange={e => setActiveCorps(e.target.value)}
-              className="px-4 py-2 bg-stone-900 border border-stone-700 text-stone-50 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+              className="px-4 py-2 bg-stone-950 border border-stone-800 text-stone-50 text-sm focus:outline-none focus:border-stone-600 transition-colors"
             >
               <option value="all">Всі гуртожитки</option>
               <option value="Гуртожиток 1">Гуртожиток 1</option>
@@ -202,7 +202,7 @@ const DashboardPage = () => {
             <select 
               value={activePriority}
               onChange={e => setActivePriority(e.target.value)}
-              className="px-4 py-2 bg-stone-900 border border-stone-700 text-stone-50 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+              className="px-4 py-2 bg-stone-950 border border-stone-800 text-stone-50 text-sm focus:outline-none focus:border-stone-600 transition-colors"
             >
               <option value="all">Всі пріоритети</option>
               <option value="low">Низький</option>
@@ -218,8 +218,8 @@ const DashboardPage = () => {
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-4 py-2 border text-[10px] font-bold uppercase tracking-widest transition-colors ${
                   activeCategory === category.id
-                    ? "bg-blue-600 text-white border-blue-500 shadow-sm"
-                    : "bg-stone-900 text-stone-400 border-stone-700 hover:bg-stone-800 hover:text-stone-300"
+                    ? "bg-stone-800 text-white border-stone-600 shadow-sm"
+                    : "bg-stone-950 text-stone-500 border-stone-800 hover:text-stone-300 hover:border-stone-700"
                 }`}
               >
                 {category.emoji && `${category.emoji} `}{category.name}
@@ -237,7 +237,7 @@ const DashboardPage = () => {
             return (
               <div
                 key={problem.id}
-                className="bg-stone-800 border border-stone-700 relative group transition-colors hover:border-stone-500"
+                className="bg-stone-900 border border-stone-800 relative group transition-colors hover:border-stone-600"
               >
                 {currentUser && (isAdmin || currentUser.user === problem.user_id) && (
                     <button 
@@ -257,7 +257,7 @@ const DashboardPage = () => {
                       className={`flex-shrink-0 flex flex-col items-center justify-center gap-1 w-16 h-16 border transition-all ${
                         hasVoted 
                             ? "bg-blue-900/20 text-blue-400 border-blue-800 cursor-default"
-                            : "bg-stone-900 text-stone-300 border-stone-700 hover:bg-blue-600 hover:text-white hover:border-blue-500 cursor-pointer" 
+                            : "bg-stone-950 text-stone-300 border-stone-800 hover:bg-blue-800 hover:text-white hover:border-blue-700 cursor-pointer" 
                       }`}
                     >
                       <span className="text-xl font-black leading-none">
@@ -274,7 +274,7 @@ const DashboardPage = () => {
                           <span className={`px-2 py-0.5 border text-[9px] font-black uppercase tracking-wider ${getStatusColor(problem.status)}`}>
                             {problem.status === 'resolved' ? 'Вирішено' : 'Активно'}
                           </span>
-                          <span className="px-2 py-0.5 border border-stone-700 bg-stone-900 text-[9px] font-black uppercase tracking-wider text-stone-400">
+                          <span className="px-2 py-0.5 border border-stone-800 bg-stone-950 text-[9px] font-black uppercase tracking-wider text-stone-400">
                             {categories.find(c => c.id === problem.category)?.name || problem.category}
                           </span>
                         </div>
@@ -292,14 +292,14 @@ const DashboardPage = () => {
 
                       {problem.photoUrl && (
                         <div 
-                          className="w-full h-48 border border-stone-700 overflow-hidden bg-stone-900 mb-6 cursor-zoom-in"
+                          className="w-full h-48 border border-stone-800 overflow-hidden bg-stone-950 mb-6 cursor-zoom-in"
                           onClick={() => setPreviewImage(resolveImageUrl(problem.photoUrl))}
                         >
                           <img src={resolveImageUrl(problem.thumbnail || problem.photoUrl)} className="w-full h-full object-cover opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         </div>
                       )}
                       
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-stone-700 gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-stone-800 gap-2">
                         <span className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">
                           {new Date(problem.createdAt).toLocaleDateString()}
                         </span>
@@ -316,13 +316,13 @@ const DashboardPage = () => {
                 </div>
 
                 {openCommentsId === problem.id && currentUser && (isAdmin || currentUser.user === problem.user_id) && (
-                  <div className="bg-stone-900 p-6 border-t border-stone-700">
+                  <div className="bg-stone-950 p-6 border-t border-stone-800">
                       <div className="space-y-4 mb-6 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                           {(commentsData[problem.id] || []).length === 0 ? (
                               <p className="text-center text-[10px] uppercase tracking-widest text-stone-500 font-bold">Немає коментарів.</p>
                           ) : (
                               (commentsData[problem.id] || []).map(c => (
-                                  <div key={c.id} className="bg-stone-800 p-4 border border-stone-700 relative group">
+                                  <div key={c.id} className="bg-stone-900 p-4 border border-stone-800 relative group">
                                       <div className="flex justify-between items-baseline mb-2">
                                           <span className="text-xs font-bold text-stone-200">{c.author}</span>
                                           <span className="text-[9px] text-stone-500 font-bold uppercase tracking-widest">{new Date(c.date).toLocaleDateString()}</span>
@@ -347,7 +347,7 @@ const DashboardPage = () => {
                               value={commentInput} 
                               onChange={e => setCommentInput(e.target.value)} 
                               placeholder="Написати коментар..." 
-                              className="flex-1 px-4 py-3 bg-stone-800 border border-stone-700 text-sm text-stone-50 focus:outline-none focus:border-blue-500 transition-colors"
+                              className="flex-1 px-4 py-3 bg-stone-900 border border-stone-800 text-sm text-stone-50 focus:outline-none focus:border-stone-600 transition-colors"
                               onKeyDown={(e) => e.key === 'Enter' && handleSendComment(problem.id, e)} 
                           />
                           <button 
@@ -365,14 +365,14 @@ const DashboardPage = () => {
           })}
 
           {filteredProblems.length === 0 && (
-             <div className="p-12 text-center text-[10px] uppercase tracking-widest text-stone-500 font-bold bg-stone-800 border border-stone-700 border-dashed">
+             <div className="p-12 text-center text-[10px] uppercase tracking-widest text-stone-500 font-bold bg-stone-900 border border-stone-800 border-dashed">
                 Заявок поки немає.
              </div>
           )}
         </div>
         
         <div className="lg:col-span-1">
-             <div className="bg-stone-800 border border-stone-700 p-6 sticky top-24">
+             <div className="bg-stone-900 border border-stone-800 p-6 sticky top-24">
                 {isAdmin ? (
                   <Link
                     to="/admin"
