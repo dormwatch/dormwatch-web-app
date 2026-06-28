@@ -48,6 +48,9 @@ const AdminPage = () => {
   const [ticketSearch, setTicketSearch] = useState("");
   const [ticketWorker, setTicketWorker] = useState("all");
   const [ticketPriority, setTicketPriority] = useState("all");
+  const [ticketDateFrom, setTicketDateFrom] = useState("");
+  const [ticketDateTo, setTicketDateTo] = useState("");
+  const [ticketCreationStatus, setTicketCreationStatus] = useState("all");
 
   // Ticket Modal State
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -203,6 +206,9 @@ const AdminPage = () => {
 
   const filteredTicketsList = useMemo(() => {
     return items.filter(p => {
+      // Only show tickets for published/approved complaints (implicitly hides resolved/pending/rejected)
+      if (p.status !== 'published' && p.status !== 'approved') return false;
+      
       if (ticketPriority !== "all" && p.priority !== ticketPriority) return false;
       if (ticketSearch) {
         const q = ticketSearch.toLowerCase();
@@ -214,9 +220,23 @@ const AdminPage = () => {
         const wId = String(ticket.user?.user || ticket.user || "");
         if (wId !== String(ticketWorker)) return false;
       }
+      
+      if (ticketCreationStatus === "created" && !ticket) return false;
+      if (ticketCreationStatus === "not_created" && ticket) return false;
+
+      const complaintDate = new Date(p.createdAt);
+      if (ticketDateFrom) {
+        if (complaintDate < new Date(ticketDateFrom)) return false;
+      }
+      if (ticketDateTo) {
+        const toDate = new Date(ticketDateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (complaintDate > toDate) return false;
+      }
+
       return true;
     });
-  }, [items, tickets, ticketWorker, ticketPriority, ticketSearch]);
+  }, [items, tickets, ticketWorker, ticketPriority, ticketSearch, ticketCreationStatus, ticketDateFrom, ticketDateTo]);
 
   const openTicketModal = (complaint: any) => {
     setSelectedComplaintForTicket(complaint);
@@ -248,6 +268,22 @@ const AdminPage = () => {
     } catch (e) {
       alert("Помилка збереження тікету.");
     }
+  };
+  const clearComplaintFilters = () => {
+    setComplaintSearch("");
+    setComplaintStatus("all");
+    setComplaintCategory("all");
+    setComplaintPriority("all");
+    setComplaintCorps("all");
+  };
+
+  const clearTicketFilters = () => {
+    setTicketSearch("");
+    setTicketWorker("all");
+    setTicketPriority("all");
+    setTicketDateFrom("");
+    setTicketDateTo("");
+    setTicketCreationStatus("all");
   };
 
   return (
@@ -375,7 +411,10 @@ const AdminPage = () => {
           {/* Filters Column */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-stone-900 border border-stone-800 p-6 space-y-6">
-              <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest border-b border-stone-800 pb-2">Filters</h3>
+              <div className="flex justify-between items-end border-b border-stone-800 pb-2">
+                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Filters</h3>
+                <button onClick={clearComplaintFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Clear</button>
+              </div>
               
               <div>
                 <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Search</label>
@@ -500,8 +539,39 @@ const AdminPage = () => {
           {/* Ticket Filters */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-stone-900 border border-stone-800 p-6 space-y-6">
-              <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest border-b border-stone-800 pb-2">Ticket Filters</h3>
+              <div className="flex justify-between items-end border-b border-stone-800 pb-2">
+                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Ticket Filters</h3>
+                <button onClick={clearTicketFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Clear</button>
+              </div>
               
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Ticket Status</label>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { id: "all", name: "All Tickets" },
+                    { id: "not_created", name: "Not created" },
+                    { id: "created", name: "Created" }
+                  ].map(s => (
+                    <label key={s.id} className="flex items-center gap-2 cursor-pointer group">
+                      <input type="radio" name="t_status" checked={ticketCreationStatus === s.id} onChange={() => setTicketCreationStatus(s.id)} className="hidden" />
+                      <div className={`w-3 h-3 border transition-colors ${ticketCreationStatus === s.id ? 'bg-blue-500 border-blue-500' : 'border-stone-600 group-hover:border-stone-400'}`}></div>
+                      <span className={`text-[11px] font-bold uppercase tracking-widest ${ticketCreationStatus === s.id ? 'text-stone-50' : 'text-stone-500 group-hover:text-stone-300'}`}>{s.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Date From</label>
+                  <input type="date" onClick={(e) => (e.target as any).showPicker && (e.target as any).showPicker()} value={ticketDateFrom} onChange={(e) => setTicketDateFrom(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] focus:outline-none focus:border-blue-500 transition-colors cursor-pointer" />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Date To</label>
+                  <input type="date" onClick={(e) => (e.target as any).showPicker && (e.target as any).showPicker()} value={ticketDateTo} onChange={(e) => setTicketDateTo(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] focus:outline-none focus:border-blue-500 transition-colors cursor-pointer" />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Search</label>
                 <input 

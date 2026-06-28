@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Briefcase, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+
 import { 
   updateUserProfile, 
   changeUserRoom, 
@@ -17,7 +17,6 @@ interface ProfileModalProps {
 }
 
 const ProfileModal = ({ isOpen, onClose, user, onProfileUpdate }: ProfileModalProps) => {
-  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
