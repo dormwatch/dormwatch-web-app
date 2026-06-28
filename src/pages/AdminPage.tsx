@@ -4,6 +4,7 @@ import { Download, Clock, Wrench, CheckCircle2, Edit2, Plus } from "lucide-react
 import { 
   fetchAllComplaints,
   updateComplaintStatus, 
+  updateComplaintPriority,
   deleteProblem,
   fetchUserProfile,
   CATEGORY_LABELS,
@@ -60,6 +61,7 @@ const AdminPage = () => {
   const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
 
   const [selectedComplaintDetails, setSelectedComplaintDetails] = useState<any>(null);
+  const [localPriority, setLocalPriority] = useState<string>('');
   const [isImageZoomed, setIsImageZoomed] = useState(false);
 
   const [comments, setComments] = useState<any[]>([]);
@@ -69,6 +71,7 @@ const AdminPage = () => {
 
   const openComplaintDetails = async (complaint: any) => {
     setSelectedComplaintDetails(complaint);
+    setLocalPriority(complaint.priority || 'low');
     setIsImageZoomed(false);
     setComments([]);
     setNewComment("");
@@ -175,6 +178,18 @@ const AdminPage = () => {
       alert("Failed to update status");
     } finally {
       setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""});
+    }
+  };
+
+  const handlePriorityChange = async (id: number, priority: string) => {
+    try {
+      await updateComplaintPriority(id, priority);
+      loadData();
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === id) {
+        setSelectedComplaintDetails({ ...selectedComplaintDetails, priority });
+      }
+    } catch(e) {
+      alert("Failed to update priority");
     }
   };
 
@@ -762,7 +777,7 @@ const AdminPage = () => {
                 onClick={handleSaveTicket} 
                 className="flex-1 px-4 py-3 bg-blue-800 text-white text-[10px] font-bold uppercase tracking-widest border border-blue-700 hover:bg-blue-700 transition-colors"
               >
-                Save Ticket
+                Save
               </button>
             </div>
           </div>
@@ -807,6 +822,26 @@ const AdminPage = () => {
                   <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem" className="w-full object-contain" />
                 </div>
               )}
+
+              <div className="pt-6 border-t border-stone-800 mb-6">
+                <h4 className="text-sm font-bold text-stone-50 uppercase tracking-widest mb-4">Update Priority</h4>
+                <div className="flex gap-2">
+                  {[
+                    { id: "low", label: "Низький", normal: "bg-green-900/10 text-green-600 border-green-900/30 hover:border-green-700", active: "bg-green-900/30 text-green-400 border-green-500 shadow-sm" },
+                    { id: "medium", label: "Середній", normal: "bg-amber-900/10 text-amber-600 border-amber-900/30 hover:border-amber-700", active: "bg-amber-900/30 text-amber-400 border-amber-500 shadow-sm" },
+                    { id: "high", label: "Високий", normal: "bg-orange-900/10 text-orange-600 border-orange-900/30 hover:border-orange-700", active: "bg-orange-900/30 text-orange-400 border-orange-500 shadow-sm" },
+                    { id: "critical", label: "Критичний", normal: "bg-red-900/10 text-red-600 border-red-900/30 hover:border-red-700", active: "bg-red-900/30 text-red-400 border-red-500 shadow-sm" },
+                  ].map(p => (
+                    <button 
+                      key={p.id} 
+                      onClick={() => setLocalPriority(p.id)}
+                      className={`flex-1 px-2 sm:px-4 py-3 text-[9px] font-bold uppercase tracking-widest transition-all border ${localPriority === p.id ? p.active : p.normal}`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <div className="mt-8 border-t border-stone-800 pt-6">
                 <h4 className="text-sm font-bold text-stone-50 uppercase tracking-widest mb-4">Comments</h4>
@@ -859,7 +894,7 @@ const AdminPage = () => {
               </div>
               
               {/* Modal Action Buttons */}
-              <div className="flex flex-wrap gap-2 pt-6 border-t border-stone-800">
+              <div className="flex flex-wrap gap-2 pt-6 border-t border-stone-800 mt-6">
                 {selectedComplaintDetails.status === 'pending' && (
                   <>
                     <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'approved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
@@ -867,10 +902,30 @@ const AdminPage = () => {
                   </>
                 )}
                 {(selectedComplaintDetails.status === 'approved' || selectedComplaintDetails.status === 'published') && (
-                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'resolved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
+                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'resolved')} className="w-full px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Mark Resolved</button>
                 )}
-                <button onClick={() => handleDelete(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id)} className="flex-1 px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
+                <button onClick={() => handleDelete(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id)} className="w-full px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
               </div>
+            </div>
+
+            <div className="p-6 border-t border-stone-800 flex gap-4 bg-stone-900/50 sticky bottom-0 z-10">
+              <button 
+                onClick={() => setSelectedComplaintDetails(null)} 
+                className="flex-1 px-4 py-3 bg-stone-800 text-stone-400 text-[10px] font-bold uppercase tracking-widest border border-stone-700 hover:text-stone-200 hover:border-stone-500 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  if (localPriority !== selectedComplaintDetails.priority) {
+                    await handlePriorityChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, localPriority);
+                  }
+                  setSelectedComplaintDetails(null);
+                }} 
+                className="flex-1 px-4 py-3 bg-blue-800 text-white text-[10px] font-bold uppercase tracking-widest border border-blue-700 hover:bg-blue-700 transition-colors"
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

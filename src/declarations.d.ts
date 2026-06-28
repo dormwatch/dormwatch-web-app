@@ -6,6 +6,7 @@ declare module '*/services/problemsApi' {
   export const fetchRejectedComplaints: any;
   export const fetchComplaintsByStatus: any;
   export const updateComplaintStatus: any;
+  export const updateComplaintPriority: any;
   export const deleteProblem: any;
   export const fetchComments: any;
   export const postComment: any;
