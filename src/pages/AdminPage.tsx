@@ -1,279 +1,1001 @@
-import { useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Download, Clock, Wrench, CheckCircle2, Edit2, Plus } from "lucide-react";
+import { 
+  fetchAllComplaints,
+  updateComplaintStatus, 
+  updateComplaintPriority,
+  deleteProblem,
+  fetchUserProfile,
+  CATEGORY_LABELS,
+  fetchTickets,
+  createTicket,
+  updateTicket,
+  fetchComments,
+  postComment,
+  deleteComment,
+  fetchEmployees
+} from "../services/problemsApi";
+import { resolveImageUrl } from "../services/imageUtils";
 
 const AdminPage = () => {
-  const [selectedFloor, setSelectedFloor] = useState<string>("all");
-  const [selectedCategory, setSelectedCategory] = useState<string>("plumbing");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialTab = queryParams.get("tab") || "overview";
+  
+  const [activeTab, setActiveTab] = useState(initialTab); // overview, complaints, tickets
+
+  useEffect(() => {
+    const tab = new URLSearchParams(location.search).get("tab");
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [location.search]);
+
+  const [items, setItems] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Filters for complaints
+  const [complaintSearch, setComplaintSearch] = useState("");
+  const [complaintStatus, setComplaintStatus] = useState("all");
+  const [complaintCategory, setComplaintCategory] = useState("all");
+  const [complaintPriority, setComplaintPriority] = useState("all");
+  const [complaintCorps, setComplaintCorps] = useState("all");
+
+  // Filters for tickets
+  const [ticketSearch, setTicketSearch] = useState("");
+  const [ticketWorker, setTicketWorker] = useState("all");
+  const [ticketPriority, setTicketPriority] = useState("all");
+  const [ticketDateFrom, setTicketDateFrom] = useState("");
+  const [ticketDateTo, setTicketDateTo] = useState("");
+  const [ticketCreationStatus, setTicketCreationStatus] = useState("all");
+
+  // Ticket Modal State
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [selectedComplaintForTicket, setSelectedComplaintForTicket] = useState<any>(null);
+  const [ticketEmployee, setTicketEmployee] = useState("");
+  const [ticketDeadline, setTicketDeadline] = useState("");
+  const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
+
+  const [selectedComplaintDetails, setSelectedComplaintDetails] = useState<any>(null);
+  const [localPriority, setLocalPriority] = useState<string>('');
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
+
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [postingComment, setPostingComment] = useState(false);
+
+  const openComplaintDetails = async (complaint: any) => {
+    setSelectedComplaintDetails(complaint);
+    setLocalPriority(complaint.priority || 'low');
+    setIsImageZoomed(false);
+    setComments([]);
+    setNewComment("");
+    setLoadingComments(true);
+    try {
+      const cid = complaint.id || complaint.complaint_id;
+      const fetched = await fetchComments(cid);
+      setComments(fetched);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handlePostComment = async () => {
+    if (!newComment.trim() || !selectedComplaintDetails) return;
+    setPostingComment(true);
+    try {
+      const cid = selectedComplaintDetails.id || selectedComplaintDetails.complaint_id;
+      const added = await postComment(cid, newComment);
+      setComments(prev => [...prev, added]);
+      setNewComment("");
+    } catch (e) {
+      alert("Не вдалося додати коментар");
+    } finally {
+      setPostingComment(false);
+    }
+  };
+
+  const [confirmDeleteCommentModal, setConfirmDeleteCommentModal] = useState<{isOpen: boolean, commentId: number | null}>({isOpen: false, commentId: null});
+
+  const handleDeleteComment = (commentId: number) => {
+    setConfirmDeleteCommentModal({isOpen: true, commentId});
+  };
+
+  const executeDeleteComment = async () => {
+    const { commentId } = confirmDeleteCommentModal;
+    if (commentId === null) return;
+    try {
+      await deleteComment(commentId);
+      setComments(prev => prev.filter(c => c.id !== commentId));
+    } catch (e) {
+      alert("Не вдалося видалити коментар");
+    } finally {
+      setConfirmDeleteCommentModal({isOpen: false, commentId: null});
+    }
+  };
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const user = await fetchUserProfile();
+        if (!user || !user.role || !["admin", "адміністратор"].includes((user.role.role_name || "").toLowerCase())) {
+          navigate("/");
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    checkAuth();
+  }, [navigate]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [allComplaints, fetchedTickets, fetchedEmployees] = await Promise.all([
+        fetchAllComplaints({}),
+        fetchTickets({}),
+        fetchEmployees()
+      ]);
+      setItems(allComplaints || []);
+      setTickets(fetchedTickets || []);
+      setEmployees(fetchedEmployees || []);
+    } catch (e) {
+      console.error("Failed to load admin data", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadData(); }, []);
+
+  const pendingCount = items.filter(i => i.status === "pending").length;
+  const inProgressCount = items.filter(i => i.status === "approved" || i.status === "published").length;
+  const resolvedCount = items.filter(i => i.status === "resolved").length;
+
+  const [confirmStatusModal, setConfirmStatusModal] = useState<{isOpen: boolean, complaintId: number | null, newStatus: string}>({isOpen: false, complaintId: null, newStatus: ""});
+
+  const handleStatusChange = (id: number, status: string) => {
+    setConfirmStatusModal({isOpen: true, complaintId: id, newStatus: status});
+  };
+
+  const executeStatusChange = async () => {
+    const { complaintId, newStatus } = confirmStatusModal;
+    if (complaintId === null) return;
+    try {
+      await updateComplaintStatus(complaintId, newStatus);
+      loadData();
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === complaintId) {
+        setSelectedComplaintDetails({ ...selectedComplaintDetails, status: newStatus });
+      }
+    } catch(e) {
+      alert("Не вдалося оновити статус");
+    } finally {
+      setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""});
+    }
+  };
+
+  const handlePriorityChange = async (id: number, priority: string) => {
+    try {
+      await updateComplaintPriority(id, priority);
+      loadData();
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === id) {
+        setSelectedComplaintDetails({ ...selectedComplaintDetails, priority });
+      }
+    } catch(e) {
+      alert("Не вдалося оновити пріоритет");
+    }
+  };
+
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState<{isOpen: boolean, complaintId: number | null}>({isOpen: false, complaintId: null});
+
+  const handleDelete = (id: number) => {
+    setConfirmDeleteModal({isOpen: true, complaintId: id});
+  };
+
+  const executeDelete = async () => {
+    const { complaintId } = confirmDeleteModal;
+    if (complaintId === null) return;
+    try {
+      await deleteProblem(complaintId);
+      loadData();
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === complaintId) {
+        setSelectedComplaintDetails(null);
+      }
+    } catch(e) {
+      alert("Не вдалося видалити заявку");
+    } finally {
+      setConfirmDeleteModal({isOpen: false, complaintId: null});
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const s = String(status || "new").toLowerCase();
+    if (s === "pending") return <span className="px-2 py-1 text-[9px] font-bold border border-yellow-700/50 text-yellow-500 uppercase tracking-widest bg-yellow-900/30">В ОЧІКУВАННІ</span>;
+    if (s === "approved" || s === "published") return <span className="px-2 py-1 text-[9px] font-bold border border-blue-700/50 text-blue-500 uppercase tracking-widest bg-blue-900/30">ОПУБЛІКОВАНО</span>;
+    if (s === "resolved") return <span className="px-2 py-1 text-[9px] font-bold border border-green-700/50 text-green-500 uppercase tracking-widest bg-green-900/30">ВИРІШЕНО</span>;
+    return <span className="px-2 py-1 text-[9px] font-bold border border-red-700/50 text-red-500 uppercase tracking-widest bg-red-900/30">ВІДХИЛЕНО</span>;
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    const p = String(priority || "medium").toLowerCase();
+    if (p === "critical") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-pink-900/30 text-pink-500 border border-pink-800">КРИТИЧНИЙ</span>;
+    if (p === "high") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-red-900/30 text-red-500 border border-red-800">ВИСОКИЙ</span>;
+    if (p === "low") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-green-900/30 text-green-500 border border-green-800">НИЗЬКИЙ</span>;
+    return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-orange-900/30 text-orange-500 border border-orange-800">СЕРЕДНІЙ</span>;
+  };
+
+  const filteredComplaints = useMemo(() => {
+    return items.filter(p => {
+      const s = p.status === 'published' ? 'approved' : p.status === 'denied' ? 'rejected' : p.status;
+      if (complaintStatus !== "all" && s !== complaintStatus) return false;
+      if (complaintCategory !== "all" && p.category !== complaintCategory) return false;
+      if (complaintPriority !== "all" && p.priority !== complaintPriority) return false;
+      if (complaintCorps !== "all" && String(p.building) !== complaintCorps) return false;
+      if (complaintSearch) {
+        const q = complaintSearch.toLowerCase();
+        if (!p.title?.toLowerCase().includes(q) && !p.description?.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [items, complaintStatus, complaintCategory, complaintPriority, complaintCorps, complaintSearch]);
+
+  const filteredTicketsList = useMemo(() => {
+    return items.filter(p => {
+      // Only show tickets for published/approved complaints (implicitly hides resolved/pending/rejected)
+      if (p.status !== 'published' && p.status !== 'approved') return false;
+      
+      if (ticketPriority !== "all" && p.priority !== ticketPriority) return false;
+      if (ticketSearch) {
+        const q = ticketSearch.toLowerCase();
+        if (!p.title?.toLowerCase().includes(q) && !p.description?.toLowerCase().includes(q)) return false;
+      }
+      const ticket = tickets.find(t => t.complaint === (p.id || p.complaint_id));
+      if (ticketWorker !== "all") {
+        if (!ticket) return false;
+        const wId = String(ticket.user?.user || ticket.user || "");
+        if (wId !== String(ticketWorker)) return false;
+      }
+      
+      if (ticketCreationStatus === "created" && !ticket) return false;
+      if (ticketCreationStatus === "not_created" && ticket) return false;
+
+      const complaintDate = new Date(p.createdAt);
+      if (ticketDateFrom) {
+        if (complaintDate < new Date(ticketDateFrom)) return false;
+      }
+      if (ticketDateTo) {
+        const toDate = new Date(ticketDateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (complaintDate > toDate) return false;
+      }
+
+      return true;
+    });
+  }, [items, tickets, ticketWorker, ticketPriority, ticketSearch, ticketCreationStatus, ticketDateFrom, ticketDateTo]);
+
+  const openTicketModal = (complaint: any) => {
+    setSelectedComplaintForTicket(complaint);
+    setTicketEmployee("");
+    setTicketDeadline("");
+    setEditingTicketId(null);
+    setIsTicketModalOpen(true);
+  };
+
+  const openEditTicketModal = (complaint: any, ticket: any) => {
+    setSelectedComplaintForTicket(complaint);
+    setTicketEmployee(ticket.user?.user || ticket.user || "");
+    setTicketDeadline(ticket.deadline ? new Date(ticket.deadline).toISOString().split('T')[0] : "");
+    setEditingTicketId(ticket.ticket_id);
+    setIsTicketModalOpen(true);
+  };
+
+  const handleSaveTicket = async () => {
+    if (!ticketEmployee) return alert("Будь ласка, оберіть виконавця.");
+    try {
+      if (editingTicketId) {
+        await updateTicket(editingTicketId, ticketEmployee, ticketDeadline || null);
+      } else {
+        const cid = selectedComplaintForTicket.id || selectedComplaintForTicket.complaint_id;
+        await createTicket(cid, ticketEmployee, ticketDeadline || null);
+      }
+      setIsTicketModalOpen(false);
+      loadData();
+    } catch (e) {
+      alert("Помилка збереження тікету.");
+    }
+  };
+  const clearComplaintFilters = () => {
+    setComplaintSearch("");
+    setComplaintStatus("all");
+    setComplaintCategory("all");
+    setComplaintPriority("all");
+    setComplaintCorps("all");
+  };
+
+  const clearTicketFilters = () => {
+    setTicketSearch("");
+    setTicketWorker("all");
+    setTicketPriority("all");
+    setTicketDateFrom("");
+    setTicketDateTo("");
+    setTicketCreationStatus("all");
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-            Адміністрування корпусу №4
-          </h2>
-          <p className="text-slate-500 mt-1">
-            Всі звернення відсортовані за пріоритетом (кількістю голосів)
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <select
-            value={selectedFloor}
-            onChange={(e) => setSelectedFloor(e.target.value)}
-            className="px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+    <div className="p-8 lg:p-12 space-y-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <h1 className="text-3xl font-bold text-stone-50">
+          {activeTab === 'overview' ? 'Загальний Огляд' : activeTab === 'complaints' ? 'Всі Заявки' : 'Управління Задачами'}
+        </h1>
+        <div className="flex items-center gap-4">
+          <button className="flex items-center gap-2 px-4 py-2 border border-stone-700 hover:bg-stone-800 transition-colors text-xs font-bold text-stone-300 uppercase tracking-widest">
+            <Download className="w-4 h-4" />
+            ЕКСПОРТ ДАНИХ
+          </button>
+          <button 
+            onClick={() => navigate("?tab=tickets")}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-800 border border-blue-700 hover:bg-blue-900 transition-colors text-xs font-bold text-white uppercase tracking-widest"
           >
-            <option value="all">Всі поверхи</option>
-            <option value="1">1 поверх</option>
-            <option value="2">2 поверх</option>
-            <option value="3">3 поверх</option>
-            <option value="4">4 поверх</option>
-            <option value="5">5 поверх</option>
-          </select>
+            <Plus className="w-4 h-4" />
+            НОВИЙ ТІКЕТ
+          </button>
         </div>
       </div>
-
-      <div className="grid lg:grid-cols-4 gap-8">
-        {/* Filters */}
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-            <h4 className="font-bold mb-4 flex items-center gap-2">
-              Категорії
-            </h4>
-            <div className="space-y-2">
-              <label className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedCategory === "plumbing"}
-                  onChange={() => setSelectedCategory("plumbing")}
-                  className="w-4 h-4 text-indigo-600 rounded"
-                />
-                <span className="text-sm font-bold text-indigo-900">
-                  Сантехніка
-                </span>
-              </label>
-              <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedCategory === "electrical"}
-                  onChange={() => setSelectedCategory("electrical")}
-                  className="w-4 h-4 text-indigo-600 rounded"
-                />
-                <span className="text-sm font-medium text-slate-600">
-                  Електрика
-                </span>
-              </label>
-              <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedCategory === "furniture"}
-                  onChange={() => setSelectedCategory("furniture")}
-                  className="w-4 h-4 text-indigo-600 rounded"
-                />
-                <span className="text-sm font-medium text-slate-600">
-                  Меблі
-                </span>
-              </label>
-              <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedCategory === "internet"}
-                  onChange={() => setSelectedCategory("internet")}
-                  className="w-4 h-4 text-indigo-600 rounded"
-                />
-                <span className="text-sm font-medium text-slate-600">
-                  Інтернет
-                </span>
-              </label>
+      {/* Tabs (Only visible for Complaints and Tickets) */}
+      {(activeTab === 'complaints' || activeTab === 'tickets') && (
+        <div className="flex border-b border-stone-800 overflow-x-auto">
+          <button 
+            onClick={() => navigate("?tab=complaints")}
+            className={`px-6 py-4 text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'complaints' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-stone-500 hover:text-stone-300'}`}
+          >
+            Всі Заявки
+          </button>
+          <button 
+            onClick={() => navigate("?tab=tickets")}
+            className={`px-6 py-4 text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'tickets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-stone-500 hover:text-stone-300'}`}
+          >
+            Управління Задачами
+          </button>
+        </div>
+      )}
+      {activeTab === "overview" && (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-stone-900 border border-stone-800 p-6 relative overflow-hidden group">
+              <div className="flex items-center gap-2 text-stone-400 mb-4">
+                <Clock className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">В очікуванні</span>
+              </div>
+              <div className="text-4xl font-bold text-stone-50 mb-2">{pendingCount}</div>
+              {/* Fake Bar Chart */}
+              <div className="absolute bottom-4 right-4 flex items-end gap-1 opacity-50">
+                <div className="w-2 h-4 bg-stone-700"></div><div className="w-2 h-6 bg-stone-700"></div><div className="w-2 h-3 bg-stone-700"></div><div className="w-2 h-8 bg-stone-700"></div><div className="w-2 h-5 bg-stone-700"></div><div className="w-2 h-10 bg-yellow-600"></div>
+              </div>
+            </div>
+            <div className="bg-stone-900 border border-stone-800 p-6 relative overflow-hidden group">
+              <div className="flex items-center gap-2 text-stone-400 mb-4">
+                <Wrench className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">В Процесі</span>
+              </div>
+              <div className="text-4xl font-bold text-stone-50 mb-2">{inProgressCount}</div>
+              {/* Fake Bar Chart */}
+              <div className="absolute bottom-4 right-4 flex items-end gap-1 opacity-50">
+                <div className="w-2 h-5 bg-stone-700"></div><div className="w-2 h-3 bg-stone-700"></div><div className="w-2 h-6 bg-stone-700"></div><div className="w-2 h-4 bg-stone-700"></div><div className="w-2 h-9 bg-stone-700"></div><div className="w-2 h-7 bg-orange-600"></div>
+              </div>
+            </div>
+            <div className="bg-stone-900 border border-stone-800 p-6 relative overflow-hidden group">
+              <div className="flex items-center gap-2 text-stone-400 mb-4">
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Вирішено</span>
+              </div>
+              <div className="text-4xl font-bold text-stone-50 mb-2">{resolvedCount}</div>
+              {/* Fake Bar Chart */}
+              <div className="absolute bottom-4 right-4 flex items-end gap-1 opacity-50">
+                <div className="w-2 h-3 bg-stone-700"></div><div className="w-2 h-5 bg-stone-700"></div><div className="w-2 h-8 bg-stone-700"></div><div className="w-2 h-4 bg-stone-700"></div><div className="w-2 h-6 bg-stone-700"></div><div className="w-2 h-12 bg-green-600"></div>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-            <h4 className="font-bold mb-4">Статус</h4>
-            <div className="space-y-2">
-              <label className="flex items-center gap-3 p-3 bg-red-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked
-                  className="w-4 h-4 text-red-600 rounded"
-                />
-                <span className="text-sm font-bold text-red-900">
-                  Терміново
-                </span>
-              </label>
-              <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 text-yellow-600 rounded"
-                />
-                <span className="text-sm font-medium text-slate-600">
-                  В роботі
-                </span>
-              </label>
-              <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 text-green-600 rounded"
-                />
-                <span className="text-sm font-medium text-slate-600">
-                  Виконано
-                </span>
-              </label>
+          <div className="bg-stone-900 border border-stone-800">
+            <div className="flex justify-between items-center p-6 border-b border-stone-800">
+              <h3 className="text-lg font-bold text-stone-50">Останні Заявки</h3>
+              <button onClick={() => navigate("?tab=complaints")} className="text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-widest">Всі</button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-stone-800 bg-stone-900/50">
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Проблема</th>
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Категорія</th>
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Дата Подання</th>
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Статус</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-800">
+                  {items.slice(0, 5).map(p => {
+                    const date = p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "N/A";
+                    return (
+                      <tr key={p.id || p.complaint_id} className="hover:bg-stone-800/20 transition-colors">
+                        <td className="p-4">
+                          <p className="font-bold text-sm text-stone-50">{p.title || "Untitled"}</p>
+                          <p className="text-xs text-stone-500 mt-1 line-clamp-1 max-w-md">{p.description}</p>
+                        </td>
+                        <td className="p-4">
+                          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{CATEGORY_LABELS[p.category] || p.category || "ІНШЕ"}</span>
+                        </td>
+                        <td className="p-4 text-xs text-stone-400 font-medium">{date}</td>
+                        <td className="p-4">
+                          {p.status === 'pending' && <span className="px-2 py-1 text-[9px] font-bold border border-yellow-700/50 text-yellow-500 uppercase tracking-widest bg-yellow-900/10">В ОЧІКУВАННІ</span>}
+                          {(p.status === 'approved' || p.status === 'published') && <span className="px-2 py-1 text-[9px] font-bold border border-orange-700/50 text-orange-500 uppercase tracking-widest bg-orange-900/10">В ПРОЦЕСІ</span>}
+                          {p.status === 'resolved' && <span className="px-2 py-1 text-[9px] font-bold border border-green-700/50 text-green-500 uppercase tracking-widest bg-green-900/10">ВИРІШЕНО</span>}
+                          {(p.status === 'denied' || p.status === 'rejected') && <span className="px-2 py-1 text-[9px] font-bold border border-red-700/50 text-red-500 uppercase tracking-widest bg-red-900/10">ВІДХИЛЕНО</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Reports List */}
-        <div className="lg:col-span-3 space-y-4">
-          {/* High Priority Report */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex gap-8 items-start hover:shadow-md transition-shadow">
-            <div className="flex flex-col items-center gap-1 p-3 bg-amber-50 rounded-2xl border border-amber-100 min-w-[70px]">
-              <svg
-                className="w-5 h-5 text-amber-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <span className="text-lg font-black text-amber-700">128</span>
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="text-xl font-bold text-slate-900">
-                    Зламана пральна машина №2
-                  </h4>
-                  <p className="text-xs font-bold text-indigo-500 uppercase mt-1">
-                    Пральня • 2 поверх
-                  </p>
-                </div>
-                <span className="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded-lg uppercase tracking-widest">
-                  Терміново
-                </span>
+      {activeTab === "complaints" && (
+        <div className="grid lg:grid-cols-4 gap-8 animate-in fade-in duration-300">
+          {/* Filters Column */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-stone-900 border border-stone-800 p-6 space-y-6">
+              <div className="flex justify-between items-end border-b border-stone-800 pb-2">
+                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Фільтри</h3>
+                <button onClick={clearComplaintFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Очистити</button>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed mb-4">
-                Ситуація потребує негайної уваги майстра. Машина не
-                запускається, горить червоний індикатор.
-              </p>
-              <div className="flex items-center justify-between border-t border-slate-50 pt-4">
-                <span className="text-xs text-slate-400 font-medium">
-                  18 коментарів • Створено 3 години тому
-                </span>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 text-sm font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
-                    Викликати майстра
-                  </button>
-                  <button className="px-4 py-2 text-sm font-bold bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors">
-                    Деталі
-                  </button>
+              
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пошук</label>
+                <input 
+                  type="text" 
+                  value={complaintSearch}
+                  onChange={(e) => setComplaintSearch(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-xs focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Статус</label>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { id: "all", name: "Всі" },
+                    { id: "pending", name: "В очікуванні" },
+                    { id: "approved", name: "Опубліковано" },
+                    { id: "resolved", name: "Вирішено" },
+                    { id: "rejected", name: "Відхилено" }
+                  ].map(s => (
+                    <label key={s.id} className="flex items-center gap-2 cursor-pointer group">
+                      <input type="radio" name="c_status" checked={complaintStatus === s.id} onChange={() => setComplaintStatus(s.id)} className="hidden" />
+                      <div className={`w-3 h-3 border transition-colors ${complaintStatus === s.id ? 'bg-blue-500 border-blue-500' : 'border-stone-600 group-hover:border-stone-400'}`}></div>
+                      <span className={`text-[11px] font-bold uppercase tracking-widest ${complaintStatus === s.id ? 'text-stone-50' : 'text-stone-500 group-hover:text-stone-300'}`}>{s.name}</span>
+                    </label>
+                  ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Категорія</label>
+                <select value={complaintCategory} onChange={(e) => setComplaintCategory(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
+                  <option value="all">ВСІ</option>
+                  <option value="plumbing">PLUMBING</option>
+                  <option value="electricity">ELECTRICITY</option>
+                  <option value="furniture">FURNITURE</option>
+                  <option value="internet">INTERNET</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пріоритет</label>
+                <select value={complaintPriority} onChange={(e) => setComplaintPriority(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
+                  <option value="all">ВСІ</option>
+                  <option value="critical">КРИТИЧНИЙ</option>
+                  <option value="high">ВИСОКИЙ</option>
+                  <option value="medium">СЕРЕДНІЙ</option>
+                  <option value="low">НИЗЬКИЙ</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Гуртожиток</label>
+                <select value={complaintCorps} onChange={(e) => setComplaintCorps(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
+                  <option value="all">ВСІ</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="3">3</option>
+                </select>
               </div>
             </div>
           </div>
 
-          {/* Medium Priority Report */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex gap-8 items-start hover:shadow-md transition-shadow">
-            <div className="flex flex-col items-center gap-1 p-3 bg-blue-50 rounded-2xl border border-blue-100 min-w-[70px]">
-              <svg
-                className="w-5 h-5 text-blue-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <span className="text-lg font-black text-blue-700">67</span>
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="text-xl font-bold text-slate-900">
-                    Відсутній стілець для навчання
-                  </h4>
-                  <p className="text-xs font-bold text-indigo-500 uppercase mt-1">
-                    Кімната 405 • 4 поверх
-                  </p>
+          {/* List Column */}
+          <div className="lg:col-span-3 space-y-4">
+            {loading ? (
+              <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">Loading...</div>
+            ) : filteredComplaints.length === 0 ? (
+              <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">No complaints found.</div>
+            ) : filteredComplaints.map(p => {
+              const cid = p.id || p.complaint_id;
+              return (
+              <div key={cid} className="bg-stone-900 border border-stone-800 p-6 flex flex-col md:flex-row gap-6 group hover:border-stone-600 transition-colors cursor-pointer" onClick={() => openComplaintDetails(p)}>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="text-xl font-bold text-stone-50">{p.title || "Untitled"}</h4>
+                    <div className="flex gap-2 items-center">
+                      {getPriorityBadge(p.priority)}
+                      {getStatusBadge(p.status)}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mb-4 items-center">
+                    <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
+                      {CATEGORY_LABELS[p.category] || p.category || "ІНШЕ"}
+                    </span>
+                    <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                      Гуртожиток {p.building} • {p.placeName}
+                    </span>
+                  </div>
+                  <p className="text-sm text-stone-400 mb-4 line-clamp-3 leading-relaxed">{p.description}</p>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-800">
+                    {p.status === 'pending' && (
+                      <>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'approved'); }} className="px-4 py-2 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Опублікувати</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'rejected'); }} className="px-4 py-2 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Відхилити</button>
+                      </>
+                    )}
+                    {(p.status === 'approved' || p.status === 'published') && (
+                      <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'resolved'); }} className="px-4 py-2 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Вирішити</button>
+                    )}
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(cid); }} className="px-4 py-2 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Видалити</button>
+                  </div>
                 </div>
-                <span className="px-3 py-1 bg-yellow-100 text-yellow-600 text-[10px] font-black rounded-lg uppercase tracking-widest">
-                  В роботі
-                </span>
+                {p.photoUrl && (
+                  <div className="w-full md:w-48 h-32 md:h-auto border border-stone-700 bg-stone-950 shrink-0">
+                    <img src={resolveImageUrl(p.thumbnail || p.photoUrl)} alt="Problem" className="w-full h-full object-cover opacity-80" />
+                  </div>
+                )}
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed mb-4">
-                У кімнаті проживає три особи, але є лише два робочих стільці.
-                Доводиться займатися по черзі.
-              </p>
-              <div className="flex items-center justify-between border-t border-slate-50 pt-4">
-                <span className="text-xs text-slate-400 font-medium">
-                  12 коментарів • Створено 1 день тому
-                </span>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 text-sm font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors">
-                    Замовити меблі
-                  </button>
-                  <button className="px-4 py-2 text-sm font-bold bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors">
-                    Деталі
-                  </button>
+            );
+            })}
+          </div>
+        </div>
+      )}
+
+      {activeTab === "tickets" && (
+        <div className="grid lg:grid-cols-4 gap-8 animate-in fade-in duration-300">
+          {/* Ticket Filters */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-stone-900 border border-stone-800 p-6 space-y-6">
+              <div className="flex justify-between items-end border-b border-stone-800 pb-2">
+                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Фільтри Тікетів</h3>
+                <button onClick={clearTicketFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Очистити</button>
+              </div>
+              
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Статус Тікета</label>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { id: "all", name: "Всі Тікети" },
+                    { id: "not_created", name: "Не створені" },
+                    { id: "created", name: "Створені" }
+                  ].map(s => (
+                    <label key={s.id} className="flex items-center gap-2 cursor-pointer group">
+                      <input type="radio" name="t_status" checked={ticketCreationStatus === s.id} onChange={() => setTicketCreationStatus(s.id)} className="hidden" />
+                      <div className={`w-3 h-3 border transition-colors ${ticketCreationStatus === s.id ? 'bg-blue-500 border-blue-500' : 'border-stone-600 group-hover:border-stone-400'}`}></div>
+                      <span className={`text-[11px] font-bold uppercase tracking-widest ${ticketCreationStatus === s.id ? 'text-stone-50' : 'text-stone-500 group-hover:text-stone-300'}`}>{s.name}</span>
+                    </label>
+                  ))}
                 </div>
+              </div>
+
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Дата Від</label>
+                  <input type="date" onClick={(e) => (e.target as any).showPicker && (e.target as any).showPicker()} value={ticketDateFrom} onChange={(e) => setTicketDateFrom(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] focus:outline-none focus:border-blue-500 transition-colors cursor-pointer" />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Дата До</label>
+                  <input type="date" onClick={(e) => (e.target as any).showPicker && (e.target as any).showPicker()} value={ticketDateTo} onChange={(e) => setTicketDateTo(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] focus:outline-none focus:border-blue-500 transition-colors cursor-pointer" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пошук</label>
+                <input 
+                  type="text" 
+                  value={ticketSearch}
+                  onChange={(e) => setTicketSearch(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-xs focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Працівник</label>
+                <select value={ticketWorker} onChange={(e) => setTicketWorker(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
+                  <option value="all">ВСІ</option>
+                  <option value="unassigned">НЕ ПРИЗНАЧЕНО</option>
+                  {employees.map(emp => (
+                    <option key={emp.user} value={emp.user}>{emp.first_name} {emp.last_name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пріоритет</label>
+                <select value={ticketPriority} onChange={(e) => setTicketPriority(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
+                  <option value="all">ВСІ</option>
+                  <option value="critical">КРИТИЧНИЙ</option>
+                  <option value="high">ВИСОКИЙ</option>
+                  <option value="medium">СЕРЕДНІЙ</option>
+                  <option value="low">НИЗЬКИЙ</option>
+                </select>
               </div>
             </div>
           </div>
 
-          {/* Low Priority Report */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex gap-8 items-start hover:shadow-md transition-shadow">
-            <div className="flex flex-col items-center gap-1 p-3 bg-slate-50 rounded-2xl border border-slate-100 min-w-[70px]">
-              <svg
-                className="w-5 h-5 text-slate-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <span className="text-lg font-black text-slate-700">23</span>
+          <div className="lg:col-span-3 space-y-4">
+            {loading ? (
+              <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">Loading...</div>
+            ) : filteredTicketsList.length === 0 ? (
+              <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">No complaints to ticket.</div>
+            ) : filteredTicketsList.map(p => {
+              const cid = p.id || p.complaint_id;
+              const ticket = tickets.find(t => t.complaint === cid);
+              const isPublished = p.status === 'approved' || p.status === 'published';
+              return (
+                <div key={cid} className="bg-stone-900 border border-stone-800 p-6 flex flex-col justify-between group hover:border-stone-600 transition-colors">
+                  <div>
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="text-xl font-bold text-stone-50">{p.title || "Untitled"}</h4>
+                      {getPriorityBadge(p.priority)}
+                    </div>
+                    <div className="flex gap-2 mb-4 items-center">
+                      <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
+                        {CATEGORY_LABELS[p.category] || p.category || "ІНШЕ"}
+                      </span>
+                      <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                        Гуртожиток {p.building} • {p.placeName}
+                      </span>
+                    </div>
+                    <p className="text-sm text-stone-400 mb-6 line-clamp-3 leading-relaxed">{p.description}</p>
+                  </div>
+                  <div>
+                    {ticket ? (
+                      <div className="bg-blue-900/10 p-4 border border-blue-900/30 relative flex justify-between items-center">
+                        <div>
+                          <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Призначено Тікет #{ticket.ticket_id}</p>
+                          {ticket.user && <p className="text-sm text-stone-300 font-medium">Працівник: {ticket.user.first_name} {ticket.user.last_name}</p>}
+                          {ticket.deadline && <p className="text-[10px] text-stone-500 uppercase tracking-widest mt-1">Дедлайн: {new Date(ticket.deadline).toLocaleDateString()}</p>}
+                        </div>
+                        <button 
+                          onClick={() => openEditTicketModal(p, ticket)} 
+                          className="p-2 bg-stone-900 border border-stone-700 text-stone-400 hover:text-blue-400 hover:border-blue-500 transition-colors"
+                          title="Редагувати Тікет"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      isPublished ? (
+                        <button 
+                          onClick={() => openTicketModal(p)}
+                          className="w-full px-4 py-3 bg-stone-800 border border-stone-700 text-stone-300 font-bold text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-colors"
+                        >
+                          Створити Тікет
+                        </button>
+                      ) : (
+                        <div className="w-full px-4 py-3 bg-stone-950 border border-stone-900 text-stone-600 font-bold text-[10px] uppercase tracking-widest text-center">
+                          Для створення задачі заявка має бути опублікована
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Ticket Modal */}
+      {isTicketModalOpen && selectedComplaintForTicket && (
+        <div className="fixed inset-0 z-[100] flex justify-end animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setIsTicketModalOpen(false)}></div>
+          <div className="relative w-full max-w-xl h-full bg-stone-900 border-l border-stone-700 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-stone-800 flex justify-between items-center sticky top-0 bg-stone-900/95 backdrop-blur z-10">
+              <h2 className="text-xl font-bold text-stone-50">{editingTicketId ? 'Редагувати Тікет' : 'Призначити Тікет'}</h2>
+              <button onClick={() => setIsTicketModalOpen(false)} className="text-stone-500 hover:text-stone-300 transition-colors text-2xl leading-none">&times;</button>
             </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-start mb-2">
+            
+            <div className="p-6 space-y-6 flex-1">
+              {/* Complaint Summary */}
+              <div className="bg-stone-800 p-4 border border-stone-700">
+                <h4 className="font-bold text-stone-50 text-lg mb-1">{selectedComplaintForTicket.title}</h4>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest mb-3">Гуртожиток {selectedComplaintForTicket.building} • {selectedComplaintForTicket.placeName}</p>
+                <p className="text-sm text-stone-300 leading-relaxed whitespace-pre-wrap">{selectedComplaintForTicket.description}</p>
+                {selectedComplaintForTicket.photoUrl && (
+                  <div className="mt-4 border border-stone-700 bg-stone-950 cursor-pointer group" onClick={() => setIsImageZoomed(true)}>
+                    <img src={resolveImageUrl(selectedComplaintForTicket.photoUrl)} alt="Problem" className="w-full max-h-48 object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                )}
+              </div>
+
+              {/* Form */}
+              <div className="space-y-4">
                 <div>
-                  <h4 className="text-xl font-bold text-slate-900">
-                    Повільний інтернет у вечірні години
-                  </h4>
-                  <p className="text-xs font-bold text-indigo-500 uppercase mt-1">
-                    Весь корпус • Всі поверхи
-                  </p>
+                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Призначити Працівника</label>
+                  <select
+                    value={ticketEmployee}
+                    onChange={(e) => setTicketEmployee(e.target.value)}
+                    className="w-full px-4 py-3 bg-stone-950 border border-stone-800 text-stone-300 text-sm focus:outline-none focus:border-blue-500 transition-colors appearance-none"
+                  >
+                    <option value="">-- Select Employee --</option>
+                    {employees.map(emp => (
+                      <option key={emp.user} value={emp.user}>
+                        {emp.first_name} {emp.last_name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <span className="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-lg uppercase tracking-widest">
-                  Новий
-                </span>
-              </div>
-              <p className="text-slate-500 text-sm leading-relaxed mb-4">
-                Після 18:00 швидкість інтернету значно падає. Важко дивитися
-                відео або завантажувати файли.
-              </p>
-              <div className="flex items-center justify-between border-t border-slate-50 pt-4">
-                <span className="text-xs text-slate-400 font-medium">
-                  7 коментарів • Створено 2 дні тому
-                </span>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 text-sm font-bold bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors">
-                    Зв'язатися з провайдером
-                  </button>
-                  <button className="px-4 py-2 text-sm font-bold bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors">
-                    Деталі
-                  </button>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Дедлайн</label>
+                  <input 
+                    type="date" 
+                    value={ticketDeadline}
+                    onChange={(e) => setTicketDeadline(e.target.value)}
+                    className="w-full px-4 py-3 bg-stone-950 border border-stone-800 text-stone-300 text-sm focus:outline-none focus:border-blue-500 transition-colors [color-scheme:dark]"
+                  />
                 </div>
               </div>
+            </div>
+
+            <div className="p-6 border-t border-stone-800 flex gap-4 bg-stone-900/50">
+              <button 
+                onClick={() => setIsTicketModalOpen(false)} 
+                className="flex-1 px-4 py-3 bg-stone-800 text-stone-400 text-[10px] font-bold uppercase tracking-widest border border-stone-700 hover:text-stone-200 hover:border-stone-500 transition-colors"
+              >
+                Скасувати
+              </button>
+              <button 
+                onClick={handleSaveTicket} 
+                className="flex-1 px-4 py-3 bg-blue-800 text-white text-[10px] font-bold uppercase tracking-widest border border-blue-700 hover:bg-blue-700 transition-colors"
+              >
+                Зберегти
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Complaint Details Modal */}
+      {selectedComplaintDetails && (
+        <div className="fixed inset-0 z-[100] flex justify-end animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setSelectedComplaintDetails(null)}></div>
+          <div className="relative w-full max-w-xl h-full bg-stone-900 border-l border-stone-700 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-stone-800 flex justify-between items-center sticky top-0 bg-stone-900/95 backdrop-blur z-10">
+              <h2 className="text-xl font-bold text-stone-50">Complaint Details</h2>
+              <button onClick={() => setSelectedComplaintDetails(null)} className="text-stone-500 hover:text-stone-300 transition-colors text-2xl leading-none">&times;</button>
+            </div>
+            <div className="p-6 space-y-6 flex-1">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-2xl font-bold text-stone-50">{selectedComplaintDetails.title || "Untitled"}</h3>
+                  <div className="flex gap-2 items-center shrink-0 ml-4">
+                    {getPriorityBadge(selectedComplaintDetails.priority)}
+                    {getStatusBadge(selectedComplaintDetails.status)}
+                  </div>
+                </div>
+                <div className="flex gap-2 mb-4 items-center flex-wrap">
+                  <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
+                    {CATEGORY_LABELS[selectedComplaintDetails.category] || selectedComplaintDetails.category || "ІНШЕ"}
+                  </span>
+                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                    Гуртожиток {selectedComplaintDetails.building} • {selectedComplaintDetails.placeName}
+                  </span>
+                </div>
+                <p className="text-sm text-stone-300 mb-6 leading-relaxed whitespace-pre-wrap">{selectedComplaintDetails.description}</p>
+                <div className="mt-4">
+                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Подано:</span>
+                  <p className="text-sm text-stone-300">{new Date(selectedComplaintDetails.createdAt).toLocaleString()}</p>
+                </div>
+              </div>
+              
+              {selectedComplaintDetails.photoUrl && (
+                <div className="border border-stone-700 bg-stone-950 p-2 cursor-pointer group mb-6" onClick={() => setIsImageZoomed(true)}>
+                  <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem" className="w-full object-contain" />
+                </div>
+              )}
+
+              <div className="pt-6 border-t border-stone-800 mb-6">
+                <h4 className="text-sm font-bold text-stone-50 uppercase tracking-widest mb-4">Update Priority</h4>
+                <div className="flex gap-2">
+                  {[
+                    { id: "low", label: "Низький", normal: "bg-green-900/10 text-green-600 border-green-900/30 hover:border-green-700", active: "bg-green-900/30 text-green-400 border-green-500 shadow-sm" },
+                    { id: "medium", label: "Середній", normal: "bg-amber-900/10 text-amber-600 border-amber-900/30 hover:border-amber-700", active: "bg-amber-900/30 text-amber-400 border-amber-500 shadow-sm" },
+                    { id: "high", label: "Високий", normal: "bg-orange-900/10 text-orange-600 border-orange-900/30 hover:border-orange-700", active: "bg-orange-900/30 text-orange-400 border-orange-500 shadow-sm" },
+                    { id: "critical", label: "Критичний", normal: "bg-red-900/10 text-red-600 border-red-900/30 hover:border-red-700", active: "bg-red-900/30 text-red-400 border-red-500 shadow-sm" },
+                  ].map(p => (
+                    <button 
+                      key={p.id} 
+                      onClick={() => setLocalPriority(p.id)}
+                      className={`flex-1 px-2 sm:px-4 py-3 text-[9px] font-bold uppercase tracking-widest transition-all border ${localPriority === p.id ? p.active : p.normal}`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8 border-t border-stone-800 pt-6">
+                <h4 className="text-sm font-bold text-stone-50 uppercase tracking-widest mb-4">Comments</h4>
+                <div className="space-y-4 mb-4 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                  {loadingComments ? (
+                    <p className="text-[10px] text-stone-500 uppercase tracking-widest">Loading...</p>
+                  ) : comments.length === 0 ? (
+                    <p className="text-[10px] text-stone-500 uppercase tracking-widest">No comments yet.</p>
+                  ) : (
+                    comments.map(c => (
+                      <div key={c.id} className="bg-stone-950 border border-stone-800 p-3 group">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{c.author}</span>
+                            {(selectedComplaintDetails.user_id && c.author_id !== selectedComplaintDetails.user_id) && <span className="bg-red-900/30 text-red-500 border border-red-800 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest">Admin</span>}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] text-stone-600 font-bold">{new Date(c.date).toLocaleString()}</span>
+                            <button 
+                              onClick={() => handleDeleteComment(c.id)}
+                              className="text-red-900 hover:text-red-500 transition-colors text-lg leading-none opacity-0 group-hover:opacity-100"
+                              title="Видалити Коментар"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-sm text-stone-300">{c.text}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+                
+                <div className="flex gap-2 mb-6">
+                  <input 
+                    type="text" 
+                    value={newComment} 
+                    onChange={(e) => setNewComment(e.target.value)} 
+                    placeholder="Додати коментар..." 
+                    className="flex-1 bg-stone-950 border border-stone-800 text-stone-50 text-sm px-3 py-2 focus:border-blue-500 outline-none"
+                  />
+                  <button 
+                    onClick={handlePostComment}
+                    disabled={postingComment || !newComment.trim()}
+                    className="bg-blue-800 hover:bg-blue-900 disabled:bg-stone-800 text-white px-4 text-[10px] uppercase tracking-widest font-bold transition-colors"
+                  >
+                    {postingComment ? "..." : "Надіслати"}
+                  </button>
+                </div>
+              </div>
+              
+              {/* Modal Action Buttons */}
+              <div className="flex flex-wrap gap-2 pt-6 border-t border-stone-800 mt-6">
+                {selectedComplaintDetails.status === 'pending' && (
+                  <>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'approved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Опублікувати</button>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'rejected')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Відхилити</button>
+                  </>
+                )}
+                {(selectedComplaintDetails.status === 'approved' || selectedComplaintDetails.status === 'published') && (
+                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'resolved')} className="w-full px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Вирішити</button>
+                )}
+                <button onClick={() => handleDelete(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id)} className="w-full px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Видалити</button>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-stone-800 flex gap-4 bg-stone-900/50 sticky bottom-0 z-10">
+              <button 
+                onClick={() => setSelectedComplaintDetails(null)} 
+                className="flex-1 px-4 py-3 bg-stone-800 text-stone-400 text-[10px] font-bold uppercase tracking-widest border border-stone-700 hover:text-stone-200 hover:border-stone-500 transition-colors"
+              >
+                Скасувати
+              </button>
+              <button 
+                onClick={async () => {
+                  if (localPriority !== selectedComplaintDetails.priority) {
+                    await handlePriorityChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, localPriority);
+                  }
+                  setSelectedComplaintDetails(null);
+                }} 
+                className="flex-1 px-4 py-3 bg-blue-800 text-white text-[10px] font-bold uppercase tracking-widest border border-blue-700 hover:bg-blue-700 transition-colors"
+              >
+                Зберегти
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Zoom Modal */}
+      {isImageZoomed && (selectedComplaintDetails?.photoUrl || selectedComplaintForTicket?.photoUrl) && (
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-stone-950/95 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setIsImageZoomed(false)}>
+          <button onClick={() => setIsImageZoomed(false)} className="absolute top-6 right-6 text-stone-500 hover:text-white transition-colors text-4xl leading-none">&times;</button>
+          <img src={resolveImageUrl(selectedComplaintDetails?.photoUrl || selectedComplaintForTicket?.photoUrl)} alt="Problem Zoomed" className="max-w-[90vw] max-h-[90vh] object-contain border border-stone-800 shadow-2xl" />
+        </div>
+      )}
+      {/* Підтвердити Зміну Статусу Modal */}
+      {confirmStatusModal.isOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""})}>
+          <div className="bg-stone-900 border border-stone-800 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Підтвердити Зміну Статусу</h3>
+            <p className="text-sm text-stone-400 mb-8 leading-relaxed">
+              Ви впевнені, що хочете змінити статус цієї заявки на <span className="font-bold text-stone-200 uppercase tracking-widest">{confirmStatusModal.newStatus}</span>?
+            </p>
+            <div className="flex gap-4">
+              <button onClick={() => setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
+                Скасувати
+              </button>
+              <button onClick={executeStatusChange} className="flex-1 px-4 py-3 bg-blue-900/30 border border-blue-800 text-[10px] font-bold text-blue-500 uppercase tracking-widest hover:bg-blue-800 hover:text-white transition-colors">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Modal */}
+      {confirmDeleteModal.isOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmDeleteModal({isOpen: false, complaintId: null})}>
+          <div className="bg-stone-900 border border-red-900/30 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Підтвердити Видалення</h3>
+            <p className="text-sm text-stone-400 mb-8 leading-relaxed">
+              Ви впевнені, що хочете видалити цю заявку назавжди? Цю дію неможливо скасувати.
+            </p>
+            <div className="flex gap-4">
+              <button onClick={() => setConfirmDeleteModal({isOpen: false, complaintId: null})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
+                Скасувати
+              </button>
+              <button onClick={executeDelete} className="flex-1 px-4 py-3 bg-red-900/30 border border-red-800 text-[10px] font-bold text-red-500 uppercase tracking-widest hover:bg-red-800 hover:text-white transition-colors">
+                Видалити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Confirm Видалити Коментар Modal */}
+      {confirmDeleteCommentModal.isOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmDeleteCommentModal({isOpen: false, commentId: null})}>
+          <div className="bg-stone-900 border border-red-900/30 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Підтвердити Видалення</h3>
+            <p className="text-sm text-stone-400 mb-8 leading-relaxed">
+              Ви впевнені, що хочете видалити цей коментар назавжди? Цю дію неможливо скасувати.
+            </p>
+            <div className="flex gap-4">
+              <button onClick={() => setConfirmDeleteCommentModal({isOpen: false, commentId: null})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
+                Скасувати
+              </button>
+              <button onClick={executeDeleteComment} className="flex-1 px-4 py-3 bg-red-900/30 border border-red-800 text-[10px] font-bold text-red-500 uppercase tracking-widest hover:bg-red-800 hover:text-white transition-colors">
+                Видалити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
