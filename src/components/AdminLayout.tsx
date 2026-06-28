@@ -21,10 +21,10 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const navItems = [
-    { name: "Admin Overview", path: "/admin?tab=overview", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { name: "Residents", path: "#", icon: <Users className="w-5 h-5" /> },
-    { name: "All Complaints", path: "/admin?tab=complaints", icon: <FileText className="w-5 h-5" /> },
-    { name: "Announcements", path: "#", icon: <Megaphone className="w-5 h-5" /> },
+    { name: "Загальний Огляд", path: "/admin?tab=overview", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { name: "Мешканці", path: "#", icon: <Users className="w-5 h-5" /> },
+    { name: "Всі Заявки", path: "/admin?tab=complaints", icon: <FileText className="w-5 h-5" /> },
+    { name: "Оголошення", path: "#", icon: <Megaphone className="w-5 h-5" /> },
   ];
 
   return (
@@ -67,7 +67,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
         <div className="p-4 border-t border-stone-700 space-y-4">
           <button onClick={() => setIsProfileModalOpen(true)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-stone-400 hover:text-stone-300 hover:bg-stone-800/50 transition-colors border-l-4 border-transparent text-left">
             <Settings className="w-5 h-5" />
-            Settings
+            Налаштування
           </button>
 
           <button onClick={() => setIsProfileModalOpen(true)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-stone-800/50 transition-colors text-left">
@@ -76,10 +76,10 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
             </div>
             <div className="flex flex-col overflow-hidden">
               <span className="text-sm font-bold text-stone-50 truncate">
-                {userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : "Admin"}
+                {userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : "Адмін"}
               </span>
               <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-widest truncate">
-                {userProfile?.place?.place_name || "Headquarters"}
+                {userProfile?.place?.place_name || "Головний офіс"}
               </span>
             </div>
           </button>

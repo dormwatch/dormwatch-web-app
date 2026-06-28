@@ -96,7 +96,7 @@ const AdminPage = () => {
       setComments(prev => [...prev, added]);
       setNewComment("");
     } catch (e) {
-      alert("Failed to post comment");
+      alert("Не вдалося додати коментар");
     } finally {
       setPostingComment(false);
     }
@@ -115,7 +115,7 @@ const AdminPage = () => {
       await deleteComment(commentId);
       setComments(prev => prev.filter(c => c.id !== commentId));
     } catch (e) {
-      alert("Failed to delete comment");
+      alert("Не вдалося видалити коментар");
     } finally {
       setConfirmDeleteCommentModal({isOpen: false, commentId: null});
     }
@@ -175,7 +175,7 @@ const AdminPage = () => {
         setSelectedComplaintDetails({ ...selectedComplaintDetails, status: newStatus });
       }
     } catch(e) {
-      alert("Failed to update status");
+      alert("Не вдалося оновити статус");
     } finally {
       setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""});
     }
@@ -189,7 +189,7 @@ const AdminPage = () => {
         setSelectedComplaintDetails({ ...selectedComplaintDetails, priority });
       }
     } catch(e) {
-      alert("Failed to update priority");
+      alert("Не вдалося оновити пріоритет");
     }
   };
 
@@ -209,7 +209,7 @@ const AdminPage = () => {
         setSelectedComplaintDetails(null);
       }
     } catch(e) {
-      alert("Failed to delete complaint");
+      alert("Не вдалося видалити заявку");
     } finally {
       setConfirmDeleteModal({isOpen: false, complaintId: null});
     }
@@ -217,18 +217,18 @@ const AdminPage = () => {
 
   const getStatusBadge = (status: string) => {
     const s = String(status || "new").toLowerCase();
-    if (s === "pending") return <span className="px-2 py-1 text-[9px] font-bold border border-yellow-700/50 text-yellow-500 uppercase tracking-widest bg-yellow-900/30">PENDING</span>;
-    if (s === "approved" || s === "published") return <span className="px-2 py-1 text-[9px] font-bold border border-blue-700/50 text-blue-500 uppercase tracking-widest bg-blue-900/30">PUBLISHED</span>;
-    if (s === "resolved") return <span className="px-2 py-1 text-[9px] font-bold border border-green-700/50 text-green-500 uppercase tracking-widest bg-green-900/30">RESOLVED</span>;
-    return <span className="px-2 py-1 text-[9px] font-bold border border-red-700/50 text-red-500 uppercase tracking-widest bg-red-900/30">REJECTED</span>;
+    if (s === "pending") return <span className="px-2 py-1 text-[9px] font-bold border border-yellow-700/50 text-yellow-500 uppercase tracking-widest bg-yellow-900/30">В ОЧІКУВАННІ</span>;
+    if (s === "approved" || s === "published") return <span className="px-2 py-1 text-[9px] font-bold border border-blue-700/50 text-blue-500 uppercase tracking-widest bg-blue-900/30">ОПУБЛІКОВАНО</span>;
+    if (s === "resolved") return <span className="px-2 py-1 text-[9px] font-bold border border-green-700/50 text-green-500 uppercase tracking-widest bg-green-900/30">ВИРІШЕНО</span>;
+    return <span className="px-2 py-1 text-[9px] font-bold border border-red-700/50 text-red-500 uppercase tracking-widest bg-red-900/30">ВІДХИЛЕНО</span>;
   };
 
   const getPriorityBadge = (priority: string) => {
     const p = String(priority || "medium").toLowerCase();
-    if (p === "critical") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-pink-900/30 text-pink-500 border border-pink-800">CRITICAL</span>;
-    if (p === "high") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-red-900/30 text-red-500 border border-red-800">HIGH</span>;
-    if (p === "low") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-green-900/30 text-green-500 border border-green-800">LOW</span>;
-    return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-orange-900/30 text-orange-500 border border-orange-800">MEDIUM</span>;
+    if (p === "critical") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-pink-900/30 text-pink-500 border border-pink-800">КРИТИЧНИЙ</span>;
+    if (p === "high") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-red-900/30 text-red-500 border border-red-800">ВИСОКИЙ</span>;
+    if (p === "low") return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-green-900/30 text-green-500 border border-green-800">НИЗЬКИЙ</span>;
+    return <span className="px-2 py-1 text-[9px] font-black uppercase tracking-widest bg-orange-900/30 text-orange-500 border border-orange-800">СЕРЕДНІЙ</span>;
   };
 
   const filteredComplaints = useMemo(() => {
@@ -333,19 +333,19 @@ const AdminPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <h1 className="text-3xl font-bold text-stone-50">
-          {activeTab === 'overview' ? 'Facility Overview' : activeTab === 'complaints' ? 'All Complaints' : 'Ticket Management'}
+          {activeTab === 'overview' ? 'Загальний Огляд' : activeTab === 'complaints' ? 'Всі Заявки' : 'Управління Задачами'}
         </h1>
         <div className="flex items-center gap-4">
           <button className="flex items-center gap-2 px-4 py-2 border border-stone-700 hover:bg-stone-800 transition-colors text-xs font-bold text-stone-300 uppercase tracking-widest">
             <Download className="w-4 h-4" />
-            Export Data
+            ЕКСПОРТ ДАНИХ
           </button>
           <button 
             onClick={() => navigate("?tab=tickets")}
             className="flex items-center gap-2 px-4 py-2 bg-blue-800 border border-blue-700 hover:bg-blue-900 transition-colors text-xs font-bold text-white uppercase tracking-widest"
           >
             <Plus className="w-4 h-4" />
-            New Work Order
+            НОВИЙ ТІКЕТ
           </button>
         </div>
       </div>
@@ -356,13 +356,13 @@ const AdminPage = () => {
             onClick={() => navigate("?tab=complaints")}
             className={`px-6 py-4 text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'complaints' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-stone-500 hover:text-stone-300'}`}
           >
-            All Complaints
+            Всі Заявки
           </button>
           <button 
             onClick={() => navigate("?tab=tickets")}
             className={`px-6 py-4 text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === 'tickets' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-stone-500 hover:text-stone-300'}`}
           >
-            Ticket Management
+            Управління Задачами
           </button>
         </div>
       )}
@@ -372,7 +372,7 @@ const AdminPage = () => {
             <div className="bg-stone-900 border border-stone-800 p-6 relative overflow-hidden group">
               <div className="flex items-center gap-2 text-stone-400 mb-4">
                 <Clock className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Pending</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">В очікуванні</span>
               </div>
               <div className="text-4xl font-bold text-stone-50 mb-2">{pendingCount}</div>
               {/* Fake Bar Chart */}
@@ -383,7 +383,7 @@ const AdminPage = () => {
             <div className="bg-stone-900 border border-stone-800 p-6 relative overflow-hidden group">
               <div className="flex items-center gap-2 text-stone-400 mb-4">
                 <Wrench className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">In Progress</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">В Процесі</span>
               </div>
               <div className="text-4xl font-bold text-stone-50 mb-2">{inProgressCount}</div>
               {/* Fake Bar Chart */}
@@ -394,7 +394,7 @@ const AdminPage = () => {
             <div className="bg-stone-900 border border-stone-800 p-6 relative overflow-hidden group">
               <div className="flex items-center gap-2 text-stone-400 mb-4">
                 <CheckCircle2 className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Resolved</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">Вирішено</span>
               </div>
               <div className="text-4xl font-bold text-stone-50 mb-2">{resolvedCount}</div>
               {/* Fake Bar Chart */}
@@ -406,17 +406,17 @@ const AdminPage = () => {
 
           <div className="bg-stone-900 border border-stone-800">
             <div className="flex justify-between items-center p-6 border-b border-stone-800">
-              <h3 className="text-lg font-bold text-stone-50">Recent Complaints</h3>
-              <button onClick={() => navigate("?tab=complaints")} className="text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-widest">View all</button>
+              <h3 className="text-lg font-bold text-stone-50">Останні Заявки</h3>
+              <button onClick={() => navigate("?tab=complaints")} className="text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-widest">Всі</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-stone-800 bg-stone-900/50">
-                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Issue</th>
-                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Category</th>
-                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Date Submitted</th>
-                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Status</th>
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Проблема</th>
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Категорія</th>
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Дата Подання</th>
+                    <th className="p-4 text-[10px] font-bold text-stone-500 uppercase tracking-widest">Статус</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-800">
@@ -429,14 +429,14 @@ const AdminPage = () => {
                           <p className="text-xs text-stone-500 mt-1 line-clamp-1 max-w-md">{p.description}</p>
                         </td>
                         <td className="p-4">
-                          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{CATEGORY_LABELS[p.category] || p.category || "OTHER"}</span>
+                          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{CATEGORY_LABELS[p.category] || p.category || "ІНШЕ"}</span>
                         </td>
                         <td className="p-4 text-xs text-stone-400 font-medium">{date}</td>
                         <td className="p-4">
-                          {p.status === 'pending' && <span className="px-2 py-1 text-[9px] font-bold border border-yellow-700/50 text-yellow-500 uppercase tracking-widest bg-yellow-900/10">PENDING</span>}
-                          {(p.status === 'approved' || p.status === 'published') && <span className="px-2 py-1 text-[9px] font-bold border border-orange-700/50 text-orange-500 uppercase tracking-widest bg-orange-900/10">IN PROGRESS</span>}
-                          {p.status === 'resolved' && <span className="px-2 py-1 text-[9px] font-bold border border-green-700/50 text-green-500 uppercase tracking-widest bg-green-900/10">RESOLVED</span>}
-                          {(p.status === 'denied' || p.status === 'rejected') && <span className="px-2 py-1 text-[9px] font-bold border border-red-700/50 text-red-500 uppercase tracking-widest bg-red-900/10">REJECTED</span>}
+                          {p.status === 'pending' && <span className="px-2 py-1 text-[9px] font-bold border border-yellow-700/50 text-yellow-500 uppercase tracking-widest bg-yellow-900/10">В ОЧІКУВАННІ</span>}
+                          {(p.status === 'approved' || p.status === 'published') && <span className="px-2 py-1 text-[9px] font-bold border border-orange-700/50 text-orange-500 uppercase tracking-widest bg-orange-900/10">В ПРОЦЕСІ</span>}
+                          {p.status === 'resolved' && <span className="px-2 py-1 text-[9px] font-bold border border-green-700/50 text-green-500 uppercase tracking-widest bg-green-900/10">ВИРІШЕНО</span>}
+                          {(p.status === 'denied' || p.status === 'rejected') && <span className="px-2 py-1 text-[9px] font-bold border border-red-700/50 text-red-500 uppercase tracking-widest bg-red-900/10">ВІДХИЛЕНО</span>}
                         </td>
                       </tr>
                     );
@@ -454,12 +454,12 @@ const AdminPage = () => {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-stone-900 border border-stone-800 p-6 space-y-6">
               <div className="flex justify-between items-end border-b border-stone-800 pb-2">
-                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Filters</h3>
-                <button onClick={clearComplaintFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Clear</button>
+                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Фільтри</h3>
+                <button onClick={clearComplaintFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Очистити</button>
               </div>
               
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Search</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пошук</label>
                 <input 
                   type="text" 
                   value={complaintSearch}
@@ -470,14 +470,14 @@ const AdminPage = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Status</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Статус</label>
                 <div className="flex flex-col gap-2">
                   {[
-                    { id: "all", name: "All" },
-                    { id: "pending", name: "Pending" },
-                    { id: "approved", name: "Published" },
-                    { id: "resolved", name: "Resolved" },
-                    { id: "rejected", name: "Rejected" }
+                    { id: "all", name: "Всі" },
+                    { id: "pending", name: "В очікуванні" },
+                    { id: "approved", name: "Опубліковано" },
+                    { id: "resolved", name: "Вирішено" },
+                    { id: "rejected", name: "Відхилено" }
                   ].map(s => (
                     <label key={s.id} className="flex items-center gap-2 cursor-pointer group">
                       <input type="radio" name="c_status" checked={complaintStatus === s.id} onChange={() => setComplaintStatus(s.id)} className="hidden" />
@@ -489,9 +489,9 @@ const AdminPage = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Category</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Категорія</label>
                 <select value={complaintCategory} onChange={(e) => setComplaintCategory(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
-                  <option value="all">ALL</option>
+                  <option value="all">ВСІ</option>
                   <option value="plumbing">PLUMBING</option>
                   <option value="electricity">ELECTRICITY</option>
                   <option value="furniture">FURNITURE</option>
@@ -500,20 +500,20 @@ const AdminPage = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Priority</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пріоритет</label>
                 <select value={complaintPriority} onChange={(e) => setComplaintPriority(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
-                  <option value="all">ALL</option>
-                  <option value="critical">CRITICAL</option>
-                  <option value="high">HIGH</option>
-                  <option value="medium">MEDIUM</option>
-                  <option value="low">LOW</option>
+                  <option value="all">ВСІ</option>
+                  <option value="critical">КРИТИЧНИЙ</option>
+                  <option value="high">ВИСОКИЙ</option>
+                  <option value="medium">СЕРЕДНІЙ</option>
+                  <option value="low">НИЗЬКИЙ</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Building</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Гуртожиток</label>
                 <select value={complaintCorps} onChange={(e) => setComplaintCorps(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
-                  <option value="all">ALL</option>
+                  <option value="all">ВСІ</option>
                   <option value="4">4</option>
                   <option value="5">5</option>
                   <option value="3">3</option>
@@ -542,10 +542,10 @@ const AdminPage = () => {
                   </div>
                   <div className="flex gap-2 mb-4 items-center">
                     <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
-                      {CATEGORY_LABELS[p.category] || p.category || "OTHER"}
+                      {CATEGORY_LABELS[p.category] || p.category || "ІНШЕ"}
                     </span>
                     <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
-                      Building {p.building} • {p.placeName}
+                      Гуртожиток {p.building} • {p.placeName}
                     </span>
                   </div>
                   <p className="text-sm text-stone-400 mb-4 line-clamp-3 leading-relaxed">{p.description}</p>
@@ -554,14 +554,14 @@ const AdminPage = () => {
                   <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-800">
                     {p.status === 'pending' && (
                       <>
-                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'approved'); }} className="px-4 py-2 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
-                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'rejected'); }} className="px-4 py-2 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'approved'); }} className="px-4 py-2 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Опублікувати</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'rejected'); }} className="px-4 py-2 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Відхилити</button>
                       </>
                     )}
                     {(p.status === 'approved' || p.status === 'published') && (
-                      <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'resolved'); }} className="px-4 py-2 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleStatusChange(cid, 'resolved'); }} className="px-4 py-2 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Вирішити</button>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); handleDelete(cid); }} className="px-4 py-2 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(cid); }} className="px-4 py-2 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Видалити</button>
                   </div>
                 </div>
                 {p.photoUrl && (
@@ -582,17 +582,17 @@ const AdminPage = () => {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-stone-900 border border-stone-800 p-6 space-y-6">
               <div className="flex justify-between items-end border-b border-stone-800 pb-2">
-                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Ticket Filters</h3>
-                <button onClick={clearTicketFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Clear</button>
+                <h3 className="text-sm font-bold text-stone-50 uppercase tracking-widest">Фільтри Тікетів</h3>
+                <button onClick={clearTicketFilters} className="text-[10px] text-stone-400 hover:text-stone-200 uppercase tracking-widest font-bold transition-colors">Очистити</button>
               </div>
               
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Ticket Status</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Статус Тікета</label>
                 <div className="flex flex-col gap-2">
                   {[
-                    { id: "all", name: "All Tickets" },
-                    { id: "not_created", name: "Not created" },
-                    { id: "created", name: "Created" }
+                    { id: "all", name: "Всі Тікети" },
+                    { id: "not_created", name: "Не створені" },
+                    { id: "created", name: "Створені" }
                   ].map(s => (
                     <label key={s.id} className="flex items-center gap-2 cursor-pointer group">
                       <input type="radio" name="t_status" checked={ticketCreationStatus === s.id} onChange={() => setTicketCreationStatus(s.id)} className="hidden" />
@@ -605,17 +605,17 @@ const AdminPage = () => {
 
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Date From</label>
+                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Дата Від</label>
                   <input type="date" onClick={(e) => (e.target as any).showPicker && (e.target as any).showPicker()} value={ticketDateFrom} onChange={(e) => setTicketDateFrom(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] focus:outline-none focus:border-blue-500 transition-colors cursor-pointer" />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Date To</label>
+                  <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Дата До</label>
                   <input type="date" onClick={(e) => (e.target as any).showPicker && (e.target as any).showPicker()} value={ticketDateTo} onChange={(e) => setTicketDateTo(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] focus:outline-none focus:border-blue-500 transition-colors cursor-pointer" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Search</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пошук</label>
                 <input 
                   type="text" 
                   value={ticketSearch}
@@ -626,10 +626,10 @@ const AdminPage = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Worker</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Працівник</label>
                 <select value={ticketWorker} onChange={(e) => setTicketWorker(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
-                  <option value="all">ALL</option>
-                  <option value="unassigned">UNASSIGNED</option>
+                  <option value="all">ВСІ</option>
+                  <option value="unassigned">НЕ ПРИЗНАЧЕНО</option>
                   {employees.map(emp => (
                     <option key={emp.user} value={emp.user}>{emp.first_name} {emp.last_name}</option>
                   ))}
@@ -637,13 +637,13 @@ const AdminPage = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Priority</label>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2">Пріоритет</label>
                 <select value={ticketPriority} onChange={(e) => setTicketPriority(e.target.value)} className="w-full px-3 py-2 bg-stone-950 border border-stone-800 text-stone-300 text-[11px] uppercase tracking-widest focus:outline-none focus:border-blue-500 appearance-none">
-                  <option value="all">ALL</option>
-                  <option value="critical">CRITICAL</option>
-                  <option value="high">HIGH</option>
-                  <option value="medium">MEDIUM</option>
-                  <option value="low">LOW</option>
+                  <option value="all">ВСІ</option>
+                  <option value="critical">КРИТИЧНИЙ</option>
+                  <option value="high">ВИСОКИЙ</option>
+                  <option value="medium">СЕРЕДНІЙ</option>
+                  <option value="low">НИЗЬКИЙ</option>
                 </select>
               </div>
             </div>
@@ -667,10 +667,10 @@ const AdminPage = () => {
                     </div>
                     <div className="flex gap-2 mb-4 items-center">
                       <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
-                        {CATEGORY_LABELS[p.category] || p.category || "OTHER"}
+                        {CATEGORY_LABELS[p.category] || p.category || "ІНШЕ"}
                       </span>
                       <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
-                        Building {p.building} • {p.placeName}
+                        Гуртожиток {p.building} • {p.placeName}
                       </span>
                     </div>
                     <p className="text-sm text-stone-400 mb-6 line-clamp-3 leading-relaxed">{p.description}</p>
@@ -679,14 +679,14 @@ const AdminPage = () => {
                     {ticket ? (
                       <div className="bg-blue-900/10 p-4 border border-blue-900/30 relative flex justify-between items-center">
                         <div>
-                          <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Assigned Ticket #{ticket.ticket_id}</p>
-                          {ticket.user && <p className="text-sm text-stone-300 font-medium">Worker: {ticket.user.first_name} {ticket.user.last_name}</p>}
-                          {ticket.deadline && <p className="text-[10px] text-stone-500 uppercase tracking-widest mt-1">Deadline: {new Date(ticket.deadline).toLocaleDateString()}</p>}
+                          <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">Призначено Тікет #{ticket.ticket_id}</p>
+                          {ticket.user && <p className="text-sm text-stone-300 font-medium">Працівник: {ticket.user.first_name} {ticket.user.last_name}</p>}
+                          {ticket.deadline && <p className="text-[10px] text-stone-500 uppercase tracking-widest mt-1">Дедлайн: {new Date(ticket.deadline).toLocaleDateString()}</p>}
                         </div>
                         <button 
                           onClick={() => openEditTicketModal(p, ticket)} 
                           className="p-2 bg-stone-900 border border-stone-700 text-stone-400 hover:text-blue-400 hover:border-blue-500 transition-colors"
-                          title="Edit Ticket"
+                          title="Редагувати Тікет"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -697,11 +697,11 @@ const AdminPage = () => {
                           onClick={() => openTicketModal(p)}
                           className="w-full px-4 py-3 bg-stone-800 border border-stone-700 text-stone-300 font-bold text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-colors"
                         >
-                          Create Ticket
+                          Створити Тікет
                         </button>
                       ) : (
                         <div className="w-full px-4 py-3 bg-stone-950 border border-stone-900 text-stone-600 font-bold text-[10px] uppercase tracking-widest text-center">
-                          Complaint must be published to create ticket
+                          Для створення задачі заявка має бути опублікована
                         </div>
                       )
                     )}
@@ -719,7 +719,7 @@ const AdminPage = () => {
           <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setIsTicketModalOpen(false)}></div>
           <div className="relative w-full max-w-xl h-full bg-stone-900 border-l border-stone-700 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-300">
             <div className="p-6 border-b border-stone-800 flex justify-between items-center sticky top-0 bg-stone-900/95 backdrop-blur z-10">
-              <h2 className="text-xl font-bold text-stone-50">{editingTicketId ? 'Edit Ticket' : 'Assign Ticket'}</h2>
+              <h2 className="text-xl font-bold text-stone-50">{editingTicketId ? 'Редагувати Тікет' : 'Призначити Тікет'}</h2>
               <button onClick={() => setIsTicketModalOpen(false)} className="text-stone-500 hover:text-stone-300 transition-colors text-2xl leading-none">&times;</button>
             </div>
             
@@ -727,7 +727,7 @@ const AdminPage = () => {
               {/* Complaint Summary */}
               <div className="bg-stone-800 p-4 border border-stone-700">
                 <h4 className="font-bold text-stone-50 text-lg mb-1">{selectedComplaintForTicket.title}</h4>
-                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest mb-3">Building {selectedComplaintForTicket.building} • {selectedComplaintForTicket.placeName}</p>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest mb-3">Гуртожиток {selectedComplaintForTicket.building} • {selectedComplaintForTicket.placeName}</p>
                 <p className="text-sm text-stone-300 leading-relaxed whitespace-pre-wrap">{selectedComplaintForTicket.description}</p>
                 {selectedComplaintForTicket.photoUrl && (
                   <div className="mt-4 border border-stone-700 bg-stone-950 cursor-pointer group" onClick={() => setIsImageZoomed(true)}>
@@ -739,7 +739,7 @@ const AdminPage = () => {
               {/* Form */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Assign Worker</label>
+                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Призначити Працівника</label>
                   <select
                     value={ticketEmployee}
                     onChange={(e) => setTicketEmployee(e.target.value)}
@@ -755,7 +755,7 @@ const AdminPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Completion Deadline</label>
+                  <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Дедлайн</label>
                   <input 
                     type="date" 
                     value={ticketDeadline}
@@ -771,13 +771,13 @@ const AdminPage = () => {
                 onClick={() => setIsTicketModalOpen(false)} 
                 className="flex-1 px-4 py-3 bg-stone-800 text-stone-400 text-[10px] font-bold uppercase tracking-widest border border-stone-700 hover:text-stone-200 hover:border-stone-500 transition-colors"
               >
-                Cancel
+                Скасувати
               </button>
               <button 
                 onClick={handleSaveTicket} 
                 className="flex-1 px-4 py-3 bg-blue-800 text-white text-[10px] font-bold uppercase tracking-widest border border-blue-700 hover:bg-blue-700 transition-colors"
               >
-                Save
+                Зберегти
               </button>
             </div>
           </div>
@@ -804,15 +804,15 @@ const AdminPage = () => {
                 </div>
                 <div className="flex gap-2 mb-4 items-center flex-wrap">
                   <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
-                    {CATEGORY_LABELS[selectedComplaintDetails.category] || selectedComplaintDetails.category || "OTHER"}
+                    {CATEGORY_LABELS[selectedComplaintDetails.category] || selectedComplaintDetails.category || "ІНШЕ"}
                   </span>
                   <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
-                    Building {selectedComplaintDetails.building} • {selectedComplaintDetails.placeName}
+                    Гуртожиток {selectedComplaintDetails.building} • {selectedComplaintDetails.placeName}
                   </span>
                 </div>
                 <p className="text-sm text-stone-300 mb-6 leading-relaxed whitespace-pre-wrap">{selectedComplaintDetails.description}</p>
                 <div className="mt-4">
-                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Submitted on:</span>
+                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Подано:</span>
                   <p className="text-sm text-stone-300">{new Date(selectedComplaintDetails.createdAt).toLocaleString()}</p>
                 </div>
               </div>
@@ -863,7 +863,7 @@ const AdminPage = () => {
                             <button 
                               onClick={() => handleDeleteComment(c.id)}
                               className="text-red-900 hover:text-red-500 transition-colors text-lg leading-none opacity-0 group-hover:opacity-100"
-                              title="Delete Comment"
+                              title="Видалити Коментар"
                             >
                               &times;
                             </button>
@@ -880,7 +880,7 @@ const AdminPage = () => {
                     type="text" 
                     value={newComment} 
                     onChange={(e) => setNewComment(e.target.value)} 
-                    placeholder="Add a comment as Admin..." 
+                    placeholder="Додати коментар..." 
                     className="flex-1 bg-stone-950 border border-stone-800 text-stone-50 text-sm px-3 py-2 focus:border-blue-500 outline-none"
                   />
                   <button 
@@ -888,7 +888,7 @@ const AdminPage = () => {
                     disabled={postingComment || !newComment.trim()}
                     className="bg-blue-800 hover:bg-blue-900 disabled:bg-stone-800 text-white px-4 text-[10px] uppercase tracking-widest font-bold transition-colors"
                   >
-                    {postingComment ? "..." : "Send"}
+                    {postingComment ? "..." : "Надіслати"}
                   </button>
                 </div>
               </div>
@@ -897,14 +897,14 @@ const AdminPage = () => {
               <div className="flex flex-wrap gap-2 pt-6 border-t border-stone-800 mt-6">
                 {selectedComplaintDetails.status === 'pending' && (
                   <>
-                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'approved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
-                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'rejected')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'approved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Опублікувати</button>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'rejected')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Відхилити</button>
                   </>
                 )}
                 {(selectedComplaintDetails.status === 'approved' || selectedComplaintDetails.status === 'published') && (
-                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'resolved')} className="w-full px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Mark Resolved</button>
+                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id, 'resolved')} className="w-full px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Вирішити</button>
                 )}
-                <button onClick={() => handleDelete(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id)} className="w-full px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
+                <button onClick={() => handleDelete(selectedComplaintDetails.id || selectedComplaintDetails.complaint_id)} className="w-full px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Видалити</button>
               </div>
             </div>
 
@@ -913,7 +913,7 @@ const AdminPage = () => {
                 onClick={() => setSelectedComplaintDetails(null)} 
                 className="flex-1 px-4 py-3 bg-stone-800 text-stone-400 text-[10px] font-bold uppercase tracking-widest border border-stone-700 hover:text-stone-200 hover:border-stone-500 transition-colors"
               >
-                Cancel
+                Скасувати
               </button>
               <button 
                 onClick={async () => {
@@ -924,7 +924,7 @@ const AdminPage = () => {
                 }} 
                 className="flex-1 px-4 py-3 bg-blue-800 text-white text-[10px] font-bold uppercase tracking-widest border border-blue-700 hover:bg-blue-700 transition-colors"
               >
-                Save
+                Зберегти
               </button>
             </div>
           </div>
@@ -938,17 +938,17 @@ const AdminPage = () => {
           <img src={resolveImageUrl(selectedComplaintDetails?.photoUrl || selectedComplaintForTicket?.photoUrl)} alt="Problem Zoomed" className="max-w-[90vw] max-h-[90vh] object-contain border border-stone-800 shadow-2xl" />
         </div>
       )}
-      {/* Confirm Status Change Modal */}
+      {/* Підтвердити Зміну Статусу Modal */}
       {confirmStatusModal.isOpen && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""})}>
           <div className="bg-stone-900 border border-stone-800 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-stone-50 mb-4">Confirm Status Change</h3>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Підтвердити Зміну Статусу</h3>
             <p className="text-sm text-stone-400 mb-8 leading-relaxed">
-              Are you sure you want to change the status of this complaint to <span className="font-bold text-stone-200 uppercase tracking-widest">{confirmStatusModal.newStatus}</span>?
+              Ви впевнені, що хочете змінити статус цієї заявки на <span className="font-bold text-stone-200 uppercase tracking-widest">{confirmStatusModal.newStatus}</span>?
             </p>
             <div className="flex gap-4">
               <button onClick={() => setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
-                Cancel
+                Скасувати
               </button>
               <button onClick={executeStatusChange} className="flex-1 px-4 py-3 bg-blue-900/30 border border-blue-800 text-[10px] font-bold text-blue-500 uppercase tracking-widest hover:bg-blue-800 hover:text-white transition-colors">
                 Confirm
@@ -962,35 +962,35 @@ const AdminPage = () => {
       {confirmDeleteModal.isOpen && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmDeleteModal({isOpen: false, complaintId: null})}>
           <div className="bg-stone-900 border border-red-900/30 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-stone-50 mb-4">Confirm Deletion</h3>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Підтвердити Видалення</h3>
             <p className="text-sm text-stone-400 mb-8 leading-relaxed">
-              Are you sure you want to permanently delete this complaint? This action cannot be undone.
+              Ви впевнені, що хочете видалити цю заявку назавжди? Цю дію неможливо скасувати.
             </p>
             <div className="flex gap-4">
               <button onClick={() => setConfirmDeleteModal({isOpen: false, complaintId: null})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
-                Cancel
+                Скасувати
               </button>
               <button onClick={executeDelete} className="flex-1 px-4 py-3 bg-red-900/30 border border-red-800 text-[10px] font-bold text-red-500 uppercase tracking-widest hover:bg-red-800 hover:text-white transition-colors">
-                Delete
+                Видалити
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* Confirm Delete Comment Modal */}
+      {/* Confirm Видалити Коментар Modal */}
       {confirmDeleteCommentModal.isOpen && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmDeleteCommentModal({isOpen: false, commentId: null})}>
           <div className="bg-stone-900 border border-red-900/30 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-stone-50 mb-4">Confirm Deletion</h3>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Підтвердити Видалення</h3>
             <p className="text-sm text-stone-400 mb-8 leading-relaxed">
-              Are you sure you want to permanently delete this comment? This action cannot be undone.
+              Ви впевнені, що хочете видалити цей коментар назавжди? Цю дію неможливо скасувати.
             </p>
             <div className="flex gap-4">
               <button onClick={() => setConfirmDeleteCommentModal({isOpen: false, commentId: null})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
-                Cancel
+                Скасувати
               </button>
               <button onClick={executeDeleteComment} className="flex-1 px-4 py-3 bg-red-900/30 border border-red-800 text-[10px] font-bold text-red-500 uppercase tracking-widest hover:bg-red-800 hover:text-white transition-colors">
-                Delete
+                Видалити
               </button>
             </div>
           </div>
