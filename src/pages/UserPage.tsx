@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Wrench, ArrowRight, BellOff } from "lucide-react";
 import { 
-  fetchMyProblems, 
-  fetchApprovedComplaints,
+  fetchMyProblems,
   fetchUserProfile, 
   CATEGORY_LABELS,
   deleteProblem,
@@ -14,10 +13,7 @@ import {
 import { resolveImageUrl } from "../services/imageUtils";
 
 const UserPage = () => {
-  const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "history" ? "history" : "active");
   const [myProblems, setMyProblems] = useState<any[]>([]);
-  const [activeProblems, setActiveProblems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
@@ -81,7 +77,6 @@ const UserPage = () => {
     try {
       await deleteProblem(id);
       setMyProblems(prev => prev.filter(p => p.id !== id));
-      setActiveProblems(prev => prev.filter(p => p.id !== id));
       setSelectedComplaintDetails(null);
     } catch (e) {
       alert("Failed to delete the complaint.");
@@ -125,14 +120,12 @@ const UserPage = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [myData, activeData, user] = await Promise.all([
+        const [myData, user] = await Promise.all([
            fetchMyProblems(),
-           fetchApprovedComplaints(),
            fetchUserProfile().catch(() => null)
         ]);
         if (!alive) return;
         setMyProblems(Array.isArray(myData) ? myData : []);
-        setActiveProblems(Array.isArray(activeData) ? activeData : []);
         setCurrentUser(user);
       } catch (e) {
         console.error("Failed to fetch user problems", e);
@@ -149,14 +142,7 @@ const UserPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const tab = searchParams.get("tab");
-    if (tab === "history" || tab === "active") {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
-
-  const visible = (activeTab === "active" ? activeProblems : myProblems)
+  const visible = myProblems
     .slice()
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -200,21 +186,15 @@ const UserPage = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-end border-b border-stone-800 pb-2">
             <h3 className="text-xl font-bold text-stone-50">
-              {activeTab === "active" ? "Active Complaints" : "My Complaints"}
+              My Complaints
             </h3>
             <div className="flex items-center gap-4">
               <Link
                 to="/dashboard"
-                className="text-sm font-bold text-stone-400 hover:text-stone-300 transition-colors"
-              >
-                View Dashboard
-              </Link>
-              <button 
-                onClick={() => setActiveTab(activeTab === "active" ? "history" : "active")}
                 className="text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors"
               >
-                {activeTab === "active" ? "View My Complaints" : "View Active"}
-              </button>
+                View Active Feed
+              </Link>
             </div>
           </div>
 
@@ -240,14 +220,6 @@ const UserPage = () => {
                       </div>
                       
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
-                          isPending ? 'text-yellow-500 border-yellow-700/50 bg-yellow-900/30' :
-                          isInProgress ? 'text-blue-500 border-blue-700/50 bg-blue-900/30' :
-                          isResolved ? 'text-green-500 border-green-700/50 bg-green-900/30' :
-                          'text-stone-500 border-stone-800 bg-stone-800/50'
-                        }`}>
-                          {isPending ? 'PENDING' : isInProgress ? 'IN PROGRESS' : isResolved ? 'RESOLVED' : 'REJECTED'}
-                        </span>
                         {p.priority && (
                           <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
                             p.priority === 'critical' ? 'text-red-500 border-red-700/50 bg-red-900/30' :
@@ -258,6 +230,14 @@ const UserPage = () => {
                             {p.priority}
                           </span>
                         )}
+                        <span className={`px-2 py-1 text-[9px] font-bold border uppercase tracking-widest ${
+                          isPending ? 'text-yellow-500 border-yellow-700/50 bg-yellow-900/30' :
+                          isInProgress ? 'text-blue-500 border-blue-700/50 bg-blue-900/30' :
+                          isResolved ? 'text-green-500 border-green-700/50 bg-green-900/30' :
+                          'text-stone-500 border-stone-800 bg-stone-800/50'
+                        }`}>
+                          {isPending ? 'PENDING' : isInProgress ? 'IN PROGRESS' : isResolved ? 'RESOLVED' : 'REJECTED'}
+                        </span>
                       </div>
                     </div>
 
