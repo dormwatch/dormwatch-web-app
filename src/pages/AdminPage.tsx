@@ -99,13 +99,22 @@ const AdminPage = () => {
     }
   };
 
-  const handleDeleteComment = async (commentId: number) => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+  const [confirmDeleteCommentModal, setConfirmDeleteCommentModal] = useState<{isOpen: boolean, commentId: number | null}>({isOpen: false, commentId: null});
+
+  const handleDeleteComment = (commentId: number) => {
+    setConfirmDeleteCommentModal({isOpen: true, commentId});
+  };
+
+  const executeDeleteComment = async () => {
+    const { commentId } = confirmDeleteCommentModal;
+    if (commentId === null) return;
     try {
       await deleteComment(commentId);
       setComments(prev => prev.filter(c => c.id !== commentId));
     } catch (e) {
       alert("Failed to delete comment");
+    } finally {
+      setConfirmDeleteCommentModal({isOpen: false, commentId: null});
     }
   };
 
@@ -147,29 +156,47 @@ const AdminPage = () => {
   const inProgressCount = items.filter(i => i.status === "approved" || i.status === "published").length;
   const resolvedCount = items.filter(i => i.status === "resolved").length;
 
-  const handleStatusChange = async (id: number, status: string) => {
-    if (!confirm(`Change status to ${status}?`)) return;
+  const [confirmStatusModal, setConfirmStatusModal] = useState<{isOpen: boolean, complaintId: number | null, newStatus: string}>({isOpen: false, complaintId: null, newStatus: ""});
+
+  const handleStatusChange = (id: number, status: string) => {
+    setConfirmStatusModal({isOpen: true, complaintId: id, newStatus: status});
+  };
+
+  const executeStatusChange = async () => {
+    const { complaintId, newStatus } = confirmStatusModal;
+    if (complaintId === null) return;
     try {
-      await updateComplaintStatus(id, status);
+      await updateComplaintStatus(complaintId, newStatus);
       loadData();
-      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === id) {
-        setSelectedComplaintDetails({ ...selectedComplaintDetails, status });
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === complaintId) {
+        setSelectedComplaintDetails({ ...selectedComplaintDetails, status: newStatus });
       }
     } catch(e) {
       alert("Failed to update status");
+    } finally {
+      setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""});
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this complaint?")) return;
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState<{isOpen: boolean, complaintId: number | null}>({isOpen: false, complaintId: null});
+
+  const handleDelete = (id: number) => {
+    setConfirmDeleteModal({isOpen: true, complaintId: id});
+  };
+
+  const executeDelete = async () => {
+    const { complaintId } = confirmDeleteModal;
+    if (complaintId === null) return;
     try {
-      await deleteProblem(id);
+      await deleteProblem(complaintId);
       loadData();
-      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === id) {
+      if (selectedComplaintDetails && (selectedComplaintDetails.id || selectedComplaintDetails.complaint_id) === complaintId) {
         setSelectedComplaintDetails(null);
       }
     } catch(e) {
       alert("Failed to delete complaint");
+    } finally {
+      setConfirmDeleteModal({isOpen: false, complaintId: null});
     }
   };
 
@@ -673,18 +700,25 @@ const AdminPage = () => {
 
       {/* Ticket Modal */}
       {isTicketModalOpen && selectedComplaintForTicket && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-stone-900 border border-stone-700 shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col">
-            <div className="p-6 border-b border-stone-800 flex justify-between items-center">
+        <div className="fixed inset-0 z-[100] flex justify-end animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setIsTicketModalOpen(false)}></div>
+          <div className="relative w-full max-w-xl h-full bg-stone-900 border-l border-stone-700 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-stone-800 flex justify-between items-center sticky top-0 bg-stone-900/95 backdrop-blur z-10">
               <h2 className="text-xl font-bold text-stone-50">{editingTicketId ? 'Edit Ticket' : 'Assign Ticket'}</h2>
               <button onClick={() => setIsTicketModalOpen(false)} className="text-stone-500 hover:text-stone-300 transition-colors text-2xl leading-none">&times;</button>
             </div>
             
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="p-6 space-y-6 flex-1">
               {/* Complaint Summary */}
               <div className="bg-stone-800 p-4 border border-stone-700">
                 <h4 className="font-bold text-stone-50 text-lg mb-1">{selectedComplaintForTicket.title}</h4>
                 <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest mb-3">Building {selectedComplaintForTicket.building} • {selectedComplaintForTicket.placeName}</p>
+                <p className="text-sm text-stone-300 leading-relaxed whitespace-pre-wrap">{selectedComplaintForTicket.description}</p>
+                {selectedComplaintForTicket.photoUrl && (
+                  <div className="mt-4 border border-stone-700 bg-stone-950 cursor-pointer group" onClick={() => setIsImageZoomed(true)}>
+                    <img src={resolveImageUrl(selectedComplaintForTicket.photoUrl)} alt="Problem" className="w-full max-h-48 object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                )}
               </div>
 
               {/* Form */}
@@ -843,10 +877,68 @@ const AdminPage = () => {
       )}
 
       {/* Image Zoom Modal */}
-      {isImageZoomed && selectedComplaintDetails?.photoUrl && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-stone-950/95 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setIsImageZoomed(false)}>
+      {isImageZoomed && (selectedComplaintDetails?.photoUrl || selectedComplaintForTicket?.photoUrl) && (
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-stone-950/95 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setIsImageZoomed(false)}>
           <button onClick={() => setIsImageZoomed(false)} className="absolute top-6 right-6 text-stone-500 hover:text-white transition-colors text-4xl leading-none">&times;</button>
-          <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem Zoomed" className="max-w-[90vw] max-h-[90vh] object-contain border border-stone-800 shadow-2xl" />
+          <img src={resolveImageUrl(selectedComplaintDetails?.photoUrl || selectedComplaintForTicket?.photoUrl)} alt="Problem Zoomed" className="max-w-[90vw] max-h-[90vh] object-contain border border-stone-800 shadow-2xl" />
+        </div>
+      )}
+      {/* Confirm Status Change Modal */}
+      {confirmStatusModal.isOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""})}>
+          <div className="bg-stone-900 border border-stone-800 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Confirm Status Change</h3>
+            <p className="text-sm text-stone-400 mb-8 leading-relaxed">
+              Are you sure you want to change the status of this complaint to <span className="font-bold text-stone-200 uppercase tracking-widest">{confirmStatusModal.newStatus}</span>?
+            </p>
+            <div className="flex gap-4">
+              <button onClick={() => setConfirmStatusModal({isOpen: false, complaintId: null, newStatus: ""})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
+                Cancel
+              </button>
+              <button onClick={executeStatusChange} className="flex-1 px-4 py-3 bg-blue-900/30 border border-blue-800 text-[10px] font-bold text-blue-500 uppercase tracking-widest hover:bg-blue-800 hover:text-white transition-colors">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Modal */}
+      {confirmDeleteModal.isOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmDeleteModal({isOpen: false, complaintId: null})}>
+          <div className="bg-stone-900 border border-red-900/30 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Confirm Deletion</h3>
+            <p className="text-sm text-stone-400 mb-8 leading-relaxed">
+              Are you sure you want to permanently delete this complaint? This action cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button onClick={() => setConfirmDeleteModal({isOpen: false, complaintId: null})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
+                Cancel
+              </button>
+              <button onClick={executeDelete} className="flex-1 px-4 py-3 bg-red-900/30 border border-red-800 text-[10px] font-bold text-red-500 uppercase tracking-widest hover:bg-red-800 hover:text-white transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Confirm Delete Comment Modal */}
+      {confirmDeleteCommentModal.isOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-stone-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setConfirmDeleteCommentModal({isOpen: false, commentId: null})}>
+          <div className="bg-stone-900 border border-red-900/30 w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-stone-50 mb-4">Confirm Deletion</h3>
+            <p className="text-sm text-stone-400 mb-8 leading-relaxed">
+              Are you sure you want to permanently delete this comment? This action cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button onClick={() => setConfirmDeleteCommentModal({isOpen: false, commentId: null})} className="flex-1 px-4 py-3 bg-stone-950 border border-stone-800 text-[10px] font-bold text-stone-300 uppercase tracking-widest hover:bg-stone-800 transition-colors">
+                Cancel
+              </button>
+              <button onClick={executeDeleteComment} className="flex-1 px-4 py-3 bg-red-900/30 border border-red-800 text-[10px] font-bold text-red-500 uppercase tracking-widest hover:bg-red-800 hover:text-white transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
