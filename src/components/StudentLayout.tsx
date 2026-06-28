@@ -40,7 +40,7 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
           <div className="flex items-center gap-4">
             {userProfile?.role && ["admin", "адміністратор"].includes((userProfile.role.role_name || "").toLowerCase()) && (
               <Link to="/admin" className="text-[10px] font-bold text-stone-400 hover:text-blue-400 uppercase tracking-widest transition-colors hidden sm:block mr-2">
-                Admin Panel
+                Панель Адміністратора
               </Link>
             )}
 

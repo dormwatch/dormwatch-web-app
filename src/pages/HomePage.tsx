@@ -86,26 +86,7 @@ const HomePage = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 pt-10 border-t border-stone-800">
-            <div>
-              <p className="text-3xl font-black text-stone-50">№12</p>
-              <p className="text-[9px] text-stone-500 font-bold uppercase tracking-widest mt-2">
-                Гуртожитків підключено
-              </p>
-            </div>
-            <div>
-              <p className="text-3xl font-black text-blue-500">452</p>
-              <p className="text-[9px] text-stone-500 font-bold uppercase tracking-widest mt-2">
-                Виправлено проблем
-              </p>
-            </div>
-            <div>
-              <p className="text-3xl font-black text-stone-50">92%</p>
-              <p className="text-[9px] text-stone-500 font-bold uppercase tracking-widest mt-2">
-                Задоволених студентів
-              </p>
-            </div>
-          </div>
+
         </div>
 
         {/* Activity Feed */}

@@ -5,7 +5,7 @@ import { createProblem, fetchUserProfile } from "../services/problemsApi";
 const CreateReportPage = () => {
   const navigate = useNavigate();
 
-  const [selectedCategory, setSelectedCategory] = useState("plumbing");
+  const [selectedКатегорія, setSelectedКатегорія] = useState("plumbing");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -24,8 +24,8 @@ const CreateReportPage = () => {
       try {
         const user = await fetchUserProfile();
         if (user) {
-          const isAdmin = user.role && ["admin", "адміністратор"].includes((user.role.role_name || "").toLowerCase());
-          if (isAdmin) {
+          const isАдмін = user.role && ["admin", "адміністратор"].includes((user.role.role_name || "").toLowerCase());
+          if (isАдмін) {
             navigate("/admin");
             return;
           }
@@ -87,7 +87,7 @@ const CreateReportPage = () => {
 
     try {
       await createProblem({
-        category: selectedCategory,
+        category: selectedКатегорія,
         title: formData.title.trim(),
         description: formData.description.trim(),
         priority: formData.priority,
@@ -134,7 +134,7 @@ const CreateReportPage = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-10">
-        {/* Category Selection */}
+        {/* Категорія Selection */}
         <div className="bg-stone-800 border border-stone-700 p-6 sm:p-8">
           <label className="block text-[10px] font-bold text-stone-400 mb-6 uppercase tracking-widest border-b border-stone-700 pb-2">
             Категорія проблеми
@@ -144,15 +144,15 @@ const CreateReportPage = () => {
               <button
                 key={category.id}
                 type="button"
-                onClick={() => setSelectedCategory(category.id)}
+                onClick={() => setSelectedКатегорія(category.id)}
                 className={`p-6 border transition-all ${
-                  selectedCategory === category.id
+                  selectedКатегорія === category.id
                     ? "bg-blue-900/20 border-blue-500 shadow-sm"
                     : "bg-stone-900 border-stone-700 hover:border-stone-500"
                 }`}
               >
                 <span className="text-3xl block mb-3 grayscale">{category.emoji}</span>
-                <span className={`text-[10px] font-bold uppercase tracking-widest ${selectedCategory === category.id ? "text-blue-400" : "text-stone-400"}`}>{category.name}</span>
+                <span className={`text-[10px] font-bold uppercase tracking-widest ${selectedКатегорія === category.id ? "text-blue-400" : "text-stone-400"}`}>{category.name}</span>
               </button>
             ))}
           </div>

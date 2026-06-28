@@ -45,7 +45,7 @@ const Header = () => {
                   : "border-transparent text-stone-400 hover:text-stone-50 hover:bg-stone-700/30"
               }`}
             >
-              Комендант-центр
+              Адмін-панель
             </Link>
           </div>
         </div>
@@ -55,7 +55,7 @@ const Header = () => {
             to="/create-report"
             className="hidden sm:flex items-center gap-2 bg-indigo-800 hover:bg-indigo-900 border border-indigo-700 text-white px-4 py-2 rounded-none text-sm font-semibold transition-colors"
           >
-            + Створити заявку
+            + Повідомити
           </Link>
 
           {/* User Profile Dropdown Placeholder */}
@@ -65,7 +65,7 @@ const Header = () => {
             </button>
             <Link to="/account" className="flex items-center gap-2 pl-2 sm:border-l sm:border-stone-700 cursor-pointer hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 rounded-none bg-stone-700 flex items-center justify-center text-stone-300 font-semibold text-sm">
-                ОК
+                ЮЗ
               </div>
               <ChevronDown className="w-4 h-4 text-stone-500" />
             </Link>
