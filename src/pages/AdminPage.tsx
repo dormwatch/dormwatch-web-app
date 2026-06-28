@@ -53,6 +53,15 @@ const AdminPage = () => {
   const [ticketDeadline, setTicketDeadline] = useState("");
   const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
 
+  // Complaint Details Modal State
+  const [selectedComplaintDetails, setSelectedComplaintDetails] = useState<any>(null);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
+
+  const openComplaintDetails = (complaint: any) => {
+    setSelectedComplaintDetails(complaint);
+    setIsImageZoomed(false);
+  };
+
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -96,6 +105,9 @@ const AdminPage = () => {
     try {
       await updateComplaintStatus(id, status);
       loadData();
+      if (selectedComplaintDetails && selectedComplaintDetails.id === id) {
+        setSelectedComplaintDetails({ ...selectedComplaintDetails, status });
+      }
     } catch(e) {
       alert("Failed to update status");
     }
@@ -106,6 +118,9 @@ const AdminPage = () => {
     try {
       await deleteProblem(id);
       loadData();
+      if (selectedComplaintDetails && selectedComplaintDetails.id === id) {
+        setSelectedComplaintDetails(null);
+      }
     } catch(e) {
       alert("Failed to delete complaint");
     }
@@ -204,7 +219,7 @@ const AdminPage = () => {
           </button>
           <button 
             onClick={() => navigate("?tab=tickets")}
-            className="flex items-center gap-2 px-4 py-2 bg-orange-600 border border-orange-500 hover:bg-orange-700 transition-colors text-xs font-bold text-white uppercase tracking-widest shadow-[0_0_15px_rgba(234,88,12,0.3)]"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-800 border border-blue-700 hover:bg-blue-900 transition-colors text-xs font-bold text-white uppercase tracking-widest"
           >
             <Plus className="w-4 h-4" />
             New Work Order
@@ -269,7 +284,7 @@ const AdminPage = () => {
           <div className="bg-stone-900 border border-stone-800">
             <div className="flex justify-between items-center p-6 border-b border-stone-800">
               <h3 className="text-lg font-bold text-stone-50">Recent Complaints</h3>
-              <button onClick={() => navigate("?tab=complaints")} className="text-xs font-bold text-orange-500 hover:text-orange-400 transition-colors uppercase tracking-widest">View all</button>
+              <button onClick={() => navigate("?tab=complaints")} className="text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-widest">View all</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -388,7 +403,7 @@ const AdminPage = () => {
             ) : filteredComplaints.length === 0 ? (
               <div className="p-12 text-center text-[10px] text-stone-500 font-bold uppercase tracking-widest">No complaints found.</div>
             ) : filteredComplaints.map(p => (
-              <div key={p.id} className="bg-stone-900 border border-stone-800 p-6 flex flex-col md:flex-row gap-6 group hover:border-stone-600 transition-colors">
+              <div key={p.id} className="bg-stone-900 border border-stone-800 p-6 flex flex-col md:flex-row gap-6 group hover:border-stone-600 transition-colors cursor-pointer" onClick={() => openComplaintDetails(p)}>
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="text-xl font-bold text-stone-50">{p.title || "Untitled"}</h4>
@@ -411,14 +426,14 @@ const AdminPage = () => {
                   <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-800">
                     {p.status === 'pending' && (
                       <>
-                        <button onClick={() => handleStatusChange(p.id, 'approved')} className="px-4 py-2 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
-                        <button onClick={() => handleStatusChange(p.id, 'rejected')} className="px-4 py-2 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(p.id, 'approved'); }} className="px-4 py-2 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleStatusChange(p.id, 'rejected'); }} className="px-4 py-2 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
                       </>
                     )}
                     {(p.status === 'approved' || p.status === 'published') && (
-                      <button onClick={() => handleStatusChange(p.id, 'resolved')} className="px-4 py-2 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleStatusChange(p.id, 'resolved'); }} className="px-4 py-2 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
                     )}
-                    <button onClick={() => handleDelete(p.id)} className="px-4 py-2 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }} className="px-4 py-2 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
                   </div>
                 </div>
                 {p.photoUrl && (
@@ -598,6 +613,71 @@ const AdminPage = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Complaint Details Modal */}
+      {selectedComplaintDetails && (
+        <div className="fixed inset-0 z-[100] flex justify-end animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm" onClick={() => setSelectedComplaintDetails(null)}></div>
+          <div className="relative w-full max-w-xl h-full bg-stone-900 border-l border-stone-700 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-stone-800 flex justify-between items-center sticky top-0 bg-stone-900/95 backdrop-blur z-10">
+              <h2 className="text-xl font-bold text-stone-50">Complaint Details</h2>
+              <button onClick={() => setSelectedComplaintDetails(null)} className="text-stone-500 hover:text-stone-300 transition-colors text-2xl leading-none">&times;</button>
+            </div>
+            <div className="p-6 space-y-6 flex-1">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-2xl font-bold text-stone-50">{selectedComplaintDetails.title || "Untitled"}</h3>
+                  <div className="flex gap-2 items-center shrink-0 ml-4">
+                    {getPriorityBadge(selectedComplaintDetails.priority)}
+                    {getStatusBadge(selectedComplaintDetails.status)}
+                  </div>
+                </div>
+                <div className="flex gap-2 mb-4 items-center flex-wrap">
+                  <span className="px-2 py-0.5 bg-stone-800 border border-stone-700 text-stone-400 text-[9px] font-black uppercase tracking-widest">
+                    {CATEGORY_LABELS[selectedComplaintDetails.category] || selectedComplaintDetails.category || "OTHER"}
+                  </span>
+                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                    Building {selectedComplaintDetails.building} • {selectedComplaintDetails.placeName}
+                  </span>
+                </div>
+                <p className="text-sm text-stone-300 mb-6 leading-relaxed whitespace-pre-wrap">{selectedComplaintDetails.description}</p>
+                <div className="mt-4">
+                  <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Submitted on:</span>
+                  <p className="text-sm text-stone-300">{new Date(selectedComplaintDetails.createdAt).toLocaleString()}</p>
+                </div>
+              </div>
+              
+              {selectedComplaintDetails.photoUrl && (
+                <div className="border border-stone-700 bg-stone-950 p-2 cursor-pointer group mb-6" onClick={() => setIsImageZoomed(true)}>
+                  <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem" className="w-full object-contain" />
+                </div>
+              )}
+              
+              {/* Modal Action Buttons */}
+              <div className="flex flex-wrap gap-2 pt-6 border-t border-stone-800">
+                {selectedComplaintDetails.status === 'pending' && (
+                  <>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id, 'approved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-blue-900/30 text-blue-500 border border-blue-800 hover:bg-blue-800 hover:text-white uppercase tracking-widest transition-colors">Publish</button>
+                    <button onClick={() => handleStatusChange(selectedComplaintDetails.id, 'rejected')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-red-900/30 text-red-500 border border-red-800 hover:bg-red-800 hover:text-white uppercase tracking-widest transition-colors">Reject</button>
+                  </>
+                )}
+                {(selectedComplaintDetails.status === 'approved' || selectedComplaintDetails.status === 'published') && (
+                  <button onClick={() => handleStatusChange(selectedComplaintDetails.id, 'resolved')} className="flex-1 px-4 py-3 text-[10px] font-bold bg-green-900/30 text-green-500 border border-green-800 hover:bg-green-800 hover:text-white uppercase tracking-widest transition-colors">Resolve</button>
+                )}
+                <button onClick={() => handleDelete(selectedComplaintDetails.id)} className="flex-1 px-4 py-3 text-[10px] font-bold bg-stone-900 text-stone-500 border border-stone-800 hover:text-red-500 hover:border-red-900 transition-colors uppercase tracking-widest">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Zoom Modal */}
+      {isImageZoomed && selectedComplaintDetails?.photoUrl && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-stone-950/95 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setIsImageZoomed(false)}>
+          <button onClick={() => setIsImageZoomed(false)} className="absolute top-6 right-6 text-stone-500 hover:text-white transition-colors text-4xl leading-none">&times;</button>
+          <img src={resolveImageUrl(selectedComplaintDetails.photoUrl)} alt="Problem Zoomed" className="max-w-[90vw] max-h-[90vh] object-contain border border-stone-800 shadow-2xl" />
         </div>
       )}
     </div>

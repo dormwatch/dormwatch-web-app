@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { fetchUserProfile } from "../services/problemsApi";
 
 // We define a simple fallback preloader to avoid complex dependencies, 
@@ -23,8 +23,12 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, requireAdmin, requireStudent, blockAdmin }: ProtectedRouteProps) => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const location = useLocation();
 
-  useEffect(() => {
+  const loadUser = () => {
+    // Optionally set loading to true here, but it might flicker.
+    // Setting it to true ensures we don't proceed with null user during login transition.
+    setLoading(true);
     fetchUserProfile()
       .then((data: any) => {
         setUser(data);
@@ -35,6 +39,14 @@ const ProtectedRoute = ({ children, requireAdmin, requireStudent, blockAdmin }: 
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadUser();
+    window.addEventListener('profileUpdated', loadUser);
+    return () => {
+      window.removeEventListener('profileUpdated', loadUser);
+    };
   }, []);
 
   if (loading) {
@@ -48,7 +60,7 @@ const ProtectedRoute = ({ children, requireAdmin, requireStudent, blockAdmin }: 
     );
 
   // If user is not logged in, they can't access protected routes
-  if (!user && (requireAdmin || requireStudent)) {
+  if (!user && location.pathname !== "/account") {
     return <Navigate to="/account" replace />;
   }
 
