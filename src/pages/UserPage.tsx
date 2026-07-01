@@ -68,7 +68,7 @@ const UserPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <LoadingSpinner size="lg" className="border-blue-500" />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -115,12 +115,9 @@ const UserPage = () => {
                   </div>
                 </div>
 
-                <Link
-                  to="/create-report"
-                  className="block w-full bg-primary p-4 text-center text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors"
-                >
-                  + Створити заявку
-                </Link>
+                <Button asChild className="w-full">
+                  <Link to="/create-report">+ Створити заявку</Link>
+                </Button>
               </div>
 
               <div className="md:col-span-2 space-y-6">
@@ -134,12 +131,9 @@ const UserPage = () => {
                   {problems.length === 0 ? (
                     <div className="border border-dashed border-border p-8 text-center">
                       <p className="text-xs text-muted-foreground mb-3">Немає активних заявок.</p>
-                      <Link
-                        to="/create-report"
-                        className="inline-flex items-center px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors"
-                      >
-                        Створити першу заявку
-                      </Link>
+                      <Button asChild size="xs">
+                        <Link to="/create-report">Створити першу заявку</Link>
+                      </Button>
                     </div>
                   ) : (
                     problems.slice(0, 5).map((p) => (
@@ -194,7 +188,7 @@ const UserPage = () => {
                         </span>
                       </div>
 
-                      <h3 className="text-base font-bold text-foreground mb-2">
+                      <h3 className="text-sm font-semibold text-foreground mb-2">
                         {p.title || "Complaint"}
                       </h3>
                       <p className="text-xs text-muted-foreground leading-relaxed mb-4">

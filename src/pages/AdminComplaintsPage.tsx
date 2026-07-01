@@ -254,7 +254,7 @@ const AdminComplaintsPage = () => {
               <div className="lg:col-span-3 space-y-4">
                 {loading && (
                   <div className="flex items-center justify-center py-12">
-                    <LoadingSpinner size="md" className="text-blue-500 border-blue-500" />
+                    <LoadingSpinner size="md" />
                   </div>
                 )}
                 {!loading && err && (

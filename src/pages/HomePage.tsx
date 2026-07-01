@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { fetchUserProfile } from "../services/problemsApi";
+import { Button } from "../components/ui/button";
 import { ArrowRight, Search, Building2, Camera, Activity, ShieldAlert } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Footer from "../components/Footer";
@@ -34,7 +35,7 @@ const HomePage = () => {
   if (checkingAuth) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner size="lg" className="border-blue-500" />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -55,12 +56,11 @@ const HomePage = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link
-              to="/auth"
-              className="bg-primary hover:bg-primary/90 text-white px-4 py-2 text-sm font-bold transition-colors border border-blue-700"
-            >
-              Вхід для студентів
-            </Link>
+            <Button asChild>
+              <Link to="/auth">
+                Вхід для студентів
+              </Link>
+            </Button>
           </div>
         </div>
         <Separator />
@@ -76,20 +76,18 @@ const HomePage = () => {
               Створюйте заявки на ремонт у вашому гуртожитку менш ніж за 15 секунд. Відстежуйте оновлення статусу в режимі реального часу. Без завантаження додатків та очікування на лінії.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                to="/auth"
-                className="bg-primary hover:bg-primary/90 text-white px-6 py-3 text-base font-bold transition-colors flex items-center justify-center gap-2 border border-blue-700"
-              >
-                Повідомити про проблему
-                <ArrowRight className="w-5 h-5" strokeWidth={2} />
-              </Link>
-              <Link
-                to="/dashboard"
-                className="bg-card hover:bg-muted text-foreground border border-border px-6 py-3 text-base font-semibold transition-colors flex items-center justify-center gap-2"
-              >
-                <Search className="w-5 h-5" strokeWidth={2} />
-                Відстежити заявку
-              </Link>
+              <Button asChild size="lg" className="gap-2">
+                <Link to="/auth">
+                  Повідомити про проблему
+                  <ArrowRight className="w-5 h-5" strokeWidth={2} />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="gap-2">
+                <Link to="/dashboard">
+                  <Search className="w-5 h-5" strokeWidth={2} />
+                  Відстежити заявку
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -105,7 +103,7 @@ const HomePage = () => {
               <div className="bg-card border border-border p-4">
                 <div className="flex justify-between items-start mb-2">
                   <span className="text-xs text-muted-foreground font-semibold">Сантехніка</span>
-                  <span className="px-2 py-0.5 bg-yellow-900/30 text-yellow-500 border border-yellow-700/50 text-xs font-bold">Очікує</span>
+                  <span className="px-2 py-0.5 bg-yellow-900/30 text-yellow-500 border border-yellow-700/50 text-xs font-semibold">Очікує</span>
                 </div>
                 <div className="w-3/4 h-3 bg-muted mb-2" />
                 <div className="w-full h-2 bg-muted mb-1" />
@@ -114,7 +112,7 @@ const HomePage = () => {
               <div className="bg-card border border-border p-4">
                 <div className="flex justify-between items-start mb-2">
                   <span className="text-xs text-muted-foreground font-semibold">Опалення</span>
-                  <span className="px-2 py-0.5 bg-primary/30 text-blue-500 border border-blue-700/50 text-xs font-bold">В роботі</span>
+                  <span className="px-2 py-0.5 bg-primary/30 text-blue-500 border border-blue-700/50 text-xs font-semibold">В роботі</span>
                 </div>
                 <div className="w-1/2 h-3 bg-muted mb-2" />
                 <div className="w-full h-2 bg-muted mb-1" />
@@ -193,13 +191,12 @@ const HomePage = () => {
           <h2 className="text-3xl font-bold text-foreground mb-6">Потрібно щось полагодити?</h2>
           <p className="text-muted-foreground mb-8 text-lg">Увійдіть за допомогою студентського квитка, щоб надіслати заявку безпосередньо до служби експлуатації кампусу.</p>
           <div className="flex justify-center gap-4">
-            <Link
-              to="/auth"
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-base font-bold transition-colors border border-blue-700 inline-flex items-center gap-2"
-            >
-              Розпочати
-              <ArrowRight className="w-5 h-5" strokeWidth={2} />
-            </Link>
+            <Button asChild size="lg" className="gap-2">
+              <Link to="/auth">
+                Розпочати
+                <ArrowRight className="w-5 h-5" strokeWidth={2} />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

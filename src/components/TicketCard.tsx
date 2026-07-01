@@ -50,13 +50,13 @@ const TicketCard = ({ id, title, description, category, date, status, location, 
             <span className="w-1 h-1 bg-border" />
             <span className="text-xs text-muted-foreground">{date}</span>
           </div>
-          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-bold ${statusBadgeClass(status)}`}>
+          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(status)}`}>
             {statusLabel(status)}
           </span>
         </div>
 
         <div>
-          <h3 className="font-bold text-lg text-foreground group-hover/ticket:text-primary transition-colors">
+          <h3 className="text-sm font-semibold text-foreground group-hover/ticket:text-primary transition-colors">
             {title}
           </h3>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">

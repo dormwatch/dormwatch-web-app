@@ -81,12 +81,9 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link
-              to="/create-report"
-              className="hidden sm:flex items-center gap-2 bg-primary hover:bg-primary/90 border border-blue-700 text-white px-4 py-2 text-sm font-semibold transition-colors"
-            >
-              + Повідомити
-            </Link>
+            <Button asChild variant="default" size="sm" className="border border-blue-700 gap-2">
+              <Link to="/create-report">+ Повідомити</Link>
+            </Button>
 
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
