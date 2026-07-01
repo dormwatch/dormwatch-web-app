@@ -265,7 +265,7 @@ const DashboardPage = () => {
                   )}
 
                   <div className="flex">
-                    <div className="flex-shrink-0 p-5 flex flex-col items-center gap-0.5 min-w-[72px]">
+                    <div className="flex-shrink-0 p-5 flex flex-col items-center gap-0.5 min-w-16">
                       <Button
                         variant={hasVoted ? "default" : "outline"}
                         size="sm"

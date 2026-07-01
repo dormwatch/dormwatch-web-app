@@ -15,6 +15,7 @@ import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import LoadingSpinner from "../components/LoadingSpinner";
 
+import { Separator } from "../components/ui/separator";
 import { statusBadgeClass, statusLabel, isAdminUser } from "../lib/complaintUtils";
 import { useUser } from "../context/UserContext";
 import type { Complaint } from "../lib/types";
@@ -96,17 +97,17 @@ const UserPage = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="bg-card border border-border p-4">
+                  <div className="bg-card border border-border p-5">
                     <p className="text-2xl font-bold text-foreground">{problems.length}</p>
                     <p className="text-xs text-muted-foreground font-semibold mt-1">Всього заявок</p>
                   </div>
-                  <div className="bg-card border border-border p-4">
+                  <div className="bg-card border border-border p-5">
                     <p className="text-2xl font-bold text-green-400">
                       {problems.filter((p) => p.status === "resolved").length}
                     </p>
                     <p className="text-xs text-muted-foreground font-semibold mt-1">Вирішено</p>
                   </div>
-                  <div className="bg-card border border-border p-4">
+                  <div className="bg-card border border-border p-5">
                     <p className="text-2xl font-bold text-yellow-400">
                       {problems.filter((p) => p.status !== "resolved").length}
                     </p>
@@ -180,7 +181,7 @@ const UserPage = () => {
                         голосів
                       </span>
                     </div>
-                    <div className="w-px bg-muted" />
+                    <Separator orientation="vertical" className="bg-border" />
                     <div className="flex-1 p-5">
                       <div className="flex justify-between items-start mb-3 gap-2">
                         <div className="flex flex-wrap gap-2">

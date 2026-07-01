@@ -274,7 +274,7 @@ const AdminComplaintsPage = () => {
                   !err &&
                   filteredComplaints.map((p) => (
                     <Card key={p.id} className="border-border shadow-none bg-card group">
-                      <div className="p-5">
+                      <div className="p-6">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
                           <div>
                             <h3 className="text-sm font-semibold text-foreground truncate max-w-xl">
@@ -431,7 +431,7 @@ const AdminComplaintsPage = () => {
                       const ticket = tickets.find((t) => t.complaint === p.id);
                       return (
                         <Card key={p.id} className="border-border shadow-none bg-card">
-                          <div className="p-5">
+                          <div className="p-6">
                             <div className="flex justify-between items-start mb-2">
                               <h4 className="text-sm font-bold text-foreground">
                                 {p.title || "Без назви"}

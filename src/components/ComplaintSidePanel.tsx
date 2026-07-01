@@ -62,7 +62,7 @@ const ComplaintSidePanel = ({
           <SheetDescription>Інформація про заявку та керування статусом</SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-5 px-4 pb-6">
+        <div className="space-y-5 px-4 py-6">
           <div>
             <div className="flex items-center justify-between mb-2">
               <Badge variant="outline" className={statusBadgeClass(complaint.status)}>
