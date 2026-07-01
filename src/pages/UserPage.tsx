@@ -94,7 +94,7 @@ const UserPage = () => {
                   <h1 className="text-3xl font-bold text-foreground tracking-tight">Вітаємо, {firstName}!</h1>
                   <p className="text-muted-foreground mt-1 flex items-center gap-2 text-sm">
                     <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-                    {building} &bull; Room {room}
+                    {building} &bull; Кімната {room}
                   </p>
                 </div>
 
@@ -192,12 +192,12 @@ const UserPage = () => {
                           </Badge>
                         </div>
                         <span className="text-xs font-normal text-muted-foreground shrink-0">
-                          {CATEGORY_LABELS[p.category as keyof typeof CATEGORY_LABELS] || p.category || "Other"} &middot; {new Date(p.createdAt).toLocaleDateString()}
+                          {CATEGORY_LABELS[p.category as keyof typeof CATEGORY_LABELS] || p.category || ""} &middot; {new Date(p.createdAt).toLocaleDateString()}
                         </span>
                       </div>
 
                       <h3 className="text-sm font-semibold text-foreground mb-2">
-                        {p.title || "Complaint"}
+                        {p.title || "Без назви"}
                       </h3>
                       <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                         {p.description || "\u2014"}

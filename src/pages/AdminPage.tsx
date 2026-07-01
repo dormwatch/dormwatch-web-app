@@ -89,7 +89,7 @@ const AdminPage = () => {
               }}
             >
               <Plus className="w-5 h-5" strokeWidth={2} />
-              Нове замовлення
+              Новий тікет
             </Button>
           </div>
         </header>

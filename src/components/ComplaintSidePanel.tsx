@@ -157,7 +157,7 @@ const ComplaintSidePanel = ({
                   onClick={() => setShowTicketForm(true)}
                 >
                   <Ticket className="w-3 h-3 mr-1" strokeWidth={2} />
-                  Створити замовлення
+                  Створити тікет
                 </Button>
               ) : (
                 <TicketCreateForm
