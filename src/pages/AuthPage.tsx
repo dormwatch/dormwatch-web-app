@@ -389,7 +389,7 @@ const AuthPage = () => {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel>Пароль</FormLabel>
-                      <a href="#" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
+                      <a href="#" tabIndex={-1} className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
                         Забули пароль?
                       </a>
                     </div>
