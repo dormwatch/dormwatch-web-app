@@ -8,6 +8,7 @@ import {
   postComment,
   deleteComment,
 } from "../services/problemsApi";
+import type { Comment } from "../lib/types";
 
 interface CommentSectionProps {
   complaintId: number;
@@ -16,7 +17,7 @@ interface CommentSectionProps {
 }
 
 const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionProps) => {
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,8 +34,8 @@ const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionP
       await postComment(complaintId, input);
       setInput("");
       loadComments();
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('Failed to send comment', err);
     }
   };
 
@@ -42,8 +43,8 @@ const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionP
     try {
       await deleteComment(commentId);
       setComments((prev) => prev.filter((c) => c.id !== commentId));
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('Failed to delete comment', err);
     }
   };
 

@@ -20,7 +20,7 @@ import { Card, CardContent } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
-import { Label } from "../components/ui/label";
+
 import { Separator } from "../components/ui/separator";
 import { statusBadgeClass, statusLabel, humanLocation, priorityBadgeClass, priorityLabel } from "../lib/complaintUtils";
 import {
@@ -30,6 +30,7 @@ import {
   MessageSquare,
   X,
 } from "lucide-react";
+import type { Complaint, Ticket, Employee } from "../lib/types";
 
 const categoryOptions = [
   { id: "all", name: "Всі категорії" },
@@ -91,21 +92,21 @@ const AdminComplaintsPage = () => {
   const [ticketStatus, setTicketStatus] = useState("all");
   const [ticketCategory, setTicketCategory] = useState("all");
 
-  const [complaints, setComplaints] = useState<any[]>([]);
-  const [approvedForTickets, setApprovedForTickets] = useState<any[]>([]);
-  const [tickets, setTickets] = useState<any[]>([]);
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [approvedForTickets, setApprovedForTickets] = useState<Complaint[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [ticketSearchQuery, setTicketSearchQuery] = useState("");
 
-  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
+  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
-  const [selectedForTicket, setSelectedForTicket] = useState<any>(null);
-  const [ticketToEdit, setTicketToEdit] = useState<any>(null);
-  const [, setEmployees] = useState<any[]>([]);
+  const [selectedForTicket, setSelectedForTicket] = useState<Complaint | null>(null);
+  const [ticketToEdit, setTicketToEdit] = useState<Ticket | null>(null);
+  const [, setEmployees] = useState<Employee[]>([]);
 
   const loadComplaints = async () => {
     setLoading(true);
@@ -113,7 +114,8 @@ const AdminComplaintsPage = () => {
     try {
       const data = await fetchAllComplaints();
       setComplaints(data);
-    } catch {
+    } catch (err) {
+      console.warn('Failed to load complaints', err);
       setErr("Не вдалося завантажити заявки.");
     } finally {
       setLoading(false);
@@ -142,8 +144,8 @@ const AdminComplaintsPage = () => {
     try {
       await updateComplaintStatus(id, newStatus);
       loadComplaints();
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('Failed to change complaint status', err);
     }
   };
 
@@ -151,12 +153,12 @@ const AdminComplaintsPage = () => {
     try {
       await deleteProblem(id);
       setComplaints((prev) => prev.filter((p) => String(p.id) !== String(id)));
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('Failed to remove complaint', err);
     }
   };
 
-  const openTicketModal = (complaint: any, ticket?: any) => {
+  const openTicketModal = (complaint: Complaint, ticket?: Ticket) => {
     setSelectedForTicket(complaint);
     setTicketToEdit(ticket || null);
     setIsTicketModalOpen(true);
@@ -186,7 +188,7 @@ const AdminComplaintsPage = () => {
           ticketSearchQuery === "" ||
           (p.title || "").toLowerCase().includes(ticketSearchQuery.toLowerCase()) ||
           (p.description || "").toLowerCase().includes(ticketSearchQuery.toLowerCase());
-        const hasTicket = tickets.some((t: any) => t.complaint === p.id);
+        const hasTicket = tickets.some((t) => t.complaint === p.id);
         let statusOk = true;
         if (ticketStatus === "created") statusOk = hasTicket;
         else if (ticketStatus === "not_created") statusOk = !hasTicket;
@@ -426,7 +428,7 @@ const AdminComplaintsPage = () => {
                 ) : (
                   <div className="grid lg:grid-cols-2 gap-4">
                     {filteredTickets.map((p) => {
-                      const ticket = tickets.find((t: any) => t.complaint === p.id);
+                      const ticket = tickets.find((t) => t.complaint === p.id);
                       return (
                         <Card key={p.id} className="border-stone-700 shadow-none bg-stone-800">
                           <div className="p-5">

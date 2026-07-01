@@ -146,8 +146,7 @@ const AuthPage = () => {
       .then(setPlaces)
       .catch(() => setPlaces([]))
       .finally(() => setPlacesLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regBuildingId]);
+  }, [regBuildingId, registerForm]);
 
   const handleLogin = async (data: LoginData) => {
     setError("");

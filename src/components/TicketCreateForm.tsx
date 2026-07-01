@@ -9,21 +9,17 @@ import {
   SelectValue,
 } from "./ui/select";
 import { fetchApprovedComplaints, fetchEmployees, createTicket, updateTicket } from "../services/problemsApi";
+import type { Complaint, Employee, Ticket } from "../lib/types";
 
 interface TicketCreateFormProps {
   onClose: () => void;
   onSaved: () => void;
-  editTicket?: {
-    ticket_id: number;
-    complaint: number;
-    user?: any;
-    deadline?: string;
-  } | null;
+  editTicket?: Ticket | null;
 }
 
 const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProps) => {
-  const [complaints, setComplaints] = useState<any[]>([]);
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedComplaint, setSelectedComplaint] = useState(
     editTicket?.complaint ? String(editTicket.complaint) : ""
   );
@@ -47,14 +43,14 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
       if (editTicket) {
         await updateTicket(
           editTicket.ticket_id,
-          selectedEmployee || null as any,
-          deadline || null as any
+          selectedEmployee || null,
+          deadline || null
         );
       } else {
         await createTicket(
           Number(selectedComplaint),
-          selectedEmployee || null as any,
-          deadline || null as any
+          selectedEmployee || null,
+          deadline || null
         );
       }
       onSaved();
@@ -94,7 +90,7 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
             <SelectValue placeholder="-- Не призначено --" />
           </SelectTrigger>
           <SelectContent>
-            {employees.map((emp: any) => (
+            {employees.map((emp) => (
               <SelectItem key={emp.user} value={String(emp.user)}>
                 {emp.first_name} {emp.last_name}
               </SelectItem>

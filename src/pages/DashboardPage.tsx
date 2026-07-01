@@ -40,6 +40,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { Separator } from "../components/ui/separator";
 import { statusBadgeClass, statusLabel, isAdminUser } from "../lib/complaintUtils";
 import { useUser } from "../context/UserContext";
+import type { Complaint } from "../lib/types";
 
 const categories = [
   { id: "all", name: "Всі" },
@@ -55,7 +56,7 @@ const DashboardPage = () => {
   const [activeCorps, setActiveCorps] = useState("all");
   const [activePriority, setActivePriority] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [problems, setProblems] = useState<any[]>([]);
+  const [problems, setProblems] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -134,7 +135,7 @@ const DashboardPage = () => {
 
   const admin = isAdminUser(currentUser);
 
-  const canManage = (problem: any) =>
+  const canManage = (problem: Complaint) =>
     admin || currentUser?.user === problem.user_id;
 
   if (loading) {

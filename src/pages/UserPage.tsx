@@ -14,9 +14,10 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { Separator } from "../components/ui/separator";
+
 import { statusBadgeClass, statusLabel, isAdminUser } from "../lib/complaintUtils";
 import { useUser } from "../context/UserContext";
+import type { Complaint } from "../lib/types";
 import {
   ChevronUp,
   ChevronDown,
@@ -27,7 +28,7 @@ import {
 
 const UserPage = () => {
   const { user: currentUser } = useUser();
-  const [problems, setProblems] = useState<any[]>([]);
+  const [problems, setProblems] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [openCommentsId, setOpenCommentsId] = useState<number | null>(null);
@@ -54,8 +55,8 @@ const UserPage = () => {
     try {
       await deleteProblem(id);
       setProblems((prev) => prev.filter((p) => p.id !== id));
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('Failed to delete problem', err);
     }
   };
 

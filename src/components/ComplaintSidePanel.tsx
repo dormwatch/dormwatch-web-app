@@ -9,9 +9,10 @@ import { resolveImageUrl } from "../services/imageUtils";
 import { CATEGORY_LABELS, updateComplaintStatus, deleteProblem } from "../services/problemsApi";
 import { statusBadgeClass, statusLabel, humanLocation, priorityBadgeClass, priorityLabel } from "../lib/complaintUtils";
 import { Trash2, Ticket } from "lucide-react";
+import type { Complaint } from "../lib/types";
 
 interface ComplaintSidePanelProps {
-  complaint: any;
+  complaint: Complaint;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onStatusChange: () => void;
@@ -35,8 +36,8 @@ const ComplaintSidePanel = ({
     try {
       await updateComplaintStatus(complaint.id, newStatus);
       onStatusChange();
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('Failed to change complaint status', err);
     }
   };
 
@@ -45,8 +46,8 @@ const ComplaintSidePanel = ({
       await deleteProblem(complaint.id);
       onStatusChange();
       onOpenChange(false);
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('Failed to delete complaint', err);
     }
   };
 
