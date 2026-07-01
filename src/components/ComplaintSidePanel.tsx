@@ -5,6 +5,17 @@ import TicketCreateForm from "./TicketCreateForm";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
 import { resolveImageUrl } from "../services/imageUtils";
 import { CATEGORY_LABELS, updateComplaintStatus, deleteProblem } from "../services/problemsApi";
 import { statusBadgeClass, statusLabel, priorityBadgeClass, priorityLabel } from "../lib/complaintUtils";
@@ -59,8 +70,8 @@ const ComplaintSidePanel = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Деталі заявки</SheetTitle>
-          <SheetDescription>Інформація про заявку та керування статусом</SheetDescription>
+          <SheetTitle>Деталі скарги</SheetTitle>
+          <SheetDescription>Інформація про скаргу та керування статусом</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-4 px-4 py-4">
@@ -70,7 +81,7 @@ const ComplaintSidePanel = ({
                 {statusLabel(complaint.status)}
               </Badge>
               <span className="text-xs font-semibold text-muted-foreground">
-                {complaint.id !== "new" && `#${complaint.id}`}
+                {String(complaint.id) !== "new" && `#${complaint.id}`}
               </span>
             </div>
             <h3 className="text-base font-bold text-foreground mb-1">{complaint.title || "Без назви"}</h3>
@@ -114,40 +125,100 @@ const ComplaintSidePanel = ({
               <div className="flex flex-wrap gap-2">
                 {complaint.status === "pending" && (
                   <>
-                    <Button
-                      size="sm"
-                      onClick={() => handleStatusChange("approved")}
-                    >
-                      <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
-                      Схвалити
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleStatusChange("rejected")}
-                    >
-                      <HugeiconsIcon icon={CancelCircleIcon} className="size-3 mr-1" strokeWidth={2} />
-                      Відхилити
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                        >
+                          <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
+                          Схвалити
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Схвалити скаргу?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Ви впевнені, що хочете схвалити цю скаргу? Вона перейде в статус "Активно".
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Скасувати</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleStatusChange("approved")}>Схвалити</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                        >
+                          <HugeiconsIcon icon={CancelCircleIcon} className="size-3 mr-1" strokeWidth={2} />
+                          Відхилити
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Відхилити скаргу?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Ви впевнені, що хочете відхилити цю скаргу? Вона перейде в статус "Відхилено".
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Скасувати</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleStatusChange("rejected")} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Відхилити</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </>
                 )}
                 {complaint.status === "approved" && (
-                  <Button
-                    size="sm"
-                    onClick={() => handleStatusChange("resolved")}
-                  >
-                    <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
-                    Позначити вирішеним
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                      >
+                        <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
+                        Позначити вирішеним
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Позначити як вирішену?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Ви впевнені, що проблема була успішно вирішена? Скарга перейде в статус "Вирішено".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Скасувати</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleStatusChange("resolved")}>Вирішити</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={handleDelete}
-                >
-                  <HugeiconsIcon icon={Delete01Icon} className="size-3 mr-1" strokeWidth={2} />
-                  Видалити
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                    >
+                      <HugeiconsIcon icon={Delete01Icon} className="size-3 mr-1" strokeWidth={2} />
+                      Видалити
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Видалити скаргу?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Ви впевнені, що хочете видалити цю скаргу? Цю дію неможливо скасувати.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Скасувати</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Видалити</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 {!showTicketForm && (
                   <Button
                     size="sm"
@@ -162,6 +233,7 @@ const ComplaintSidePanel = ({
 
               {showTicketForm && (
                 <TicketCreateForm
+                  fixedComplaintId={complaint.id as number}
                   onClose={() => setShowTicketForm(false)}
                   onSaved={() => {
                     setShowTicketForm(false);
