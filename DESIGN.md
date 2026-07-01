@@ -46,7 +46,7 @@ The application background utilizes two overlaid textures for depth: a dot matri
 
 ### The "Ticket" Motif
 Complaint cards and data containers feel like physical work orders.
-*   **Categorization:** Use the `micro-label` class — 10px uppercase, tracking-widest (0.2em), semi-bold (`font-weight: 600`), muted-foreground color.
+*   **Categorization:** Use context-specific label classes (§3.3) — `label-field` for form labels, `label-section` for section headers, `label-meta` for metadata values.
 *   **Separators:** Dashed borders via `<Separator dashed />` to divide card sections. Solid separators for page-level and header boundaries.
 *   **Status Indicators:** Small, crisp, rectangular badges with high-contrast text and a subtle, translucent background fill (see Semantic Status Colors below).
 
@@ -174,7 +174,6 @@ Applied via custom CSS classes (`badge-pending`, `badge-progress`, etc.) using `
 *   **Outline Buttons:** `border-border bg-background hover:bg-muted hover:text-foreground`.
 *   **Ghost Buttons:** Used for icon-only actions, secondary triggers. `hover:bg-muted hover:text-foreground`.
 *   **Destructive Buttons:** `bg-destructive/10 text-destructive hover:bg-destructive/20`.
-*   **Button Labels:** Uppercase, `tracking-wider`, `font-bold`, `text-[10px]` for small labels.
 *   **Focus States:** `focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50`.
 
 ### Cards
@@ -247,7 +246,7 @@ The marketing/landing page for unauthenticated visitors. Auto-redirects logged-i
 *   **Brand mark:** `Building2` icon + "DormWatch" in `text-blue-500 font-bold text-xl tracking-tight`.
 *   **Nav links:** "Як це працює", "Поширені запитання", "Екстрені контакти" — `text-stone-300` hover to `text-stone-50`.
 *   **Hero Section:** Two-column grid (`lg:grid-cols-2`). Left: headline with `text-blue-400` accent span, body text, two CTA buttons. Right: stylized mock-ticket illustration (layered borders with `rotate-3` / `-rotate-2` transforms and opacity stacking, containing skeleton ticket cards with hover left-border reveal).
-*   **Stats Banner:** 4-column grid with `divide-x divide-stone-800`. Large stat numbers (`text-3xl font-bold`) + `micro-label` descriptions.
+*   **Stats Banner:** 4-column grid with `divide-x divide-stone-800`. Large stat numbers (`text-3xl font-bold`) + `label-meta` descriptions.
 *   **Features Grid:** 3-column grid of feature cards. Each card: `bg-stone-800 border border-stone-700 p-8` with icon in `w-12 h-12 border border-stone-600 bg-stone-900` box, group-hover left-border reveal.
 *   **CTA Section:** Centered text + primary button. `bg-stone-900 py-20`.
 
@@ -257,7 +256,7 @@ Dual-mode form page (login / register) controlled by `?tab=register` query param
 *   **Login card:** Email (validated `@lpnu.ua`), password. "Забули пароль?" link.
 *   **Register card:** First name, last name, `@lpnu.ua` email, building → room cascade (dynamic fetch), password + confirm.
 *   **Cross-link card:** Below main card, a `bg-muted/50` card with `w-1 bg-muted-foreground` left accent bar, linking between login/register.
-*   **Error banner:** `border border-destructive/40 bg-destructive/10` box with `text-[11px]` error text.
+*   **Error banner:** `border border-destructive/40 bg-destructive/10` box with `text-xs` error text.
 *   **Back link:** Below card, "Повернутися на головну" with `ArrowLeft01Icon` that translates `-x-1` on hover.
 
 ### User Dashboard (`/user`)
@@ -273,7 +272,7 @@ Tabbed dashboard for authenticated residents.
 ### Problem Feed (`/dashboard`)
 Public/semi-public view of all approved complaints with filtering and voting.
 *   **Filters toolbar:** Search input (`w-48`) with inline `Search` icon, building `Select`, priority `Select` (all `h-8 text-xs`).
-*   **Category pills:** Outline/default toggle buttons in `text-[10px] font-semibold uppercase tracking-widest`.
+*   **Category pills:** Outline/default toggle buttons in `text-xs font-semibold`.
 *   **Content grid:** `lg:grid-cols-3`, 2/3 for complaint list, 1/3 for sidebar action cards.
 *   **Complaint cards:** Vote-up button (left column, `Separator orientation="vertical" dashed`), status + category badges, title, description, optional photo (click-to-zoom via `Dialog`), `Separator dashed`, date + comments toggle.
 *   **Sidebar:** Primary-colored action card (`bg-primary text-primary-foreground`) with context-dependent CTA (admin → "Перейти в комендант-центр", user → "Створити нову заявку").
@@ -283,9 +282,9 @@ Multi-section form for submitting new complaints.
 *   **Back button:** `border border-border hover:border-primary hover:bg-primary/5`.
 *   **Category selector:** 2×2 / 4-column grid of icon+label buttons. Active: `variant="default"`, inactive: `variant="outline"`, `border-2`.
 *   **Priority selector:** 3 outline/default toggle buttons (`Низький / Середній / Високий`), `flex-1`.
-*   **Form fields:** Title, place name, description (`Textarea`, `min-h-36 resize-none`). All with `micro-label` above.
+*   **Form fields:** Title, place name, description (`Textarea`, `min-h-36 resize-none`). All with `label-field` above.
 *   **Photo upload:** Square `aspect-square` drop zone with `border-2 border-dashed`. Shows preview with `X` overlay button when photo selected.
-*   **Submit button:** Full-width, `font-bold uppercase tracking-wider`.
+*   **Submit button:** Full-width, button label styling per §3.4.
 
 ### Admin Dashboard (`/admin`)
 Sidebar + main content layout for administrators.
@@ -301,13 +300,13 @@ Sidebar + main content layout for administrators.
 ### TicketCard
 Compact complaint summary used in the User Dashboard.
 *   **Props:** `id`, `title`, `description`, `category`, `date`, `status`, `location?`, `categoryLabel?`.
-*   **Layout:** Category micro-label + bullet + date → status badge → title + description → `Separator` → `ProgressStepper` + `#id`.
+*   **Layout:** Category `label-meta` + bullet + date → status badge → title + description → `Separator` → `ProgressStepper` + `#id`.
 *   **Hover:** Group hover reveals `w-1 bg-blue-500` left bar, title shifts to `text-blue-400`.
 
 ### StatCard
 Metric display for admin dashboard.
 *   **Props:** `icon`, `label`, `value`, `sparklineColor?`, `sparklineData?`, `loading?`.
-*   **Layout:** Icon + `micro-label` → large `text-3xl font-bold` value → optional sparkline bar chart at bottom (hidden at 20% opacity, revealed to 100% on hover).
+*   **Layout:** Icon + `label-section` → large `text-3xl font-bold` value → optional sparkline bar chart at bottom (hidden at 20% opacity, revealed to 100% on hover).
 *   **Skeleton:** Custom `StatCardSkeleton` with `animate-pulse` and mock sparkline bars.
 
 ### CommunityBoard
@@ -362,7 +361,7 @@ Defined in `@layer components` in `index.css`:
 
 | Class | Purpose |
 |---|---|
-| `.micro-label` | 10px uppercase tracking-widest semi-bold muted-foreground text |
+
 | `.badge-status` | Base badge styling (px/py, uppercase, tracking, border) |
 | `.badge-pending` | Yellow status badge colors |
 | `.badge-progress` | Blue status badge colors |
