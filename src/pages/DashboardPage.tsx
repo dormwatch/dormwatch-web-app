@@ -7,7 +7,8 @@ import {
   fetchBuildings,
 } from "../services/problemsApi";
 import { resolveImageUrl } from "../services/imageUtils";
-import { ChevronUp, ChevronDown, MessageSquare, X, Search, Trash2, SearchX } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ChevronUpIcon, ChevronDownIcon, Message01Icon, Cancel01Icon, SearchIcon, Delete01Icon, SearchIcon as SearchIcon2, AddIcon, Refresh01Icon } from "@hugeicons/core-free-icons";
 import { Card } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -159,7 +160,7 @@ const DashboardPage = () => {
             />
           )}
           <DialogClose className="absolute top-4 right-4 text-foreground hover:text-stone-300">
-            <X className="w-6 h-6" strokeWidth={2} />
+            <HugeiconsIcon icon={Cancel01Icon} className="size-6" strokeWidth={2} />
           </DialogClose>
         </DialogContent>
       </Dialog>
@@ -173,7 +174,7 @@ const DashboardPage = () => {
           <div className="lg:col-span-1 space-y-6">
             <div className="space-y-4">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" strokeWidth={2} />
+                <HugeiconsIcon icon={SearchIcon} className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" strokeWidth={2} />
                 <Input
                   placeholder="Пошук заявок..."
                   value={searchQuery}
@@ -238,7 +239,7 @@ const DashboardPage = () => {
                   size="sm"
                   className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/80"
                 >
-                  <Link to="/create-report">Створити нову заявку</Link>
+                  <Link to="/create-report"><HugeiconsIcon icon={AddIcon} className="size-4 mr-1.5" strokeWidth={2} />Створити нову заявку</Link>
                 </Button>
               )}
             </div>
@@ -260,7 +261,7 @@ const DashboardPage = () => {
                       className="absolute top-2 right-2 z-10 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                       title="Видалити"
                     >
-                      <Trash2 className="w-3.5 h-3.5" strokeWidth={2} />
+                      <HugeiconsIcon icon={Delete01Icon} className="size-3.5" strokeWidth={2} />
                     </Button>
                   )}
 
@@ -277,7 +278,7 @@ const DashboardPage = () => {
                             : ""
                         }`}
                       >
-                        <ChevronUp className="w-4 h-4" strokeWidth={2} />
+                        <HugeiconsIcon icon={ChevronUpIcon} className="size-4" strokeWidth={2} />
                         <span className="text-base font-bold leading-none">
                           {problem.votesCount || 0}
                         </span>
@@ -334,8 +335,8 @@ const DashboardPage = () => {
                             }
                             className="text-primary text-xs font-semibold hover:underline inline-flex items-center gap-1 p-0 h-auto"
                           >
-                            <MessageSquare className="w-3 h-3" strokeWidth={2} />
-                            Коментарі {openCommentsId === problem.id ? <ChevronUp className="w-3 h-3 inline" strokeWidth={2} /> : <ChevronDown className="w-3 h-3 inline" strokeWidth={2} />}
+                            <HugeiconsIcon icon={Message01Icon} className="size-3" strokeWidth={2} />
+                            Коментарі {openCommentsId === problem.id ? <HugeiconsIcon icon={ChevronUpIcon} className="size-3 inline" strokeWidth={2} /> : <HugeiconsIcon icon={ChevronDownIcon} className="size-3 inline" strokeWidth={2} />}
                           </Button>
                         )}
                       </div>
@@ -361,7 +362,7 @@ const DashboardPage = () => {
             {filteredProblems.length === 0 && (
               <div className="border border-dashed border-border p-8 flex flex-col items-center justify-center text-center">
                 <div className="w-12 h-12 mb-4 border border-border bg-card flex items-center justify-center text-muted-foreground">
-                  <SearchX className="w-5 h-5" strokeWidth={1.5} />
+                  <HugeiconsIcon icon={SearchIcon2} className="size-5" strokeWidth={1.5} />
                 </div>
                 <p className="text-xs text-muted-foreground mb-3">
                   Немає заявок за вибраними фільтрами.
@@ -376,6 +377,7 @@ const DashboardPage = () => {
                     setSearchQuery("");
                   }}
                 >
+                  <HugeiconsIcon icon={Refresh01Icon} className="size-3 mr-1" strokeWidth={2} />
                   Скинути фільтри
                 </Button>
               </div>

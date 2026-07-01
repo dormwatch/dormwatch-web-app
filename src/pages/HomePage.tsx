@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { fetchUserProfile } from "../services/problemsApi";
 import { Button } from "../components/ui/button";
-import { ArrowRight, Search, Building2, Camera, Activity, ShieldAlert } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, SearchIcon, Building03Icon, Camera01Icon, Activity01Icon, ShieldIcon } from "@hugeicons/core-free-icons";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Footer from "../components/Footer";
 import { Separator } from "../components/ui/separator";
@@ -45,7 +46,7 @@ const HomePage = () => {
       <nav className="bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 text-primary font-bold text-xl tracking-tight">
-            <Building2 className="w-6 h-6" strokeWidth={1.5} />
+            <HugeiconsIcon icon={Building03Icon} className="size-6" strokeWidth={1.5} />
             <span>DormWatch</span>
           </div>
 
@@ -79,12 +80,12 @@ const HomePage = () => {
               <Button asChild size="lg" className="gap-2">
                 <Link to="/auth">
                   Повідомити про проблему
-                  <ArrowRight className="w-5 h-5" strokeWidth={2} />
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="size-5" strokeWidth={2} />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="gap-2">
                 <Link to="/dashboard">
-                  <Search className="w-5 h-5" strokeWidth={2} />
+                  <HugeiconsIcon icon={SearchIcon} className="size-5" strokeWidth={2} />
                   Відстежити заявку
                 </Link>
               </Button>
@@ -155,7 +156,7 @@ const HomePage = () => {
           <div className="bg-card border border-border p-8 relative group hover:border-stone-500 transition-colors">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="w-12 h-12 bg-background border border-border mb-6 flex items-center justify-center">
-              <Camera className="w-6 h-6 text-blue-400" strokeWidth={1.5} />
+              <HugeiconsIcon icon={Camera01Icon} className="size-6 text-blue-400" strokeWidth={1.5} />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-3">Сфотографуйте та надішліть</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -165,7 +166,7 @@ const HomePage = () => {
           <div className="bg-card border border-border p-8 relative group hover:border-stone-500 transition-colors">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="w-12 h-12 bg-background border border-border mb-6 flex items-center justify-center">
-              <Activity className="w-6 h-6 text-blue-400" strokeWidth={1.5} />
+              <HugeiconsIcon icon={Activity01Icon} className="size-6 text-blue-400" strokeWidth={1.5} />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-3">Прозоре відстеження</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -175,7 +176,7 @@ const HomePage = () => {
           <div className="bg-card border border-border p-8 relative group hover:border-stone-500 transition-colors">
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="w-12 h-12 bg-background border border-border mb-6 flex items-center justify-center">
-              <ShieldAlert className="w-6 h-6 text-blue-400" strokeWidth={1.5} />
+              <HugeiconsIcon icon={ShieldIcon} className="size-6 text-blue-400" strokeWidth={1.5} />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-3">Екстрене реагування</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -194,7 +195,7 @@ const HomePage = () => {
             <Button asChild size="lg" className="gap-2">
               <Link to="/auth">
                 Розпочати
-                <ArrowRight className="w-5 h-5" strokeWidth={2} />
+                <HugeiconsIcon icon={ArrowRight01Icon} className="size-5" strokeWidth={2} />
               </Link>
             </Button>
           </div>

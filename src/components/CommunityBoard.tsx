@@ -1,4 +1,5 @@
-import { BellOff } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { BellOffIcon } from "@hugeicons/core-free-icons";
 
 const CommunityBoard = () => {
   return (
@@ -8,7 +9,7 @@ const CommunityBoard = () => {
       </div>
       <div className="bg-card/50 border border-border border-dashed p-8 flex flex-col items-center justify-center text-center h-[280px]">
         <div className="w-12 h-12 mb-4 border border-border bg-card flex items-center justify-center text-muted-foreground">
-          <BellOff className="w-5 h-5" strokeWidth={1.5} />
+          <HugeiconsIcon icon={BellOffIcon} className="size-5" strokeWidth={1.5} />
         </div>
         <h3 className="text-foreground font-semibold mb-1">Немає оголошень</h3>
         <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px]">

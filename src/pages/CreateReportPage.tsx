@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createProblem, fetchUserProfile } from "../services/problemsApi";
-import { ArrowLeft, Camera, Droplets, Zap, Armchair, Wifi, X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, Camera01Icon, DropletsIcon, BoltIcon, ArmchairIcon, WifiIcon, Cancel01Icon, Forward01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 
 const categories = [
-  { id: "plumbing", label: "Сантехніка", Icon: Droplets },
-  { id: "electricity", label: "Електрика", Icon: Zap },
-  { id: "furniture", label: "Меблі", Icon: Armchair },
-  { id: "internet", label: "Інтернет", Icon: Wifi },
+  { id: "plumbing", label: "Сантехніка", Icon: DropletsIcon },
+  { id: "electricity", label: "Електрика", Icon: BoltIcon },
+  { id: "furniture", label: "Меблі", Icon: ArmchairIcon },
+  { id: "internet", label: "Інтернет", Icon: WifiIcon },
 ];
 
 const CreateReportPage = () => {
@@ -93,7 +94,7 @@ const CreateReportPage = () => {
           to="/"
           className="p-2 border border-border hover:border-primary hover:bg-primary/5 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" strokeWidth={2} />
+                  <HugeiconsIcon icon={ArrowLeft01Icon} className="size-4" strokeWidth={2} />
         </Link>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
           Нове звернення
@@ -120,8 +121,9 @@ const CreateReportPage = () => {
                   onClick={() => setSelectedCategory(category.id)}
                   className="p-4 h-auto flex flex-col items-center gap-2 transition-all"
                 >
-                  <category.Icon
-                    className={`w-6 h-6 ${
+                   <HugeiconsIcon
+                    icon={category.Icon}
+                    className={`size-6 ${
                       isActive ? "text-primary-foreground" : "text-muted-foreground"
                     }`}
                     strokeWidth={2}
@@ -218,13 +220,14 @@ const CreateReportPage = () => {
                   onClick={handleRemovePhoto}
                   className="absolute top-2 right-2 bg-card/80 border border-border text-destructive hover:bg-card transition-all"
                 >
-                  <X className="w-4 h-4" strokeWidth={2} />
+                  <HugeiconsIcon icon={Cancel01Icon} className="size-4" strokeWidth={2} />
                 </Button>
               </div>
             ) : (
               <label className="w-full aspect-square border-2 border-dashed border-border flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors">
-                <Camera
-                  className="w-8 h-8 text-muted-foreground mb-3"
+                <HugeiconsIcon
+                  icon={Camera01Icon}
+                  className="size-8 text-muted-foreground mb-3"
                   strokeWidth={2}
                 />
                 <p className="text-xs font-normal text-muted-foreground">
@@ -247,6 +250,7 @@ const CreateReportPage = () => {
           disabled={submitting}
           className="w-full"
         >
+          <HugeiconsIcon icon={Forward01Icon} className="size-4 mr-2" strokeWidth={2} />
           {submitting ? "Публікую..." : "Опублікувати звернення"}
         </Button>
       </form>

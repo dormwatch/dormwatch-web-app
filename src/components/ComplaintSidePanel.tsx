@@ -8,7 +8,8 @@ import { Separator } from "./ui/separator";
 import { resolveImageUrl } from "../services/imageUtils";
 import { CATEGORY_LABELS, updateComplaintStatus, deleteProblem } from "../services/problemsApi";
 import { statusBadgeClass, statusLabel, priorityBadgeClass, priorityLabel } from "../lib/complaintUtils";
-import { Trash2, Ticket } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Delete01Icon, Ticket01Icon, CheckmarkCircleIcon, CancelCircleIcon } from "@hugeicons/core-free-icons";
 import type { Complaint } from "../lib/types";
 
 interface ComplaintSidePanelProps {
@@ -117,6 +118,7 @@ const ComplaintSidePanel = ({
                       size="sm"
                       onClick={() => handleStatusChange("approved")}
                     >
+                      <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
                       Схвалити
                     </Button>
                     <Button
@@ -124,6 +126,7 @@ const ComplaintSidePanel = ({
                       variant="destructive"
                       onClick={() => handleStatusChange("rejected")}
                     >
+                      <HugeiconsIcon icon={CancelCircleIcon} className="size-3 mr-1" strokeWidth={2} />
                       Відхилити
                     </Button>
                   </>
@@ -133,6 +136,7 @@ const ComplaintSidePanel = ({
                     size="sm"
                     onClick={() => handleStatusChange("resolved")}
                   >
+                    <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
                     Позначити вирішеним
                   </Button>
                 )}
@@ -141,7 +145,7 @@ const ComplaintSidePanel = ({
                   variant="destructive"
                   onClick={handleDelete}
                 >
-                  <Trash2 className="w-3 h-3 mr-1" strokeWidth={2} />
+                  <HugeiconsIcon icon={Delete01Icon} className="size-3 mr-1" strokeWidth={2} />
                   Видалити
                 </Button>
                 {!showTicketForm && (
@@ -150,7 +154,7 @@ const ComplaintSidePanel = ({
                     variant="outline"
                     onClick={() => setShowTicketForm(true)}
                   >
-                    <Ticket className="w-3 h-3 mr-1" strokeWidth={2} />
+                    <HugeiconsIcon icon={Ticket01Icon} className="size-3 mr-1" strokeWidth={2} />
                     Створити тікет
                   </Button>
                 )}

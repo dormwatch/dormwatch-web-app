@@ -1,6 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { LayoutDashboard, ClipboardList, Users, Megaphone, Settings, LogOut, Building2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { DashboardSquare01Icon, ClipboardIcon, GroupIcon, Megaphone01Icon, SettingsIcon, Logout01Icon, Building03Icon } from "@hugeicons/core-free-icons";
 import { logoutUser } from "../services/problemsApi";
 import { Separator } from "./ui/separator";
 import { SettingsModal } from "./SettingsModal";
@@ -13,10 +14,10 @@ interface AdminSidebarProps {
 }
 
 const navItems = [
-  { to: "/admin", icon: LayoutDashboard, label: "Огляд" },
-  { to: "#", icon: Users, label: "Мешканці" },
-  { to: "/admin/complaints", icon: ClipboardList, label: "Всі заявки" },
-  { to: "#", icon: Megaphone, label: "Оголошення" },
+  { to: "/admin", icon: DashboardSquare01Icon, label: "Огляд" },
+  { to: "#", icon: GroupIcon, label: "Мешканці" },
+  { to: "/admin/complaints", icon: ClipboardIcon, label: "Всі заявки" },
+  { to: "#", icon: Megaphone01Icon, label: "Оголошення" },
 ];
 
 const AdminSidebar = ({ userName = "Адмін", userRole = "Адміністратор", initials = "AD" }: AdminSidebarProps) => {
@@ -27,7 +28,7 @@ const AdminSidebar = ({ userName = "Адмін", userRole = "Адміністр�
       <aside className="hidden md:flex md:flex-col md:w-56 lg:w-64 bg-background border-r border-border min-h-screen shrink-0">
         <div className="h-20 px-6 flex items-center border-b border-border">
           <Link to="/admin" className="flex items-center gap-2 text-primary font-bold text-xl">
-            <Building2 className="w-6 h-6" strokeWidth={1.5} />
+            <HugeiconsIcon icon={Building03Icon} className="size-6" strokeWidth={1.5} />
             <span>DormWatch</span>
           </Link>
         </div>
@@ -48,7 +49,7 @@ const AdminSidebar = ({ userName = "Адмін", userRole = "Адміністр�
                 )
               }
             >
-              <item.icon className="w-5 h-5" strokeWidth={1.5} />
+              <HugeiconsIcon icon={item.icon} className="size-5" strokeWidth={1.5} />
               {item.label}
             </NavLink>
           ))}
@@ -59,7 +60,7 @@ const AdminSidebar = ({ userName = "Адмін", userRole = "Адміністр�
             onClick={() => setSettingsOpen(true)}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50 border-l-4 border-transparent text-left"
           >
-            <Settings className="w-5 h-5" strokeWidth={1.5} />
+            <HugeiconsIcon icon={SettingsIcon} className="size-5" strokeWidth={1.5} />
             Налаштування
           </button>
 
@@ -76,7 +77,7 @@ const AdminSidebar = ({ userName = "Адмін", userRole = "Адміністр�
               className="ml-auto p-1.5 text-muted-foreground hover:text-red-400 transition-colors shrink-0"
               title="Вийти"
             >
-              <LogOut className="w-3.5 h-3.5" strokeWidth={1.5} />
+              <HugeiconsIcon icon={Logout01Icon} className="size-3.5" strokeWidth={1.5} />
             </button>
           </div>
         </div>

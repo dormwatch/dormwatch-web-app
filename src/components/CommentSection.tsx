@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Send, X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Forward01Icon, Cancel01Icon, Refresh01Icon, Message01Icon } from "@hugeicons/core-free-icons";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import LoadingSpinner from "./LoadingSpinner";
@@ -51,8 +52,8 @@ const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionP
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <Button variant="link" size="xs" onClick={loadComments} className="p-0 h-auto text-xs font-semibold text-primary hover:underline">
-          {comments.length > 0 ? `Коментарі (${comments.length})` : "Завантажити коментарі"}
+        <Button variant="link" size="xs" onClick={loadComments} className="p-0 h-auto text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1">
+          {comments.length > 0 ? <><HugeiconsIcon icon={Message01Icon} className="size-3" strokeWidth={2} /> Коментарі ({comments.length})</> : <><HugeiconsIcon icon={Refresh01Icon} className="size-3" strokeWidth={2} /> Завантажити коментарі</>}
         </Button>
       </div>
 
@@ -78,7 +79,7 @@ const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionP
               <p className="text-xs text-muted-foreground">{c.text}</p>
               {(currentUserId === c.author_id || isAdmin) && (
                 <Button variant="ghost" size="icon-xs" onClick={() => handleDelete(c.id)} className="absolute top-1 right-1 text-red-400 opacity-0 group-hover/comment:opacity-100 transition-opacity">
-                  <X className="w-3 h-3" strokeWidth={2} />
+                  <HugeiconsIcon icon={Cancel01Icon} className="size-3" strokeWidth={2} />
                 </Button>
               )}
             </div>
@@ -95,7 +96,7 @@ const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionP
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
         />
         <Button size="sm" onClick={handleSend}>
-          <Send className="w-3 h-3 mr-1" strokeWidth={2} />
+          <HugeiconsIcon icon={Forward01Icon} className="size-3 mr-1" strokeWidth={2} />
           Надіслати
         </Button>
       </div>

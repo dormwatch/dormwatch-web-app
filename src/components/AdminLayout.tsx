@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Building2, LayoutDashboard, Users, FileText, Megaphone, Settings } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Building03Icon, DashboardSquare01Icon, GroupIcon, File01Icon, Megaphone01Icon, SettingsIcon } from "@hugeicons/core-free-icons";
 import { Button } from "./ui/button";
 import { type ReactNode, useState } from "react";
 import { getUserInitials } from "../lib/complaintUtils";
@@ -16,10 +17,10 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   const placeName = user?.place?.place_name || "Головний офіс";
 
   const navItems = [
-    { name: "Загальний огляд", path: "/admin", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { name: "Мешканці", path: "#", icon: <Users className="w-5 h-5" /> },
-    { name: "Всі заявки", path: "/admin/complaints", icon: <FileText className="w-5 h-5" /> },
-    { name: "Оголошення", path: "#", icon: <Megaphone className="w-5 h-5" /> },
+    { name: "Загальний огляд", path: "/admin", icon: <HugeiconsIcon icon={DashboardSquare01Icon} className="size-5" /> },
+    { name: "Мешканці", path: "#", icon: <HugeiconsIcon icon={GroupIcon} className="size-5" /> },
+    { name: "Всі заявки", path: "/admin/complaints", icon: <HugeiconsIcon icon={File01Icon} className="size-5" /> },
+    { name: "Оголошення", path: "#", icon: <HugeiconsIcon icon={Megaphone01Icon} className="size-5" /> },
   ];
 
   return (
@@ -27,7 +28,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
       <aside className="w-full md:w-64 bg-background border-r border-border flex flex-col md:sticky md:top-0 md:h-screen z-40 relative">
         <div className="h-20 px-6 flex items-center border-b border-border">
           <Link to="/admin" className="flex items-center gap-3 text-primary font-bold text-xl hover:text-primary/80 transition-colors">
-            <Building2 className="w-6 h-6" />
+            <HugeiconsIcon icon={Building03Icon} className="size-6" />
             <span>DormWatch</span>
           </Link>
         </div>
@@ -54,7 +55,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
         <div className="p-4 border-t border-border space-y-4">
           <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} className="w-full justify-start gap-3 px-4 py-3 text-sm font-semibold border-l-4 border-transparent text-left text-muted-foreground hover:text-foreground">
-            <Settings className="w-5 h-5" />
+            <HugeiconsIcon icon={SettingsIcon} className="size-5" />
             Налаштування
           </Button>
 

@@ -16,7 +16,8 @@ import {
   TableRow,
   TableCell,
 } from "../components/ui/table";
-import { Clock, Hammer, CheckCircle, Download, Plus } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ClockIcon, HammerIcon, CheckmarkCircleIcon, Download01Icon, AddIcon } from "@hugeicons/core-free-icons";
 import { statusBadgeClass, statusLabel } from "../lib/complaintUtils";
 import { CATEGORY_LABELS } from "../services/problemsApi";
 import { useUser } from "../context/UserContext";
@@ -65,7 +66,7 @@ const AdminPage = () => {
               size="default"
               className="gap-2"
             >
-              <Download className="w-4 h-4" strokeWidth={2} />
+              <HugeiconsIcon icon={Download01Icon} className="size-4" strokeWidth={2} />
               Експорт даних
             </Button>
             <Button
@@ -88,7 +89,7 @@ const AdminPage = () => {
                 setSheetOpen(true);
               }}
             >
-              <Plus className="w-5 h-5" strokeWidth={2} />
+              <HugeiconsIcon icon={AddIcon} className="size-5" strokeWidth={2} />
               Новий тікет
             </Button>
           </div>
@@ -106,19 +107,19 @@ const AdminPage = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard
-                icon={<Clock className="w-4 h-4" strokeWidth={1.5} />}
+                icon={<HugeiconsIcon icon={ClockIcon} className="size-4" strokeWidth={1.5} />}
                 label="Очікує"
                 value={pendingCount}
                 sparklineColor="#eab308"
               />
               <StatCard
-                icon={<Hammer className="w-4 h-4" strokeWidth={1.5} />}
+                icon={<HugeiconsIcon icon={HammerIcon} className="size-4" strokeWidth={1.5} />}
                 label="В роботі"
                 value={inProgressCount}
                 sparklineColor="#3b82f6"
               />
               <StatCard
-                icon={<CheckCircle className="w-4 h-4" strokeWidth={1.5} />}
+                icon={<HugeiconsIcon icon={CheckmarkCircleIcon} className="size-4" strokeWidth={1.5} />}
                 label="Вирішено"
                 value={resolvedCount}
                 sparklineColor="#22c55e"

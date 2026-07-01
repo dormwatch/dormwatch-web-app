@@ -216,16 +216,22 @@ Consistent animated skeleton placeholders for async content.
 
 ## 6. Iconography
 
-The project uses **two icon libraries**:
+The project uses **Hugeicons** exclusively.
 
-*   **Lucide Icons** (`lucide-react`): The primary icon set. Used for navigation, status, actions, and UI chrome.
+*   **Hugeicons** (`@hugeicons/react` + `@hugeicons/core-free-icons`): The sole icon set used across the entire application.
     *   **Style:** Outline, 1.5–2px stroke width.
-    *   **Sizing:** Primary navigation/actions: `w-6 h-6`. Secondary/list items: `w-4 h-4` to `w-5 h-5`. Micro actions: `w-3.5 h-3.5`.
-    *   **Common icons:** `Building2` (brand), `ArrowRight` (CTAs), `Search`, `Trash2`, `MessageSquare`, `Wrench`, `Bell`, `Settings`, `LogOut`, `MapPin`, `ChevronUp`.
-
-*   **Hugeicons** (`@hugeicons/react` + `@hugeicons/core-free-icons`): Used exclusively on the Auth page for form chrome and navigation links.
-    *   **Icons used:** `Building03Icon`, `ArrowRight01Icon`, `ArrowLeft01Icon`.
-    *   Rendered via `<HugeiconsIcon icon={...} strokeWidth={2} className="size-8" />`.
+    *   **Rendering:** All icons are rendered via `<HugeiconsIcon icon={IconName} strokeWidth={2} className="size-X" />`.
+    *   **Sizing:** Use Tailwind `size-*` utilities instead of `w-* h-*` pairs (e.g., `size-4` for 16px).
+        *   Primary navigation/actions: `size-6`.
+        *   Secondary/list items: `size-4` to `size-5`.
+        *   Micro actions: `size-3` to `size-3.5`.
+        *   Inline with button text: `size-3` or `size-4` with `mr-1`/`mr-1.5`/`mr-2`.
+    *   **Common icons:** `Building03Icon` (brand), `ArrowRight01Icon` (CTAs), `SearchIcon`, `Delete01Icon`, `Message01Icon`, `BellIcon`, `SettingsIcon`, `Logout01Icon`, `MapPinIcon`, `ChevronUpIcon`, `AddIcon`, `Cancel01Icon`, `SaveIcon`, `CheckmarkCircleIcon`, `CancelCircleIcon`.
+    *   **Import pattern:**
+        ```tsx
+        import { HugeiconsIcon } from "@hugeicons/react";
+        import { IconName01, IconName02 } from "@hugeicons/core-free-icons";
+        ```
 
 ---
 

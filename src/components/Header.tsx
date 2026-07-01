@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { fetchUserProfile, logoutUser } from "../services/problemsApi";
 import { getUserInitials } from "../lib/complaintUtils";
-import { Building2, Bell, Settings, LogOut } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Building03Icon, BellIcon, SettingsIcon, Logout01Icon, AddIcon } from "@hugeicons/core-free-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +43,7 @@ const Header = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 text-primary font-bold text-xl">
-              <Building2 className="w-6 h-6" strokeWidth={1.5} />
+              <HugeiconsIcon icon={Building03Icon} className="size-6" strokeWidth={1.5} />
               <span>DormWatch</span>
             </Link>
 
@@ -82,12 +83,12 @@ const Header = () => {
 
           <div className="flex items-center gap-4">
             <Button asChild variant="default" size="sm" className="gap-2">
-              <Link to="/create-report">+ Повідомити</Link>
+              <Link to="/create-report"><HugeiconsIcon icon={AddIcon} className="size-4" strokeWidth={2} />Повідомити</Link>
             </Button>
 
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
-                <Bell className="w-5 h-5" strokeWidth={1.5} />
+                <HugeiconsIcon icon={BellIcon} className="size-5" strokeWidth={1.5} />
               </Button>
               <Separator orientation="vertical" className="hidden sm:block h-6" />
 
@@ -104,7 +105,7 @@ const Header = () => {
                     className="text-xs font-semibold cursor-pointer"
                     onSelect={() => setSettingsOpen(true)}
                   >
-                    <Settings className="w-3.5 h-3.5 mr-2" strokeWidth={1.5} />
+                    <HugeiconsIcon icon={SettingsIcon} className="size-3.5 mr-2" strokeWidth={1.5} />
                     Налаштування
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -112,7 +113,7 @@ const Header = () => {
                     className="text-xs font-semibold text-destructive cursor-pointer"
                     onSelect={logoutUser}
                   >
-                    <LogOut className="w-3.5 h-3.5 mr-2" strokeWidth={2} />
+                    <HugeiconsIcon icon={Logout01Icon} className="size-3.5 mr-2" strokeWidth={2} />
                     Вийти
                   </DropdownMenuItem>
                 </DropdownMenuContent>

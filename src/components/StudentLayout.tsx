@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Bell, ChevronDown } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Building03Icon, BellIcon, ChevronDownIcon } from "@hugeicons/core-free-icons";
 import { type ReactNode, useState } from "react";
 import { isAdminUser, getUserInitials } from "../lib/complaintUtils";
 import { useUser } from "../context/UserContext";
@@ -21,7 +22,7 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 text-primary font-bold text-xl cursor-pointer hover:text-primary/80 transition-colors">
-              <Building2 className="w-6 h-6" />
+              <HugeiconsIcon icon={Building03Icon} className="size-6" />
               <span>DormWatch</span>
             </Link>
 
@@ -63,7 +64,7 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
 
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
-              <Bell className="w-5 h-5" />
+              <HugeiconsIcon icon={BellIcon} className="size-5" />
               <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 border border-border" />
             </Button>
 
@@ -71,7 +72,7 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
               <div className="w-8 h-8 bg-background border border-border flex items-center justify-center text-muted-foreground font-bold text-xs">
                 {initials}
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              <HugeiconsIcon icon={ChevronDownIcon} className="size-4 text-muted-foreground" />
             </Button>
           </div>
         </div>

@@ -8,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, AddIcon, SaveIcon } from "@hugeicons/core-free-icons";
 import { fetchApprovedComplaints, fetchEmployees, createTicket, updateTicket } from "../services/problemsApi";
 import type { Complaint, Employee, Ticket } from "../lib/types";
 
@@ -113,12 +115,14 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
 
       <div className="flex gap-3 pt-2">
         <Button variant="outline" onClick={onClose}>
+          <HugeiconsIcon icon={Cancel01Icon} className="size-4 mr-1.5" strokeWidth={2} />
           Скасувати
         </Button>
         <Button
           onClick={handleSave}
           disabled={saving || !selectedComplaint}
         >
+          {editTicket ? <HugeiconsIcon icon={SaveIcon} className="size-4 mr-1.5" strokeWidth={2} /> : <HugeiconsIcon icon={AddIcon} className="size-4 mr-1.5" strokeWidth={2} />}
           {saving ? "Збереження..." : editTicket ? "Оновити тікет" : "Створити тікет"}
         </Button>
       </div>

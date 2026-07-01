@@ -23,14 +23,18 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 
 import { Separator } from "../components/ui/separator";
 import { statusBadgeClass, statusLabel, priorityBadgeClass, priorityLabel } from "../lib/complaintUtils";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Search,
-  Trash2,
-  Edit3,
-  MessageSquare,
-  X,
-  Inbox,
-} from "lucide-react";
+  SearchIcon,
+  Delete01Icon,
+  EditIcon,
+  Message01Icon,
+  Cancel01Icon,
+  InboxIcon,
+  CheckmarkCircleIcon,
+  CancelCircleIcon,
+  AddIcon,
+} from "@hugeicons/core-free-icons";
 import type { Complaint, Ticket, Employee } from "../lib/types";
 
 const categoryOptions = [
@@ -220,7 +224,7 @@ const AdminComplaintsPage = () => {
                 <Card className="border-border shadow-none bg-card">
                   <CardContent className="p-4">
                     <div className="relative mb-4">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" strokeWidth={2} />
+                      <HugeiconsIcon icon={SearchIcon} className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" strokeWidth={2} />
                       <Input
                         placeholder="Пошук заявок..."
                         value={searchQuery}
@@ -267,7 +271,7 @@ const AdminComplaintsPage = () => {
                 {!loading && !err && filteredComplaints.length === 0 && (
                   <div className="border border-dashed border-border p-8 flex flex-col items-center justify-center text-center">
                     <div className="w-12 h-12 mb-4 border border-border bg-card flex items-center justify-center text-muted-foreground">
-                      <Inbox className="w-5 h-5" strokeWidth={1.5} />
+                      <HugeiconsIcon icon={InboxIcon} className="size-5" strokeWidth={1.5} />
                     </div>
                     <p className="text-sm font-bold text-foreground mb-1">Заявок не знайдено</p>
                     <p className="text-xs text-muted-foreground">Жодна заявка не відповідає поточним фільтрам.</p>
@@ -335,7 +339,7 @@ const AdminComplaintsPage = () => {
                               }}
                               className="text-primary text-xs font-semibold hover:underline inline-flex items-center gap-1 p-0 h-auto"
                             >
-                              <MessageSquare className="w-3 h-3" strokeWidth={2} />
+                              <HugeiconsIcon icon={Message01Icon} className="size-3" strokeWidth={2} />
                               Коментарі
                             </Button>
                           </div>
@@ -347,6 +351,7 @@ const AdminComplaintsPage = () => {
                                   size="xs"
                                   onClick={() => handleChangeStatus(p.id, "approved")}
                                 >
+                                  <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
                                   Схвалити
                                 </Button>
                                 <Button
@@ -354,6 +359,7 @@ const AdminComplaintsPage = () => {
                                   variant="destructive"
                                   onClick={() => handleChangeStatus(p.id, "rejected")}
                                 >
+                                  <HugeiconsIcon icon={CancelCircleIcon} className="size-3 mr-1" strokeWidth={2} />
                                   Відхилити
                                 </Button>
                               </>
@@ -363,6 +369,7 @@ const AdminComplaintsPage = () => {
                                 size="xs"
                                 onClick={() => handleChangeStatus(p.id, "resolved")}
                               >
+                                <HugeiconsIcon icon={CheckmarkCircleIcon} className="size-3 mr-1" strokeWidth={2} />
                                 Вирішити
                               </Button>
                             )}
@@ -371,7 +378,7 @@ const AdminComplaintsPage = () => {
                               variant="destructive"
                               onClick={() => handleRemove(p.id)}
                             >
-                              <Trash2 className="w-3 h-3 mr-1" strokeWidth={2} />
+                              <HugeiconsIcon icon={Delete01Icon} className="size-3 mr-1" strokeWidth={2} />
                               Видалити
                             </Button>
                           </div>
@@ -479,7 +486,7 @@ const AdminComplaintsPage = () => {
                                   onClick={() => openTicketModal(p, ticket)}
                                   className="absolute top-2 right-2 text-primary hover:text-blue-300 opacity-0 group-hover/ticket:opacity-100 transition-opacity"
                                 >
-                                  <Edit3 className="w-3.5 h-3.5" strokeWidth={2} />
+                                  <HugeiconsIcon icon={EditIcon} className="size-3.5" strokeWidth={2} />
                                 </Button>
                               </div>
                             ) : (
@@ -487,6 +494,7 @@ const AdminComplaintsPage = () => {
                                 size="sm"
                                 onClick={() => openTicketModal(p)}
                               >
+                                <HugeiconsIcon icon={AddIcon} className="size-4 mr-1.5" strokeWidth={2} />
                                 Створити тікет
                               </Button>
                             )}
@@ -529,7 +537,7 @@ const AdminComplaintsPage = () => {
                 onClick={() => setIsTicketModalOpen(false)}
                 className="text-muted-foreground hover:text-foreground"
               >
-                <X className="w-5 h-5" strokeWidth={2} />
+                <HugeiconsIcon icon={Cancel01Icon} className="size-5" strokeWidth={2} />
               </Button>
             </div>
             <TicketCreateForm

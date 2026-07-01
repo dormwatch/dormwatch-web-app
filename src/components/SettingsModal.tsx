@@ -26,16 +26,20 @@ import {
   fetchBuildings,
   logoutUser,
 } from "@/services/problemsApi";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Building2,
-  Home,
-  Phone,
-  User,
-  Camera,
-  ShieldAlert,
-  Briefcase,
-  LogOut,
-} from "lucide-react";
+  Building03Icon,
+  Home01Icon,
+  AiPhone01Icon,
+  UserIcon,
+  Camera01Icon,
+  ShieldIcon,
+  Briefcase01Icon,
+  Logout01Icon,
+  SaveIcon,
+  Cancel01Icon,
+  EditIcon,
+} from "@hugeicons/core-free-icons";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { isAdminUser, getUserInitials } from "@/lib/complaintUtils";
 
@@ -222,15 +226,15 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
             <div className="border-b border-border px-5">
               <TabsList variant="line" className="h-9">
                 <TabsTrigger value="profile" className="text-xs font-semibold">
-                  <User className="w-3 h-3 mr-1" strokeWidth={2} />
+                  <HugeiconsIcon icon={UserIcon} className="size-3 mr-1" strokeWidth={2} />
                   Профіль
                 </TabsTrigger>
                 <TabsTrigger value="room" className="text-xs font-semibold">
-                  <Home className="w-3 h-3 mr-1" strokeWidth={2} />
+                  <HugeiconsIcon icon={Home01Icon} className="size-3 mr-1" strokeWidth={2} />
                   Розміщення
                 </TabsTrigger>
                 <TabsTrigger value="contacts" className="text-xs font-semibold">
-                  <Phone className="w-3 h-3 mr-1" strokeWidth={2} />
+                  <HugeiconsIcon icon={AiPhone01Icon} className="size-3 mr-1" strokeWidth={2} />
                   Контакти
                 </TabsTrigger>
 
@@ -252,7 +256,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                         </div>
                         <label className="cursor-pointer">
                           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
-                            <Camera className="w-3 h-3" strokeWidth={1.5} />
+                            <HugeiconsIcon icon={Camera01Icon} className="size-3" strokeWidth={1.5} />
                             Змінити фото
                           </span>
                           <input
@@ -308,6 +312,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                           onClick={handleSaveProfile}
                           disabled={saving}
                         >
+                          <HugeiconsIcon icon={SaveIcon} className="size-4 mr-1.5" strokeWidth={2} />
                           {saving ? "Зберігаю..." : "Зберегти"}
                         </Button>
                         <Button
@@ -318,6 +323,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                             setPhotoPreview(null);
                           }}
                         >
+                          <HugeiconsIcon icon={Cancel01Icon} className="size-4 mr-1.5" strokeWidth={2} />
                           Скасувати
                         </Button>
                       </div>
@@ -327,7 +333,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 py-1.5 px-2">
                           <div className="w-7 h-7 bg-muted border border-border flex items-center justify-center shrink-0">
-                            <User className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
+                            <HugeiconsIcon icon={UserIcon} className="size-3.5 text-primary" strokeWidth={2} />
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs font-normal text-muted-foreground">Ім'я</p>
@@ -338,7 +344,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                         </div>
                         <div className="flex items-center gap-3 py-1.5 px-2">
                           <div className="w-7 h-7 bg-muted border border-border flex items-center justify-center shrink-0">
-                            <User className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
+                            <HugeiconsIcon icon={UserIcon} className="size-3.5 text-primary" strokeWidth={2} />
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs font-normal text-muted-foreground">Прізвище</p>
@@ -349,7 +355,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                         </div>
                         <div className="flex items-center gap-3 py-1.5 px-2">
                           <div className="w-7 h-7 bg-muted border border-border flex items-center justify-center shrink-0">
-                            <Building2 className="w-3.5 h-3.5 text-primary" strokeWidth={1.5} />
+                            <HugeiconsIcon icon={Building03Icon} className="size-3.5 text-primary" strokeWidth={1.5} />
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs font-normal text-muted-foreground">Гуртожиток</p>
@@ -360,7 +366,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                         </div>
                         <div className="flex items-center gap-3 py-1.5 px-2">
                           <div className="w-7 h-7 bg-muted border border-border flex items-center justify-center shrink-0">
-                            <Home className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
+                            <HugeiconsIcon icon={Home01Icon} className="size-3.5 text-primary" strokeWidth={2} />
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs font-normal text-muted-foreground">Кімната</p>
@@ -379,6 +385,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                           size="sm"
                           onClick={() => setIsEditing(true)}
                         >
+                          <HugeiconsIcon icon={EditIcon} className="size-3.5 mr-1.5" strokeWidth={2} />
                           Редагувати профіль
                         </Button>
                       </div>
@@ -391,7 +398,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                         className="w-full text-red-400 hover:text-red-300 hover:bg-red-900/10"
                         onClick={handleLogout}
                       >
-                        <LogOut className="w-3 h-3 mr-1.5" strokeWidth={2} />
+                        <HugeiconsIcon icon={Logout01Icon} className="size-3 mr-1.5" strokeWidth={2} />
                         Вийти
                       </Button>
                     </div>
@@ -403,10 +410,10 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                     <div className="p-3 bg-muted border border-border">
                       <p className="text-xs font-semibold text-foreground mb-1.5">Поточне розміщення</p>
                       <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                        <HugeiconsIcon icon={Building03Icon} className="size-4 text-primary" strokeWidth={1.5} />
                         <p className="text-sm font-bold text-foreground">{buildingInfo}</p>
                         <span className="w-1 h-1 bg-border inline-block mx-1.5" />
-                        <Home className="w-4 h-4 text-primary" strokeWidth={2} />
+                        <HugeiconsIcon icon={Home01Icon} className="size-4 text-primary" strokeWidth={2} />
                         <p className="text-sm font-bold text-foreground">{roomInfo}</p>
                       </div>
                     </div>
@@ -467,6 +474,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                         onClick={handleSaveProfile}
                         disabled={saving}
                       >
+                        <HugeiconsIcon icon={SaveIcon} className="size-4 mr-1.5" strokeWidth={2} />
                         {saving ? "Зберігаю..." : "Зберегти розміщення"}
                       </Button>
                     </div>
@@ -480,7 +488,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-4 bg-muted border border-border p-4">
                       <div className="p-2 bg-card border border-border shrink-0">
-                        <Briefcase className="w-4 h-4 text-primary" strokeWidth={2} />
+                        <HugeiconsIcon icon={Briefcase01Icon} className="size-4 text-primary" strokeWidth={2} />
                       </div>
                       <div>
                         <p className="text-xs font-bold text-muted-foreground">
@@ -493,7 +501,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                     </div>
                     <div className="flex items-center gap-4 bg-muted border border-border p-4">
                       <div className="p-2 bg-card border border-border shrink-0">
-                        <Phone className="w-4 h-4 text-primary" strokeWidth={2} />
+                        <HugeiconsIcon icon={AiPhone01Icon} className="size-4 text-primary" strokeWidth={2} />
                       </div>
                       <div>
                         <p className="text-xs font-bold text-muted-foreground">
@@ -505,7 +513,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                       </div>
                     </div>
                     <div className="p-3 border border-dashed border-border text-center">
-                      <ShieldAlert className="w-5 h-5 text-muted-foreground mx-auto mb-2" strokeWidth={1.5} />
+                      <HugeiconsIcon icon={ShieldIcon} className="size-5 text-muted-foreground mx-auto mb-2" strokeWidth={1.5} />
                       <p className="text-xs text-muted-foreground font-semibold">
                         Екстрені ситуації — телефонуйте 101 або 112
                       </p>

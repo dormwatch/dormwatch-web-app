@@ -1,4 +1,5 @@
-import { Building2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Building03Icon } from "@hugeicons/core-free-icons";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router-dom";
 
@@ -8,7 +9,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Building2 className="w-5 h-5 text-primary" />
+            <HugeiconsIcon icon={Building03Icon} className="size-5 text-primary" />
             <span className="text-lg font-bold">DormWatch</span>
           </div>
           <p className="text-muted-foreground text-xs">Система прямої комунікації між студентами та адміністрацією.</p>

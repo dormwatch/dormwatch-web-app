@@ -19,15 +19,17 @@ import { Separator } from "../components/ui/separator";
 import { statusBadgeClass, statusLabel, isAdminUser } from "../lib/complaintUtils";
 import { useUser } from "../context/UserContext";
 import type { Complaint } from "../lib/types";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ChevronUp,
-  ChevronDown,
-  Trash2,
-  MessageSquare,
-  MapPin,
-  Inbox,
-  FileText,
-} from "lucide-react";
+  ChevronUpIcon,
+  ChevronDownIcon,
+  Delete01Icon,
+  Message01Icon,
+  MapPinIcon,
+  InboxIcon,
+  File01Icon,
+  AddIcon,
+} from "@hugeicons/core-free-icons";
 
 const UserPage = () => {
   const { user: currentUser } = useUser();
@@ -93,7 +95,7 @@ const UserPage = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-foreground tracking-tight">Вітаємо, {firstName}!</h1>
                   <p className="text-muted-foreground mt-1 flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                    <HugeiconsIcon icon={MapPinIcon} className="size-4 text-muted-foreground" strokeWidth={1.5} />
                     {building}<span className="w-1 h-1 bg-border inline-block mx-1.5" />Кімната {room}
                   </p>
                 </div>
@@ -118,7 +120,10 @@ const UserPage = () => {
                 </div>
 
                 <Button asChild className="w-full">
-                  <Link to="/create-report">+ Створити заявку</Link>
+                  <Link to="/create-report">
+                    <HugeiconsIcon icon={AddIcon} className="size-4 mr-2" strokeWidth={2} />
+                    Створити заявку
+                  </Link>
                 </Button>
               </div>
 
@@ -133,11 +138,11 @@ const UserPage = () => {
                   {problems.length === 0 ? (
                     <div className="border border-dashed border-border p-8 flex flex-col items-center justify-center text-center">
                       <div className="w-12 h-12 mb-4 border border-border bg-card flex items-center justify-center text-muted-foreground">
-                        <Inbox className="w-5 h-5" strokeWidth={1.5} />
+                        <HugeiconsIcon icon={InboxIcon} className="size-5" strokeWidth={1.5} />
                       </div>
                       <p className="text-xs text-muted-foreground mb-3">Немає активних заявок.</p>
                       <Button asChild size="xs">
-                        <Link to="/create-report">Створити першу заявку</Link>
+                        <Link to="/create-report"><HugeiconsIcon icon={AddIcon} className="size-4 mr-1.5" strokeWidth={2} />Створити першу заявку</Link>
                       </Button>
                     </div>
                   ) : (
@@ -166,7 +171,7 @@ const UserPage = () => {
               {problems.length === 0 && (
                 <div className="border border-dashed border-border p-8 flex flex-col items-center justify-center text-center">
                   <div className="w-12 h-12 mb-4 border border-border bg-card flex items-center justify-center text-muted-foreground">
-                    <FileText className="w-5 h-5" strokeWidth={1.5} />
+                    <HugeiconsIcon icon={File01Icon} className="size-5" strokeWidth={1.5} />
                   </div>
                   <p className="text-sm font-bold text-foreground mb-1">Ще немає звернень</p>
                 </div>
@@ -228,8 +233,8 @@ const UserPage = () => {
                             }
                             className="text-primary text-xs font-semibold hover:underline inline-flex items-center gap-1 p-0 h-auto"
                           >
-                            <MessageSquare className="w-3 h-3" strokeWidth={2} />
-                            Коментарі {openCommentsId === p.id ? <ChevronUp className="w-3 h-3 inline" strokeWidth={2} /> : <ChevronDown className="w-3 h-3 inline" strokeWidth={2} />}
+                            <HugeiconsIcon icon={Message01Icon} className="size-3" strokeWidth={2} />
+                            Коментарі {openCommentsId === p.id ? <HugeiconsIcon icon={ChevronUpIcon} className="size-3 inline" strokeWidth={2} /> : <HugeiconsIcon icon={ChevronDownIcon} className="size-3 inline" strokeWidth={2} />}
                           </Button>
                         </div>
                         <Button
@@ -238,7 +243,7 @@ const UserPage = () => {
                           onClick={() => onDelete(p.id)}
                           className="text-red-400 border border-red-400/30 hover:bg-red-400/10 transition-colors"
                         >
-                          <Trash2 className="w-3.5 h-3.5" strokeWidth={2} />
+                          <HugeiconsIcon icon={Delete01Icon} className="size-3.5" strokeWidth={2} />
                         </Button>
                       </div>
                     </div>
