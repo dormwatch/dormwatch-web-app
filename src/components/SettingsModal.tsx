@@ -473,7 +473,7 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                 </TabsContent>
 
                 <TabsContent value="contacts" className="mt-0 focus-visible:ring-0 focus-visible:outline-none">
-                  <h4 className="text-xs font-bold text-stone-400 mb-6">
+                  <h4 className="text-xs font-bold text-muted-foreground mb-6">
                     Екстрені контакти
                   </h4>
                   <div className="space-y-4">

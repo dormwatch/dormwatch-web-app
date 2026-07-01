@@ -69,8 +69,8 @@ function FilterRadioGroup({
           key={opt.id}
           className={`flex items-center gap-3 p-2.5 cursor-pointer transition-colors border-l-4 ${
             value === opt.id
-              ? "border-l-blue-500 bg-blue-500/5 text-stone-50"
-              : "border-l-transparent text-stone-400 hover:border-l-stone-500 hover:text-stone-200"
+              ? "border-l-blue-500 bg-primary/5 text-foreground"
+              : "border-l-transparent text-muted-foreground hover:border-l-stone-500 hover:text-foreground"
           }`}
         >
           <RadioGroupItem value={opt.id} id={`filter-${opt.id}`} className="w-3.5 h-3.5 accent-blue-500" />
@@ -216,10 +216,10 @@ const AdminComplaintsPage = () => {
           <TabsContent value="requests" className="flex-1 p-5">
             <div className="grid lg:grid-cols-4 gap-8">
               <div className="lg:col-span-1 space-y-4">
-                <Card className="border-stone-700 shadow-none bg-stone-800">
+                <Card className="border-border shadow-none bg-card">
                   <CardContent className="p-4">
                     <div className="relative mb-4">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-stone-400" strokeWidth={2} />
+                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" strokeWidth={2} />
                       <Input
                         placeholder="Пошук заявок..."
                         value={searchQuery}
@@ -228,7 +228,7 @@ const AdminComplaintsPage = () => {
                       />
                     </div>
 
-                    <h4 className="text-xs font-semibold text-stone-400 mb-3">
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-3">
                       Статус
                     </h4>
                     <FilterRadioGroup
@@ -237,9 +237,9 @@ const AdminComplaintsPage = () => {
                       onChange={setSelectedStatus}
                     />
 
-                    <Separator className="my-4 bg-stone-700" />
+                    <Separator className="my-4 bg-muted" />
 
-                    <h4 className="text-xs font-semibold text-stone-400 mb-3">
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-3">
                       Категорії
                     </h4>
                     <FilterRadioGroup
@@ -265,19 +265,19 @@ const AdminComplaintsPage = () => {
 
                 {!loading && !err && filteredComplaints.length === 0 && (
                   <div className="border border-dashed border-border p-8 text-center">
-                    <p className="text-sm font-bold text-stone-50 mb-1">Заявок не знайдено</p>
-                    <p className="text-xs text-stone-400">Жодна заявка не відповідає поточним фільтрам.</p>
+                    <p className="text-sm font-bold text-foreground mb-1">Заявок не знайдено</p>
+                    <p className="text-xs text-muted-foreground">Жодна заявка не відповідає поточним фільтрам.</p>
                   </div>
                 )}
 
                 {!loading &&
                   !err &&
                   filteredComplaints.map((p) => (
-                    <Card key={p.id} className="border-stone-700 shadow-none bg-stone-800 group">
+                    <Card key={p.id} className="border-border shadow-none bg-card group">
                       <div className="p-5">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
                           <div>
-                            <h3 className="text-base font-bold text-stone-50 truncate max-w-xl">
+                            <h3 className="text-base font-bold text-foreground truncate max-w-xl">
                               {p.title || "Без назви"}
                             </h3>
                             <p className="text-xs font-normal text-muted-foreground mt-1">
@@ -297,18 +297,18 @@ const AdminComplaintsPage = () => {
                             Пріоритет: {priorityLabel(p.priority)}
                           </Badge>
                           {p.createdAt && (
-                            <span className="text-xs text-stone-400 font-medium">
+                            <span className="text-xs text-muted-foreground font-medium">
                               {new Date(p.createdAt).toLocaleDateString()}
                             </span>
                           )}
                         </div>
 
-                        <p className="text-xs text-stone-400 leading-relaxed mb-4">
+                        <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                           {p.description || "—"}
                         </p>
 
                         {p.photoUrl && (
-                          <div className="w-full h-44 overflow-hidden border border-stone-700 mb-4">
+                          <div className="w-full h-44 overflow-hidden border border-border mb-4">
                             <img
                               src={resolveImageUrl(p.thumbnail || p.photoUrl)}
                               alt=""
@@ -319,7 +319,7 @@ const AdminComplaintsPage = () => {
 
                         <div className="flex flex-col md:flex-row md:items-center justify-between pt-4 gap-4">
                           <div className="flex items-center gap-4">
-                            <span className="text-xs text-stone-400 font-medium">
+                            <span className="text-xs text-muted-foreground font-medium">
                               ID: {p.id}
                             </span>
                             <Button
@@ -329,7 +329,7 @@ const AdminComplaintsPage = () => {
                                 setSelectedComplaint(p);
                                 setSheetOpen(true);
                               }}
-                              className="text-blue-400 text-xs font-semibold hover:underline inline-flex items-center gap-1 p-0 h-auto"
+                              className="text-primary text-xs font-semibold hover:underline inline-flex items-center gap-1 p-0 h-auto"
                             >
                               <MessageSquare className="w-3 h-3" strokeWidth={2} />
                               Коментарі
@@ -382,10 +382,10 @@ const AdminComplaintsPage = () => {
           <TabsContent value="tickets" className="flex-1 p-5">
             <div className="grid lg:grid-cols-4 gap-8">
               <div className="lg:col-span-1 space-y-4">
-                <Card className="border-stone-700 shadow-none bg-stone-800">
+                <Card className="border-border shadow-none bg-card">
                   <CardContent className="p-4">
                     <div className="relative mb-4">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-stone-400" strokeWidth={2} />
+                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" strokeWidth={2} />
                       <Input
                         placeholder="Пошук тікетів..."
                         value={ticketSearchQuery}
@@ -394,7 +394,7 @@ const AdminComplaintsPage = () => {
                       />
                     </div>
 
-                    <h4 className="text-xs font-semibold text-stone-400 mb-3">
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-3">
                       Статус тікету
                     </h4>
                     <FilterRadioGroup
@@ -403,9 +403,9 @@ const AdminComplaintsPage = () => {
                       onChange={setTicketStatus}
                     />
 
-                    <Separator className="my-4 bg-stone-700" />
+                    <Separator className="my-4 bg-muted" />
 
-                    <h4 className="text-xs font-semibold text-stone-400 mb-3">
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-3">
                       Категорії
                     </h4>
                     <FilterRadioGroup
@@ -418,22 +418,22 @@ const AdminComplaintsPage = () => {
               </div>
 
               <div className="lg:col-span-3 space-y-6">
-                <h3 className="text-sm font-bold text-stone-50">
+                <h3 className="text-sm font-bold text-foreground">
                   Тікети для підтверджених заявок
                 </h3>
                 {filteredTickets.length === 0 ? (
                   <div className="border border-dashed border-border p-8 text-center">
-                    <p className="text-xs text-stone-400">Жодна заявка не відповідає фільтрам.</p>
+                    <p className="text-xs text-muted-foreground">Жодна заявка не відповідає фільтрам.</p>
                   </div>
                 ) : (
                   <div className="grid lg:grid-cols-2 gap-4">
                     {filteredTickets.map((p) => {
                       const ticket = tickets.find((t) => t.complaint === p.id);
                       return (
-                        <Card key={p.id} className="border-stone-700 shadow-none bg-stone-800">
+                        <Card key={p.id} className="border-border shadow-none bg-card">
                           <div className="p-5">
                             <div className="flex justify-between items-start mb-2">
-                              <h4 className="text-sm font-bold text-stone-50">
+                              <h4 className="text-sm font-bold text-foreground">
                                 {p.title || "Без назви"}
                               </h4>
                               <Badge
@@ -444,25 +444,25 @@ const AdminComplaintsPage = () => {
                               </Badge>
                             </div>
                             <div className="flex gap-2 mb-3 items-center">
-                              <Badge variant="outline" className="text-stone-400 border-stone-700 bg-stone-800">
+                              <Badge variant="outline" className="text-muted-foreground border-border bg-card">
                                 {CATEGORY_LABELS[p.category as keyof typeof CATEGORY_LABELS] || p.category || "Категорія"}
                               </Badge>
-                              <span className="text-xs text-stone-400">{humanLocation(p)}</span>
+                              <span className="text-xs text-muted-foreground">{humanLocation(p)}</span>
                             </div>
-                            <p className="text-xs text-stone-400 mb-4 line-clamp-3">{p.description}</p>
+                            <p className="text-xs text-muted-foreground mb-4 line-clamp-3">{p.description}</p>
 
                             {ticket ? (
-                              <div className="bg-blue-500/5 p-3 border border-blue-500/10 relative group/ticket">
-                                <p className="text-xs font-bold text-blue-400">
+                              <div className="bg-primary/5 p-3 border border-primary/10 relative group/ticket">
+                                <p className="text-xs font-bold text-primary">
                                   Тікет створено (ID: {ticket.ticket_id})
                                 </p>
                                 {ticket.user && (
-                                  <p className="text-xs text-blue-400/80 mt-1">
+                                  <p className="text-xs text-primary/80 mt-1">
                                     Виконавець: {ticket.user.first_name} {ticket.user.last_name}
                                   </p>
                                 )}
                                 {ticket.deadline && (
-                                  <p className="text-xs text-blue-400/70 mt-1">
+                                  <p className="text-xs text-primary/70 mt-1">
                                     Дедлайн: {new Date(ticket.deadline).toLocaleDateString()}
                                   </p>
                                 )}
@@ -470,7 +470,7 @@ const AdminComplaintsPage = () => {
                                   variant="ghost"
                                   size="icon-xs"
                                   onClick={() => openTicketModal(p, ticket)}
-                                  className="absolute top-2 right-2 text-blue-400 hover:text-blue-300 opacity-0 group-hover/ticket:opacity-100 transition-opacity"
+                                  className="absolute top-2 right-2 text-primary hover:text-blue-300 opacity-0 group-hover/ticket:opacity-100 transition-opacity"
                                 >
                                   <Edit3 className="w-3.5 h-3.5" strokeWidth={2} />
                                 </Button>
@@ -510,17 +510,17 @@ const AdminComplaintsPage = () => {
       )}
 
       {isTicketModalOpen && selectedForTicket && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm">
-          <div className="bg-stone-800 w-full max-w-lg max-h-[90vh] overflow-y-auto border border-stone-700 shadow-lg p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-lg max-h-[90vh] overflow-y-auto border border-border shadow-lg p-6">
             <div className="flex justify-between items-start mb-6">
-              <h2 className="text-base font-bold text-stone-50">
+              <h2 className="text-base font-bold text-foreground">
                 {ticketToEdit ? "Редагувати тікет" : "Створити тікет"}
               </h2>
               <Button
                 variant="ghost"
                 size="icon-xs"
                 onClick={() => setIsTicketModalOpen(false)}
-                className="text-stone-400 hover:text-stone-50"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" strokeWidth={2} />
               </Button>

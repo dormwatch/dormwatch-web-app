@@ -38,7 +38,7 @@ const Header = () => {
 
   return (
     <>
-      <nav className="bg-stone-800 sticky top-0 z-10">
+      <nav className="bg-card sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 text-primary font-bold text-xl tracking-tight">
@@ -51,8 +51,8 @@ const Header = () => {
                 to="/"
                 className={`px-4 py-5 text-sm font-semibold transition-colors border-b-2 ${
                   currentPath === "/"
-                    ? "border-blue-500 text-stone-50 bg-stone-700/30"
-                    : "border-transparent text-stone-400 hover:text-stone-50 hover:bg-stone-700/30"
+                    ? "border-blue-500 text-foreground bg-muted/50"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 Головна
@@ -61,8 +61,8 @@ const Header = () => {
                 to="/dashboard"
                 className={`px-4 py-5 text-sm font-semibold transition-colors border-b-2 ${
                   currentPath === "/dashboard"
-                    ? "border-blue-500 text-stone-50 bg-stone-700/30"
-                    : "border-transparent text-stone-400 hover:text-stone-50 hover:bg-stone-700/30"
+                    ? "border-blue-500 text-foreground bg-muted/50"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 Дашборд
@@ -71,8 +71,8 @@ const Header = () => {
                 to="/admin"
                 className={`px-4 py-5 text-sm font-semibold transition-colors border-b-2 ${
                   currentPath === "/admin"
-                    ? "border-blue-500 text-stone-50 bg-stone-700/30"
-                    : "border-transparent text-stone-400 hover:text-stone-50 hover:bg-stone-700/30"
+                    ? "border-blue-500 text-foreground bg-muted/50"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 Адмін-панель
@@ -83,13 +83,13 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <Link
               to="/create-report"
-              className="hidden sm:flex items-center gap-2 bg-blue-800 hover:bg-blue-900 border border-blue-700 text-white px-4 py-2 text-sm font-semibold transition-colors"
+              className="hidden sm:flex items-center gap-2 bg-primary hover:bg-primary/90 border border-blue-700 text-white px-4 py-2 text-sm font-semibold transition-colors"
             >
               + Повідомити
             </Link>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-stone-400 hover:text-stone-50">
+              <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
                 <Bell className="w-5 h-5" strokeWidth={1.5} />
               </Button>
               <Separator orientation="vertical" className="hidden sm:block h-6" />
@@ -97,7 +97,7 @@ const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 pl-2 cursor-pointer hover:opacity-80 transition-opacity outline-none">
-                    <div className="w-8 h-8 bg-stone-700 flex items-center justify-center text-stone-300 font-semibold text-sm">
+                    <div className="w-8 h-8 bg-muted flex items-center justify-center text-muted-foreground font-semibold text-sm">
                       {initials}
                     </div>
                   </button>

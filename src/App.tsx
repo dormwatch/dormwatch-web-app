@@ -65,7 +65,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<div className="p-8 font-bold text-stone-400">404 — сторінку не знайдено</div>} />
+      <Route path="*" element={<div className="p-8 font-bold text-muted-foreground">404 — сторінку не знайдено</div>} />
     </Routes>
   );
 }

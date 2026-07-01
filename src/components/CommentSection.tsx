@@ -70,15 +70,15 @@ const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionP
           {comments.map((c) => (
             <div
               key={c.id}
-              className="bg-stone-800 p-3 border border-stone-700 relative group/comment"
+              className="bg-card p-3 border border-border relative group/comment"
             >
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-xs font-bold text-stone-50">{c.author}</span>
-                <span className="text-xs text-stone-400">
+                <span className="text-xs font-bold text-foreground">{c.author}</span>
+                <span className="text-xs text-muted-foreground">
                   {new Date(c.date).toLocaleDateString()}
                 </span>
               </div>
-              <p className="text-xs text-stone-400">{c.text}</p>
+              <p className="text-xs text-muted-foreground">{c.text}</p>
               {(currentUserId === c.author_id || isAdmin) && (
                 <button
                   onClick={() => handleDelete(c.id)}

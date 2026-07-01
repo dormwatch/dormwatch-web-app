@@ -68,19 +68,19 @@ const ComplaintSidePanel = ({
               <Badge variant="outline" className={statusBadgeClass(complaint.status)}>
                 {statusLabel(complaint.status)}
               </Badge>
-              <span className="text-xs font-semibold text-stone-500">
+              <span className="text-xs font-semibold text-muted-foreground">
                 {complaint.id !== "new" && `#${complaint.id}`}
               </span>
             </div>
-            <h3 className="text-base font-bold text-stone-50 mb-1">{complaint.title || "Без назви"}</h3>
+            <h3 className="text-base font-bold text-foreground mb-1">{complaint.title || "Без назви"}</h3>
             <p className="text-xs font-normal text-muted-foreground">{humanLocation(complaint)}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-stone-400 font-medium">
+            <span className="text-xs text-muted-foreground font-medium">
               {categoryLabel}
             </span>
-            <span className="w-1 h-1 bg-stone-600" />
+            <span className="w-1 h-1 bg-border" />
             <Badge
               variant="outline"
               className={priorityBadgeClass(complaint.priority)}
@@ -88,18 +88,18 @@ const ComplaintSidePanel = ({
                 Пріоритет: {priorityLabel(complaint.priority)}
             </Badge>
             {complaint.createdAt && (
-              <span className="text-xs text-stone-500 font-medium">
+              <span className="text-xs text-muted-foreground font-medium">
                 {new Date(complaint.createdAt).toLocaleDateString()}
               </span>
             )}
           </div>
 
-          <Separator className="bg-stone-700" />
+          <Separator className="bg-muted" />
 
-          <p className="text-xs text-stone-400 leading-relaxed">{complaint.description || "—"}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{complaint.description || "—"}</p>
 
           {complaint.photoUrl && (
-            <div className="w-full h-44 overflow-hidden border border-stone-700">
+            <div className="w-full h-44 overflow-hidden border border-border">
               <img
                 src={resolveImageUrl(complaint.thumbnail || complaint.photoUrl)}
                 alt=""
@@ -108,7 +108,7 @@ const ComplaintSidePanel = ({
             </div>
           )}
 
-          <Separator className="bg-stone-700" />
+          <Separator className="bg-muted" />
 
           {isAdmin && (
             <div className="space-y-3">
@@ -148,7 +148,7 @@ const ComplaintSidePanel = ({
                 </Button>
               </div>
 
-              <Separator className="bg-stone-700" />
+              <Separator className="bg-muted" />
 
               {!showTicketForm ? (
                 <Button
@@ -171,7 +171,7 @@ const ComplaintSidePanel = ({
             </div>
           )}
 
-          <Separator className="bg-stone-700" />
+          <Separator className="bg-muted" />
 
           <CommentSection complaintId={complaint.id} currentUserId={currentUserId} isAdmin={isAdmin} />
         </div>

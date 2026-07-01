@@ -16,7 +16,7 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="bg-stone-800 border-b border-stone-700 sticky top-0 z-50">
+      <nav className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 text-primary font-bold text-xl tracking-tight cursor-pointer hover:text-primary/80 transition-colors">
@@ -29,8 +29,8 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
                 to="/"
                 className={`px-4 py-5 text-sm font-semibold transition-colors border-b-2 ${
                   currentPath === "/"
-                    ? "border-blue-500 text-stone-50 bg-stone-700/30"
-                    : "border-transparent text-stone-400 hover:text-stone-50 hover:bg-stone-700/30"
+                    ? "border-blue-500 text-foreground bg-muted/50"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 Головна
@@ -39,8 +39,8 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
                 to="/dashboard"
                 className={`px-4 py-5 text-sm font-semibold transition-colors border-b-2 ${
                   currentPath === "/dashboard"
-                    ? "border-blue-500 text-stone-50 bg-stone-700/30"
-                    : "border-transparent text-stone-400 hover:text-stone-50 hover:bg-stone-700/30"
+                    ? "border-blue-500 text-foreground bg-muted/50"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 Дашборд
@@ -50,8 +50,8 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
                   to="/admin"
                   className={`px-4 py-5 text-sm font-semibold transition-colors border-b-2 ${
                     currentPath === "/admin"
-                      ? "border-blue-500 text-stone-50 bg-stone-700/30"
-                      : "border-transparent text-stone-400 hover:text-stone-50 hover:bg-stone-700/30"
+                      ? "border-blue-500 text-foreground bg-muted/50"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
                   Адмін-панель
@@ -61,16 +61,16 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="p-2 text-stone-400 hover:text-stone-50 transition-colors relative">
+            <button className="p-2 text-muted-foreground hover:text-foreground transition-colors relative">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 border border-stone-800" />
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 border border-border" />
             </button>
 
-            <button onClick={() => setIsSettingsOpen(true)} className="flex items-center gap-2 pl-4 border-l border-stone-700 cursor-pointer hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-stone-900 border border-stone-700 flex items-center justify-center text-stone-300 font-bold text-xs">
+            <button onClick={() => setIsSettingsOpen(true)} className="flex items-center gap-2 pl-4 border-l border-border cursor-pointer hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 bg-background border border-border flex items-center justify-center text-muted-foreground font-bold text-xs">
                 {initials}
               </div>
-              <ChevronDown className="w-4 h-4 text-stone-500" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </div>

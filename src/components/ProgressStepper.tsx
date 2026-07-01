@@ -25,7 +25,7 @@ const ProgressStepper = ({ stage }: ProgressStepperProps) => {
                 ? s.accent
                 : i < currentIdx
                 ? "text-blue-400"
-                : "text-stone-600"
+                : "text-muted-foreground"
             )}
           >
             {s.label}
@@ -44,7 +44,7 @@ const ProgressStepper = ({ stage }: ProgressStepperProps) => {
                 isComplete && "bg-blue-500",
                 isCurrent && stage === "in_progress" && "bg-blue-500 animate-pulse",
                 isCurrent && stage !== "in_progress" && "bg-blue-500",
-                !isComplete && !isCurrent && "bg-stone-700"
+                !isComplete && !isCurrent && "bg-muted"
               )}
             />
           );

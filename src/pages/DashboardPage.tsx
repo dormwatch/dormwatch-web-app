@@ -149,7 +149,7 @@ const DashboardPage = () => {
   return (
     <>
       <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
-        <DialogContent className="max-w-4xl bg-stone-900/95 border-border p-0" showCloseButton={false}>
+        <DialogContent className="max-w-4xl bg-background/95 border-border p-0" showCloseButton={false}>
           <DialogTitle className="sr-only">Image preview</DialogTitle>
           {previewImage && (
             <img

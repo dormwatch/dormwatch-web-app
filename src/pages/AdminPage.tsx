@@ -57,20 +57,20 @@ const AdminPage = () => {
 
   return (
     <div className="flex-1 flex flex-col min-h-screen">
-      <header className="h-16 bg-stone-800 flex items-center justify-between px-6 lg:px-8 shrink-0">
-          <h1 className="text-2xl font-bold text-stone-50">Інформаційна панель</h1>
+      <header className="h-16 bg-card flex items-center justify-between px-6 lg:px-8 shrink-0">
+          <h1 className="text-2xl font-bold text-foreground">Інформаційна панель</h1>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="default"
-              className="hidden md:inline-flex items-center gap-2 text-base font-semibold border-stone-600 text-stone-300 hover:bg-stone-700"
+              className="hidden md:inline-flex items-center gap-2 text-base font-semibold border-border text-muted-foreground hover:bg-muted"
             >
               <Download className="w-4 h-4" strokeWidth={2} />
               Експорт даних
             </Button>
             <Button
               size="default"
-              className="inline-flex items-center gap-2 bg-blue-800 hover:bg-blue-900 text-white text-base font-semibold"
+              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-base font-semibold"
               onClick={() => {
                 setSelectedComplaint({
                   id: "new",
@@ -126,9 +126,9 @@ const AdminPage = () => {
               </div>
             )}
 
-            <div className="bg-stone-800 border border-stone-700 overflow-hidden">
+            <div className="bg-card border border-border overflow-hidden">
               <div className="px-6 py-4 flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-stone-50">Останні заявки</h2>
+                <h2 className="text-xl font-semibold text-foreground">Останні заявки</h2>
                 <Link to="/admin/complaints" className="text-sm font-semibold text-blue-500 hover:text-blue-400">
                   Всі заявки
                 </Link>
@@ -136,7 +136,7 @@ const AdminPage = () => {
               <Separator />
               <Table className="text-left border-collapse">
                 <TableHeader>
-                  <TableRow className="bg-stone-900/50 border-b border-stone-700 text-sm text-stone-400">
+                  <TableRow className="bg-muted/50 border-b border-border text-sm text-muted-foreground">
                     <TableHead className="px-6 py-3 font-semibold">Проблема</TableHead>
                     <TableHead className="px-6 py-3 font-semibold">Категорія</TableHead>
                     <TableHead className="px-6 py-3 font-semibold">Дата подання</TableHead>
@@ -148,39 +148,39 @@ const AdminPage = () => {
                     Array.from({ length: 4 }).map((_, i) => (
                       <TableRow key={i} className="animate-pulse">
                         <TableCell className="px-6 py-4">
-                          <div className="h-5 w-48 bg-stone-700/50 mb-1" />
-                          <div className="h-4 w-32 bg-stone-700/30" />
+                          <div className="h-5 w-48 bg-muted/50 mb-1" />
+                          <div className="h-4 w-32 bg-muted/30" />
                         </TableCell>
-                        <TableCell className="px-6 py-4"><div className="h-5 w-20 bg-stone-700/50" /></TableCell>
-                        <TableCell className="px-6 py-4"><div className="h-5 w-24 bg-stone-700/50" /></TableCell>
-                        <TableCell className="px-6 py-4"><div className="h-6 w-16 bg-stone-700/50" /></TableCell>
+                        <TableCell className="px-6 py-4"><div className="h-5 w-20 bg-muted/50" /></TableCell>
+                        <TableCell className="px-6 py-4"><div className="h-5 w-24 bg-muted/50" /></TableCell>
+                        <TableCell className="px-6 py-4"><div className="h-6 w-16 bg-muted/50" /></TableCell>
                       </TableRow>
                     ))
                   ) : recentComplaints.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="px-6 py-8 text-center">
-                        <p className="text-sm text-stone-400">Заявок поки немає.</p>
+                        <p className="text-sm text-muted-foreground">Заявок поки немає.</p>
                       </TableCell>
                     </TableRow>
                   ) : (
                     recentComplaints.map((c) => (
                       <TableRow
                         key={c.id}
-                        className="group relative bg-stone-800 hover:bg-stone-700/50 transition-colors cursor-pointer"
+                        className="group relative bg-card hover:bg-muted/50 transition-colors cursor-pointer"
                         onClick={() => handleRowClick(c)}
                       >
                         <TableCell className="px-6 py-4">
-                          <p className="font-semibold text-stone-50">
+                          <p className="font-semibold text-foreground">
                             {c.title}
                           </p>
-                          <p className="text-sm text-stone-400 mt-0.5">
+                          <p className="text-sm text-muted-foreground mt-0.5">
                             {c.description}
                           </p>
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-xs text-stone-400 font-semibold">
+                        <TableCell className="px-6 py-4 text-xs text-muted-foreground font-semibold">
                           {CATEGORY_LABELS[c.category as keyof typeof CATEGORY_LABELS] || c.category}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-sm text-stone-300">
+                        <TableCell className="px-6 py-4 text-sm text-muted-foreground">
                           {new Date(c.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="px-6 py-4">

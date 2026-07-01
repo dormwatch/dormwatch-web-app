@@ -22,9 +22,9 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-stone-900 bg-dot-grid relative">
-      <aside className="w-full md:w-64 bg-stone-900 border-r border-stone-700 flex flex-col md:sticky md:top-0 md:h-screen z-40 relative">
-        <div className="h-20 px-6 flex items-center border-b border-stone-700">
+    <div className="min-h-screen flex flex-col md:flex-row bg-background bg-dot-grid relative">
+      <aside className="w-full md:w-64 bg-background border-r border-border flex flex-col md:sticky md:top-0 md:h-screen z-40 relative">
+        <div className="h-20 px-6 flex items-center border-b border-border">
           <Link to="/admin" className="flex items-center gap-3 text-primary font-bold text-xl tracking-tight hover:text-primary/80 transition-colors">
             <Building2 className="w-6 h-6" />
             <span>Dormwatch</span>
@@ -40,8 +40,8 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all border-l-4 ${
                   isActive
-                    ? "border-blue-500 bg-stone-800 text-stone-50"
-                    : "border-transparent text-stone-400 hover:bg-stone-800/50 hover:text-stone-300"
+                    ? "border-blue-500 bg-card text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 }`}
               >
                 {item.icon}
@@ -51,21 +51,21 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
           })}
         </nav>
 
-        <div className="p-4 border-t border-stone-700 space-y-4">
-          <button onClick={() => setIsSettingsOpen(true)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-stone-400 hover:text-stone-300 hover:bg-stone-800/50 transition-colors border-l-4 border-transparent text-left">
+        <div className="p-4 border-t border-border space-y-4">
+          <button onClick={() => setIsSettingsOpen(true)} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors border-l-4 border-transparent text-left">
             <Settings className="w-5 h-5" />
             Налаштування
           </button>
 
-          <button onClick={() => setIsSettingsOpen(true)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-stone-800/50 transition-colors text-left">
-            <div className="w-10 h-10 bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-300 font-bold text-sm shrink-0">
+          <button onClick={() => setIsSettingsOpen(true)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors text-left">
+            <div className="w-10 h-10 bg-card border border-border flex items-center justify-center text-muted-foreground font-bold text-sm shrink-0">
               {initials}
             </div>
             <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-bold text-stone-50 truncate">
+              <span className="text-sm font-bold text-foreground truncate">
                 {user ? `${user.first_name} ${user.last_name}` : "Адмін"}
               </span>
-              <span className="text-xs text-stone-500 font-semibold truncate">
+              <span className="text-xs text-muted-foreground font-semibold truncate">
                 {placeName}
               </span>
             </div>

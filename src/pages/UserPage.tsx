@@ -88,29 +88,29 @@ const UserPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-1 space-y-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-stone-50 tracking-tight">Hello, {firstName}!</h1>
-                  <p className="text-stone-400 mt-1 flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-stone-400" strokeWidth={1.5} />
+                  <h1 className="text-3xl font-bold text-foreground tracking-tight">Hello, {firstName}!</h1>
+                  <p className="text-muted-foreground mt-1 flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
                     {building} &bull; Room {room}
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="bg-stone-800 border border-stone-700 p-4">
-                    <p className="text-2xl font-bold text-stone-50">{problems.length}</p>
-                    <p className="text-xs text-stone-400 font-semibold mt-1">Всього заявок</p>
+                  <div className="bg-card border border-border p-4">
+                    <p className="text-2xl font-bold text-foreground">{problems.length}</p>
+                    <p className="text-xs text-muted-foreground font-semibold mt-1">Всього заявок</p>
                   </div>
-                  <div className="bg-stone-800 border border-stone-700 p-4">
+                  <div className="bg-card border border-border p-4">
                     <p className="text-2xl font-bold text-green-400">
                       {problems.filter((p) => p.status === "resolved").length}
                     </p>
-                    <p className="text-xs text-stone-400 font-semibold mt-1">Вирішено</p>
+                    <p className="text-xs text-muted-foreground font-semibold mt-1">Вирішено</p>
                   </div>
-                  <div className="bg-stone-800 border border-stone-700 p-4">
+                  <div className="bg-card border border-border p-4">
                     <p className="text-2xl font-bold text-yellow-400">
                       {problems.filter((p) => p.status !== "resolved").length}
                     </p>
-                    <p className="text-xs text-stone-400 font-semibold mt-1">Активні</p>
+                    <p className="text-xs text-muted-foreground font-semibold mt-1">Активні</p>
                   </div>
                 </div>
 
@@ -124,7 +124,7 @@ const UserPage = () => {
 
               <div className="md:col-span-2 space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-stone-50">Активні заявки</h2>
+                  <h2 className="text-lg font-semibold text-foreground">Активні заявки</h2>
                   <Link to="/dashboard" className="text-sm font-semibold text-primary hover:underline">
                     Історія
                   </Link>
@@ -132,7 +132,7 @@ const UserPage = () => {
                 <div className="space-y-3">
                   {problems.length === 0 ? (
                     <div className="border border-dashed border-border p-8 text-center">
-                      <p className="text-xs text-stone-400 mb-3">Немає активних заявок.</p>
+                      <p className="text-xs text-muted-foreground mb-3">Немає активних заявок.</p>
                       <Link
                         to="/create-report"
                         className="inline-flex items-center px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors"
@@ -165,22 +165,22 @@ const UserPage = () => {
             <div className="space-y-4">
               {problems.length === 0 && (
                 <div className="border border-dashed border-border p-8 text-center">
-                  <p className="text-sm font-bold text-stone-50 mb-1">Ще немає звернень</p>
+                  <p className="text-sm font-bold text-foreground mb-1">Ще немає звернень</p>
                 </div>
               )}
 
               {problems.map((p) => (
-                <Card key={p.id} className="border-stone-700 shadow-none bg-stone-800">
+                <Card key={p.id} className="border-border shadow-none bg-card">
                   <div className="flex">
                     <div className="flex-shrink-0 p-5 flex flex-col items-center gap-0.5 min-w-16">
-                      <span className="text-base font-bold text-stone-50 leading-none">
+                      <span className="text-base font-bold text-foreground leading-none">
                         {p.votesCount || 0}
                       </span>
-                      <span className="text-xs font-semibold text-stone-400">
+                      <span className="text-xs font-semibold text-muted-foreground">
                         голосів
                       </span>
                     </div>
-                    <div className="w-px bg-stone-700" />
+                    <div className="w-px bg-muted" />
                     <div className="flex-1 p-5">
                       <div className="flex justify-between items-start mb-3 gap-2">
                         <div className="flex flex-wrap gap-2">
@@ -193,15 +193,15 @@ const UserPage = () => {
                         </span>
                       </div>
 
-                      <h3 className="text-base font-bold text-stone-50 mb-2">
+                      <h3 className="text-base font-bold text-foreground mb-2">
                         {p.title || "Complaint"}
                       </h3>
-                      <p className="text-xs text-stone-400 leading-relaxed mb-4">
+                      <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                         {p.description || "\u2014"}
                       </p>
 
                       {p.photoUrl && (
-                        <div className="w-full h-48 overflow-hidden border border-stone-700 mb-4">
+                        <div className="w-full h-48 overflow-hidden border border-border mb-4">
                           <img
                             src={resolveImageUrl(p.thumbnail || p.photoUrl)}
                             className="w-full h-full object-cover"
@@ -212,7 +212,7 @@ const UserPage = () => {
 
                       <div className="flex items-center justify-between pt-4">
                         <div className="flex items-center gap-4">
-                          <span className="text-xs font-semibold text-stone-50">
+                          <span className="text-xs font-semibold text-foreground">
                             {typeof p.votesCount === "number"
                               ? `${p.votesCount} голосів`
                               : "0 голосів"}
@@ -223,7 +223,7 @@ const UserPage = () => {
                             onClick={() =>
                               setOpenCommentsId(openCommentsId === p.id ? null : p.id)
                             }
-                            className="text-blue-400 text-xs font-semibold hover:underline inline-flex items-center gap-1 p-0 h-auto"
+                            className="text-primary text-xs font-semibold hover:underline inline-flex items-center gap-1 p-0 h-auto"
                           >
                             <MessageSquare className="w-3 h-3" strokeWidth={2} />
                             Коментарі {openCommentsId === p.id ? <ChevronUp className="w-3 h-3 inline" strokeWidth={2} /> : <ChevronDown className="w-3 h-3 inline" strokeWidth={2} />}
@@ -242,7 +242,7 @@ const UserPage = () => {
                   </div>
 
                   {openCommentsId === p.id && (
-                    <div className="bg-stone-900/30 p-4">
+                    <div className="bg-muted/30 p-4">
                       <CommentSection
                         complaintId={p.id}
                         currentUserId={currentUser?.user}

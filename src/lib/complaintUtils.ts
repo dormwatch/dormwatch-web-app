@@ -4,7 +4,7 @@ export const statusBadgeClass = (status: string) => {
   if (s === "rejected") return "text-red-500 bg-red-500/10 border-red-700/50";
   if (s === "resolved") return "text-green-500 bg-green-500/10 border-green-700/50";
   if (s === "approved") return "text-blue-500 bg-blue-500/10 border-blue-700/50";
-  return "text-stone-400 bg-stone-800 border-stone-700";
+  return "text-muted-foreground bg-card border-border";
 };
 
 export const STATUS_LABELS: Record<string, string> = {
