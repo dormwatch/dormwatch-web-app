@@ -62,7 +62,7 @@ const ComplaintSidePanel = ({
           <SheetDescription>Інформація про заявку та керування статусом</SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-5 px-4 py-6">
+        <div className="space-y-4 px-4 py-4">
           <div>
             <div className="flex items-center justify-between mb-2">
               <Badge variant="outline" className={statusBadgeClass(complaint.status)}>
@@ -93,8 +93,6 @@ const ComplaintSidePanel = ({
               </span>
             )}
           </div>
-
-          <Separator />
 
           <p className="text-xs text-muted-foreground leading-relaxed">{complaint.description || "—"}</p>
 
@@ -146,20 +144,19 @@ const ComplaintSidePanel = ({
                   <Trash2 className="w-3 h-3 mr-1" strokeWidth={2} />
                   Видалити
                 </Button>
+                {!showTicketForm && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowTicketForm(true)}
+                  >
+                    <Ticket className="w-3 h-3 mr-1" strokeWidth={2} />
+                    Створити тікет
+                  </Button>
+                )}
               </div>
 
-              <Separator />
-
-              {!showTicketForm ? (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowTicketForm(true)}
-                >
-                  <Ticket className="w-3 h-3 mr-1" strokeWidth={2} />
-                  Створити тікет
-                </Button>
-              ) : (
+              {showTicketForm && (
                 <TicketCreateForm
                   onClose={() => setShowTicketForm(false)}
                   onSaved={() => {
@@ -171,7 +168,7 @@ const ComplaintSidePanel = ({
             </div>
           )}
 
-          <Separator />
+          <Separator dashed />
 
           <CommentSection complaintId={complaint.id} currentUserId={currentUserId} isAdmin={isAdmin} />
         </div>

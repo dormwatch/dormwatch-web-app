@@ -49,7 +49,7 @@ const CommentSection = ({ complaintId, currentUserId, isAdmin }: CommentSectionP
   };
 
   return (
-    <div className="bg-muted/30">
+    <div>
       <div className="flex items-center gap-2 mb-3">
         <Button variant="link" size="xs" onClick={loadComments} className="p-0 h-auto text-xs font-semibold text-primary hover:underline">
           {comments.length > 0 ? `Коментарі (${comments.length})` : "Завантажити коментарі"}

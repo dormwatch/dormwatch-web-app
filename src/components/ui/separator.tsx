@@ -20,7 +20,7 @@ function Separator({
       className={cn(
         "shrink-0 data-horizontal:w-full data-vertical:self-stretch",
         dashed
-          ? "border-0 bg-transparent data-horizontal:h-0 data-horizontal:border-t data-vertical:w-0 data-vertical:border-l"
+          ? "border-0 bg-transparent data-horizontal:h-0 data-horizontal:border-t data-vertical:w-0 data-vertical:border-l border-border"
           : "bg-border data-horizontal:h-px data-vertical:w-px",
         className,
         dashed && "border-dashed"
