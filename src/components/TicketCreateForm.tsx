@@ -19,13 +19,14 @@ interface TicketCreateFormProps {
   onClose: () => void;
   onSaved: () => void;
   editTicket?: Ticket | null;
+  fixedComplaintId?: number;
 }
 
-const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProps) => {
+const TicketCreateForm = ({ onClose, onSaved, editTicket, fixedComplaintId }: TicketCreateFormProps) => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedComplaint, setSelectedComplaint] = useState(
-    editTicket?.complaint ? String(editTicket.complaint) : ""
+    fixedComplaintId ? String(fixedComplaintId) : (editTicket?.complaint ? String(editTicket.complaint) : "")
   );
   const [selectedEmployee, setSelectedEmployee] = useState(
     editTicket?.user?.user ? String(editTicket.user.user) : ""
@@ -72,7 +73,7 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
         <label className="text-xs font-semibold text-muted-foreground mb-2 block">
           Скарга
         </label>
-        <Select value={selectedComplaint} onValueChange={setSelectedComplaint}>
+        <Select value={selectedComplaint} onValueChange={setSelectedComplaint} disabled={!!fixedComplaintId || !!editTicket}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Виберіть скаргу..." />
           </SelectTrigger>

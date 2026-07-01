@@ -233,6 +233,7 @@ const ComplaintSidePanel = ({
 
               {showTicketForm && (
                 <TicketCreateForm
+                  fixedComplaintId={complaint.id as number}
                   onClose={() => setShowTicketForm(false)}
                   onSaved={() => {
                     setShowTicketForm(false);

@@ -41,7 +41,6 @@ import {
   SearchIcon,
   Delete01Icon,
   EditIcon,
-  Message01Icon,
   Cancel01Icon,
   InboxIcon,
   CheckmarkCircleIcon,
@@ -641,6 +640,7 @@ const AdminComplaintsPage = () => {
               </Button>
             </div>
             <TicketCreateForm
+              fixedComplaintId={selectedForTicket.id as number}
               onClose={() => setIsTicketModalOpen(false)}
               onSaved={() => {
                 setIsTicketModalOpen(false);
