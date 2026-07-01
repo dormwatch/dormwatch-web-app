@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+
 import {
   Select,
   SelectContent,
@@ -12,6 +12,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, AddIcon, SaveIcon } from "@hugeicons/core-free-icons";
 import { fetchApprovedComplaints, fetchEmployees, createTicket, updateTicket } from "../services/problemsApi";
 import type { Complaint, Employee, Ticket } from "../lib/types";
+import { DatePicker } from "./ui/date-picker";
+import { format } from "date-fns";
 
 interface TicketCreateFormProps {
   onClose: () => void;
@@ -28,8 +30,8 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
   const [selectedEmployee, setSelectedEmployee] = useState(
     editTicket?.user?.user ? String(editTicket.user.user) : ""
   );
-  const [deadline, setDeadline] = useState(
-    editTicket?.deadline ? editTicket.deadline.split("T")[0] : ""
+  const [deadlineDate, setDeadlineDate] = useState<Date | undefined>(
+    editTicket?.deadline ? new Date(editTicket.deadline) : undefined
   );
   const [saving, setSaving] = useState(false);
 
@@ -42,17 +44,18 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
     if (!selectedComplaint) return;
     setSaving(true);
     try {
+      const deadlineStr = deadlineDate ? format(deadlineDate, "yyyy-MM-dd") : null;
       if (editTicket) {
         await updateTicket(
           editTicket.ticket_id,
           selectedEmployee || null,
-          deadline || null
+          deadlineStr
         );
       } else {
         await createTicket(
           Number(selectedComplaint),
           selectedEmployee || null,
-          deadline || null
+          deadlineStr
         );
       }
       onSaved();
@@ -67,16 +70,16 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
     <div className="space-y-5">
       <div>
         <label className="text-xs font-semibold text-muted-foreground mb-2 block">
-          Заявка
+          Скарга
         </label>
         <Select value={selectedComplaint} onValueChange={setSelectedComplaint}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Виберіть заявку..." />
+            <SelectValue placeholder="Виберіть скаргу..." />
           </SelectTrigger>
           <SelectContent>
             {complaints.map((c) => (
               <SelectItem key={c.id} value={String(c.id)}>
-                {c.title || `Заявка #${c.id}`}
+                {c.title || `Скарга #${c.id}`}
               </SelectItem>
             ))}
           </SelectContent>
@@ -105,11 +108,10 @@ const TicketCreateForm = ({ onClose, onSaved, editTicket }: TicketCreateFormProp
         <label className="text-xs font-semibold text-muted-foreground mb-2 block">
           Дедлайн
         </label>
-        <Input
-          type="date"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          className="w-full"
+        <DatePicker
+          date={deadlineDate}
+          setDate={setDeadlineDate}
+          placeholder="Оберіть дедлайн"
         />
       </div>
 

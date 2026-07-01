@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { DatePicker } from "../components/ui/date-picker";
+import { format } from "date-fns";
 import {
   fetchAllComplaints,
   fetchApprovedComplaints,
@@ -93,6 +95,7 @@ const AdminComplaintsPage = () => {
   const { user: currentUser } = useUser();
   const [selectedStatus, setSelectedStatus] = useState(location.state?.selectedStatus || "pending");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const [ticketStatus, setTicketStatus] = useState("all");
   const [ticketCategory, setTicketCategory] = useState("all");
@@ -121,7 +124,7 @@ const AdminComplaintsPage = () => {
       setComplaints(data);
     } catch (err) {
       console.warn('Failed to load complaints', err);
-      setErr("Не вдалося завантажити заявки.");
+      setErr("Не вдалося завантажити скарги.");
     } finally {
       setLoading(false);
     }
@@ -179,9 +182,10 @@ const AdminComplaintsPage = () => {
           searchQuery === "" ||
           (p.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
           (p.description || "").toLowerCase().includes(searchQuery.toLowerCase());
-        return statusOk && categoryOk && searchOk;
+        const dateOk = !selectedDate || new Date(p.createdAt).toLocaleDateString('en-CA') === format(selectedDate, 'yyyy-MM-dd');
+        return statusOk && categoryOk && searchOk && dateOk;
       }),
-    [complaints, selectedStatus, selectedCategory, searchQuery]
+    [complaints, selectedStatus, selectedCategory, searchQuery, selectedDate]
   );
 
   const filteredTickets = useMemo(
@@ -209,7 +213,7 @@ const AdminComplaintsPage = () => {
           <div className="flex items-center">
             <TabsList variant="line" className="h-auto bg-transparent">
               <TabsTrigger value="requests" className="px-5 py-3 text-xs font-semibold">
-                Заявки
+                Скарги
               </TabsTrigger>
               <TabsTrigger value="tickets" className="px-5 py-3 text-xs font-semibold">
                 Тікети
@@ -226,7 +230,7 @@ const AdminComplaintsPage = () => {
                     <div className="relative mb-4">
                       <HugeiconsIcon icon={SearchIcon} className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" strokeWidth={2} />
                       <Input
-                        placeholder="Пошук заявок..."
+                        placeholder="Пошук скарг..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-8"
@@ -252,6 +256,19 @@ const AdminComplaintsPage = () => {
                       value={selectedCategory}
                       onChange={setSelectedCategory}
                     />
+
+                    <Separator className="my-4" />
+
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-3">
+                      Дата подання
+                    </h4>
+                    <div className="space-y-2">
+                      <DatePicker
+                        date={selectedDate}
+                        setDate={setSelectedDate}
+                        placeholder="Оберіть дату"
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -273,8 +290,8 @@ const AdminComplaintsPage = () => {
                     <div className="w-12 h-12 mb-4 border border-border bg-card flex items-center justify-center text-muted-foreground">
                       <HugeiconsIcon icon={InboxIcon} className="size-5" strokeWidth={1.5} />
                     </div>
-                    <p className="text-sm font-bold text-foreground mb-1">Заявок не знайдено</p>
-                    <p className="text-xs text-muted-foreground">Жодна заявка не відповідає поточним фільтрам.</p>
+                    <p className="text-sm font-bold text-foreground mb-1">Скарг не знайдено</p>
+                    <p className="text-xs text-muted-foreground">Жодна скарга не відповідає поточним фільтрам.</p>
                   </div>
                 )}
 

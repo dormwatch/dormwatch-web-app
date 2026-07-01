@@ -59,8 +59,8 @@ const ComplaintSidePanel = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Деталі заявки</SheetTitle>
-          <SheetDescription>Інформація про заявку та керування статусом</SheetDescription>
+          <SheetTitle>Деталі скарги</SheetTitle>
+          <SheetDescription>Інформація про скаргу та керування статусом</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-4 px-4 py-4">
