@@ -28,6 +28,10 @@ declare module '*/services/problemsApi' {
   export const voteComplaint: any;
   export const fetchMyProblems: any;
   export const logoutUser: any;
+  export const fetchNotifications: any;
+  export const markNotificationAsRead: any;
+  export const markAllNotificationsAsRead: any;
+  export const downloadTicketsPDF: any;
 }
 
 declare module '*/services/imageUtils' {

@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Building2, Bell, ChevronDown } from "lucide-react";
+import { Building2, ChevronDown } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { fetchUserProfile } from "../services/problemsApi";
 import ProfileModal from "./ProfileModal";
+import NotificationBell from "./NotificationBell";
 
 const StudentLayout = ({ children }: { children: ReactNode }) => {
   const [initials, setInitials] = useState("JD");
@@ -37,25 +38,24 @@ const StudentLayout = ({ children }: { children: ReactNode }) => {
           </Link>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-4">
-            {userProfile?.role && ["admin", "адміністратор"].includes((userProfile.role.role_name || "").toLowerCase()) && (
-              <Link to="/admin" className="text-[10px] font-bold text-stone-400 hover:text-blue-400 uppercase tracking-widest transition-colors hidden sm:block mr-2">
-                Панель Адміністратора
-              </Link>
-            )}
+          {userProfile && (
+            <div className="flex items-center gap-4">
+              {userProfile.role && ["admin", "адміністратор"].includes((userProfile.role.role_name || "").toLowerCase()) && (
+                <Link to="/admin" className="text-[10px] font-bold text-stone-400 hover:text-blue-400 uppercase tracking-widest transition-colors hidden sm:block mr-2">
+                  Панель Адміністратора
+                </Link>
+              )}
 
-            <button className="p-2 text-stone-400 hover:text-stone-50 transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-none border border-stone-900"></span>
-            </button>
-            
-            <button onClick={() => setIsProfileModalOpen(true)} className="flex items-center gap-2 pl-4 border-l border-stone-700 cursor-pointer hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 rounded-none bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-300 font-bold text-xs">
-                {initials}
-              </div>
-              <ChevronDown className="w-4 h-4 text-stone-500" />
-            </button>
-          </div>
+              <NotificationBell />
+              
+              <button onClick={() => setIsProfileModalOpen(true)} className="flex items-center gap-2 pl-4 border-l border-stone-700 cursor-pointer hover:opacity-80 transition-opacity">
+                <div className="w-8 h-8 rounded-none bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-300 font-bold text-xs">
+                  {initials}
+                </div>
+                <ChevronDown className="w-4 h-4 text-stone-500" />
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 

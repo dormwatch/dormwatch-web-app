@@ -282,7 +282,9 @@ export async function fetchUserProfile() {
 
 export async function createProblem(problem) {
   const formData = new FormData();
-  if (problem.place_name) {
+  if (problem.place_id) {
+    formData.append("place_id", problem.place_id);
+  } else if (problem.place_name) {
     formData.append("place_name", problem.place_name);
   }
   formData.append("category", problem.category);
@@ -299,6 +301,54 @@ export async function createProblem(problem) {
     body: formData,
   });
   return normalizeComplaint(raw);
+}
+
+export async function fetchNotifications() {
+  try {
+    return await fetchJson("/notifications/");
+  } catch (e) {
+    console.warn("Failed to fetch notifications", e);
+    return [];
+  }
+}
+
+export async function markNotificationAsRead(id) {
+  try {
+    return await fetchJson(`/notifications/${id}/read/`, { method: "PATCH" });
+  } catch (e) {
+    console.warn("Failed to mark notification as read", e);
+  }
+}
+
+export async function markAllNotificationsAsRead() {
+  try {
+    return await fetchJson("/notifications/read-all/", { method: "PATCH" });
+  } catch (e) {
+    console.warn("Failed to mark all notifications as read", e);
+  }
+}
+
+export async function downloadTicketsPDF(filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.worker && filters.worker !== 'all') params.append('worker', filters.worker);
+  if (filters.date_to) params.append('date_to', filters.date_to);
+  const q = params.toString() ? `?${params.toString()}` : "";
+  
+  const headers = {};
+  if (accessToken) {
+    headers["Authorization"] = `Bearer ${accessToken}`;
+  }
+  
+  const res = await fetch(`${API_BASE}/admin/tickets/pdf/${q}`, {
+    headers,
+    credentials: "include",
+  });
+  
+  if (!res.ok) {
+    throw new Error(`Failed to download PDF: ${res.status}`);
+  }
+  
+  return await res.blob();
 }
 
 export async function fetchMyProblems() {

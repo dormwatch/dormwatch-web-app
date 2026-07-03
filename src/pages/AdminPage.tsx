@@ -14,9 +14,11 @@ import {
   fetchComments,
   postComment,
   deleteComment,
-  fetchEmployees
+  fetchEmployees,
+  downloadTicketsPDF
 } from "../services/problemsApi";
 import { resolveImageUrl } from "../services/imageUtils";
+import NotificationBell from "../components/NotificationBell";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -25,6 +27,27 @@ const AdminPage = () => {
   const initialTab = queryParams.get("tab") || "overview";
   
   const [activeTab, setActiveTab] = useState(initialTab); // overview, complaints, tickets
+
+  const handleExportPDF = async () => {
+    try {
+      const filters: any = {};
+      if (activeTab === "tickets") {
+        if (ticketWorker !== "all") filters.worker = ticketWorker;
+        if (ticketDateTo) filters.date_to = ticketDateTo;
+      }
+      const blob = await downloadTicketsPDF(filters);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `tickets_report_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      alert("Не вдалося завантажити звіт у форматі PDF.");
+    }
+  };
 
   useEffect(() => {
     const tab = new URLSearchParams(location.search).get("tab");
@@ -336,13 +359,17 @@ const AdminPage = () => {
           {activeTab === 'overview' ? 'Загальний Огляд' : activeTab === 'complaints' ? 'Всі Заявки' : 'Управління Задачами'}
         </h1>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 px-4 py-2 border border-stone-700 hover:bg-stone-800 transition-colors text-xs font-bold text-stone-300 uppercase tracking-widest">
+          <NotificationBell />
+          <button 
+            onClick={handleExportPDF}
+            className="flex items-center gap-2 px-4 py-2 border border-stone-700 hover:bg-stone-800 transition-colors text-xs font-bold text-stone-300 uppercase tracking-widest cursor-pointer"
+          >
             <Download className="w-4 h-4" />
             ЕКСПОРТ ДАНИХ
           </button>
           <button 
             onClick={() => navigate("?tab=tickets")}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-800 border border-blue-700 hover:bg-blue-900 transition-colors text-xs font-bold text-white uppercase tracking-widest"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-800 border border-blue-700 hover:bg-blue-900 transition-colors text-xs font-bold text-white uppercase tracking-widest cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             НОВИЙ ТІКЕТ

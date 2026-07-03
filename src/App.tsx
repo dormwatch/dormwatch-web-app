@@ -56,25 +56,21 @@ function App() {
         }
       />
 
-      {/* Admin routes wrapped in AdminLayout */}
+      {/* ТИМЧАСОВО ДЛЯ ТЕСТУ ДИЗАЙНУ АДМІНКИ */}
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
-            <StudentLayout>
-              <DashboardPage />
-            </StudentLayout>
-          </ProtectedRoute>
+          <AdminLayout>
+            <DashboardPage />
+          </AdminLayout>
         }
       />
       <Route
         path="/admin"
         element={
-          <ProtectedRoute requireAdmin>
-            <AdminLayout>
-              <AdminPage />
-            </AdminLayout>
-          </ProtectedRoute>
+          <AdminLayout>
+            <AdminPage />
+          </AdminLayout>
         }
       />
 

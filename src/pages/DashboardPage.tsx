@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { fetchApprovedComplaints, CATEGORY_LABELS } from "../services/problemsApi";
 import { resolveImageUrl } from "../services/imageUtils";
 import { List, Droplet, Zap, Armchair, Wifi } from "lucide-react";
+import NotificationBell from "../components/NotificationBell";
 
 const DashboardPage = () => {
   const [activeПроблемаs, setActiveПроблемаs] = useState<any[]>([]);
@@ -106,6 +107,7 @@ const DashboardPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <NotificationBell />
           <Link
             to="/user"
             className="text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors"

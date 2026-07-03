@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createProblem, fetchUserProfile } from "../services/problemsApi";
+import { createProblem, fetchUserProfile, fetchPlaces } from "../services/problemsApi";
 
 const CreateReportPage = () => {
   const navigate = useNavigate();
@@ -19,6 +19,8 @@ const CreateReportPage = () => {
   const [error, setError] = useState("");
   const [loadingAuth, setLoadingAuth] = useState(true);
 
+  const [buildingPlaces, setBuildingPlaces] = useState<any[]>([]);
+
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -29,8 +31,21 @@ const CreateReportPage = () => {
             navigate("/admin");
             return;
           }
-          if (user.place && user.place.place_name) {
-            setFormData(prev => ({ ...prev, placeName: user.place.place_name }));
+          if (user.place) {
+            if (user.place.place_name) {
+              setFormData(prev => ({ ...prev, placeName: user.place.place_name }));
+            }
+            if (user.place.building && user.place.building.building_id) {
+              const bId = user.place.building.building_id;
+              try {
+                const fetched = await fetchPlaces(bId);
+                if (Array.isArray(fetched)) {
+                  setBuildingPlaces(fetched);
+                }
+              } catch (err) {
+                console.warn("Помилка завантаження кімнат", err);
+              }
+            }
           }
         }
       } catch (e) {
@@ -82,19 +97,24 @@ const CreateReportPage = () => {
       setError("Опиши проблему.");
       return;
     }
+    if (!formData.placeName.trim()) {
+      setError("Вкажіть місце проблеми.");
+      return;
+    }
 
     setSubmitting(true);
 
-    try {
-      await createProblem({
-        category: selectedКатегорія,
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        priority: formData.priority,
-        place_name: formData.placeName?.trim() || undefined,
-        photoFile: photoFile || undefined, 
-      });
+    const payload: any = {
+      category: selectedКатегорія,
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      priority: formData.priority,
+      place_name: formData.placeName.trim(),
+      photoFile: photoFile || undefined,
+    };
 
+    try {
+      await createProblem(payload);
       navigate("/user"); 
     } catch (err: any) {
       console.error(err);
@@ -213,12 +233,21 @@ const CreateReportPage = () => {
                 <input
                   type="text"
                   name="placeName"
+                  list="places-list"
                   value={formData.placeName || ""}
                   onChange={handleInputChange}
-                  placeholder="Напр. кімната 404..."
+                  placeholder="Напр. кімната 404, спортзал..."
                   maxLength={100}
                   className="w-full p-4 bg-stone-900 border border-stone-700 text-stone-50 text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder:text-stone-600"
+                  required
                 />
+                {buildingPlaces.length > 0 && (
+                  <datalist id="places-list">
+                    {buildingPlaces.map((p: any) => (
+                      <option key={p.place_id} value={p.place_name} />
+                    ))}
+                  </datalist>
+                )}
               </div>
 
               <div>
